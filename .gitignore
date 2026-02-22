@@ -1,0 +1,5 @@
+ansible/vars.yml
+claude/.claude/*
+!claude/.claude/settings.json
+!claude/.claude/hooks/
+!claude/.claude/hooks/*

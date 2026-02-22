@@ -1,0 +1,28 @@
+---
+- name: Developer setup for WSL2
+  hosts: localhost
+  connection: local
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Create ~/repos directory
+      file:
+        path: "{{ ansible_env.HOME }}/repos"
+        state: directory
+        mode: "0755"
+
+    - name: Disable login message
+      file:
+        path: "{{ ansible_env.HOME }}/.hushlogin"
+        state: touch
+        modification_time: preserve
+        access_time: preserve
+
+    - import_tasks: tasks/apt-packages.yml
+    - import_tasks: tasks/shell-config.yml
+    - import_tasks: tasks/git.yml
+    - import_tasks: tasks/node.yml
+    - import_tasks: tasks/zoxide.yml
+    - import_tasks: tasks/bun.yml
+    - import_tasks: tasks/claude-code.yml
+    - import_tasks: tasks/emacs.yml

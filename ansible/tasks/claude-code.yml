@@ -1,0 +1,32 @@
+---
+- name: Check if Claude Code is installed
+  command: which claude
+  register: claude_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Claude Code
+  shell: curl -fsSL https://claude.ai/install.sh | bash
+  when: claude_check.rc != 0
+
+- name: Deploy Claude dotfiles with stow
+  command: >
+    stow
+    --dir="{{ playbook_dir }}/.."
+    --target="{{ ansible_env.HOME }}"
+    claude
+  changed_when: false
+
+- name: Deploy ccstatusline dotfiles with stow
+  command: >
+    stow
+    --dir="{{ playbook_dir }}/.."
+    --target="{{ ansible_env.HOME }}"
+    ccstatusline
+  changed_when: false
+
+- name: Add ccstatusline alias
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: 'alias ccstatusline="bunx ccstatusline@latest"'
+    state: present

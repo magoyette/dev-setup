@@ -1,0 +1,61 @@
+---
+- name: Configure git user name
+  community.general.git_config:
+    name: user.name
+    scope: global
+    value: "{{ git_user_name }}"
+
+- name: Configure git user email
+  community.general.git_config:
+    name: user.email
+    scope: global
+    value: "{{ git_user_email }}"
+
+- name: Configure git default branch
+  community.general.git_config:
+    name: init.defaultBranch
+    scope: global
+    value: main
+
+- name: Configure git push autoSetupRemote
+  community.general.git_config:
+    name: push.autoSetupRemote
+    scope: global
+    value: "true"
+
+- name: Check if Git for Windows credential manager exists
+  ansible.builtin.stat:
+    path: "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"
+  register: gcm_stat
+
+- name: Ensure ~/.local/bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+  when: gcm_stat.stat.exists
+
+- name: Create symlink for git-credential-manager (avoids spaces in path)
+  ansible.builtin.file:
+    src: "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"
+    dest: "{{ ansible_env.HOME }}/.local/bin/git-credential-manager"
+    state: link
+  when: gcm_stat.stat.exists
+
+- name: Configure git credential helper
+  community.general.git_config:
+    name: credential.helper
+    scope: global
+    value: "{{ ansible_env.HOME }}/.local/bin/git-credential-manager"
+  when: gcm_stat.stat.exists
+
+- name: Warn if Git for Windows credential manager not found
+  ansible.builtin.debug:
+    msg: "Git for Windows credential manager not found at /mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe - skipping credential helper setup"
+  when: not gcm_stat.stat.exists
+
+# Removes and re-adds all aliases, so always reports changed.
+# The end result is always identical, making it effectively idempotent.
+- name: Configure git aliases
+  shell: "{{ playbook_dir }}/../scripts/git-config.sh"
+  changed_when: true

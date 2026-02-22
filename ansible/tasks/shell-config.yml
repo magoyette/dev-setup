@@ -1,0 +1,30 @@
+---
+- name: Add ~/.local/bin to PATH
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: 'export PATH="$HOME/.local/bin:$PATH"'
+    state: present
+
+- name: Set COLORTERM to truecolor
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "export COLORTERM=truecolor"
+    state: present
+
+- name: Add bat alias
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: 'alias bat="batcat"'
+    state: present
+
+- name: Set BAT_THEME
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "export BAT_THEME=OneHalfDark"
+    state: present
+
+- name: Add zoxide init to bashrc
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: 'eval "$(zoxide init bash)"'
+    state: present

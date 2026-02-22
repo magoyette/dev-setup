@@ -1,0 +1,44 @@
+---
+- name: Enable deb-src repositories for Emacs dependencies
+  become: true
+  replace:
+    path: /etc/apt/sources.list.d/ubuntu.sources
+    regexp: '^Types: deb$'
+    replace: 'Types: deb deb-src'
+  register: deb_src_enabled
+
+- name: Update apt cache after enabling deb-src
+  become: true
+  apt:
+    update_cache: true
+  when: deb_src_enabled.changed
+
+- name: Install Emacs build dependencies
+  become: true
+  apt:
+    name: emacs
+    state: build-dep
+
+- name: Install libmagick development packages
+  become: true
+  apt:
+    name:
+      - libmagickwand-dev
+      - libmagickcore-dev
+    state: present
+
+- name: Install tree-sitter library
+  become: true
+  apt:
+    name: libtree-sitter0
+    state: present
+
+- name: Check installed Emacs version
+  command: emacs --version
+  register: emacs_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Install Emacs {{ emacs_version }} from source
+  shell: "{{ playbook_dir }}/../scripts/install-emacs-in-ubuntu.sh {{ emacs_version }}"
+  when: emacs_version_output.rc != 0 or emacs_version not in emacs_version_output.stdout
