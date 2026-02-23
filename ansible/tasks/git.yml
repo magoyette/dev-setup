@@ -23,6 +23,60 @@
     scope: global
     value: "true"
 
+- name: Set git conflictStyle
+  community.general.git_config:
+    name: merge.conflictStyle
+    scope: global
+    value: "zdiff3"
+
+- name: Set git diff colorMoved
+  community.general.git_config:
+    name: diff.colorMoved
+    scope: global
+    value: "default"
+
+- name: Configure delta as git pager
+  community.general.git_config:
+    name: core.pager
+    scope: global
+    value: "delta"
+
+- name: Configure delta as git diffFilter
+  community.general.git_config:
+    name: interactive.diffFilter
+    scope: global
+    value: "delta --color-only"
+
+- name: Set delta navigate
+  community.general.git_config:
+    name: delta.navigate
+    scope: global
+    value: "true"
+
+- name: Set delta color theme
+  community.general.git_config:
+    name: delta.dark
+    scope: global
+    value: "true"
+
+- name: Set delta line numbers
+  community.general.git_config:
+    name: delta.line-numbers
+    scope: global
+    value: "true"
+
+- name: Set delta hyperlinks
+  community.general.git_config:
+    name: delta.hyperlinks
+    scope: global
+    value: "true"
+
+- name: Set delta hyperlinks format
+  community.general.git_config:
+    name: delta.hyperlinks-file-link-format
+    scope: global
+    value: "vscode://file/{path}:{line}"
+
 - name: Check if Git for Windows credential manager exists
   ansible.builtin.stat:
     path: "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"
