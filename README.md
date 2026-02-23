@@ -50,6 +50,18 @@ This installs Ansible via apt, then runs the Ansible playbook. The playbook is i
 git alias
 ```
 
+## Releasing a new version
+
+Update `CHANGELOG.md` first: move entries from `[Unreleased]` to a new versioned section with today's date and update the comparison links at the bottom, then commit.
+
+Run the release script from the repo root:
+
+```sh
+./scripts/release.sh
+```
+
+It will prompt for the version in `X.Y.Z` format (e.g. `1.2.0`), create an annotated git tag, push the commits, and push the tag.
+
 ## Installed tools
 
 ### Configuration management

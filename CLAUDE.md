@@ -193,6 +193,35 @@ The `llm-docs/` directory contains detailed documentation about fixes applied to
 - Understanding why certain architectural decisions were made
 - Verifying that fixes were properly applied
 
+## Versioning and Changelog
+
+This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with Git tags, and maintains a `CHANGELOG.md` following the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format.
+
+**Version bump guidelines:**
+
+| Change type | Version bump | Examples |
+|---|---|---|
+| Breaking change to provisioning | **MAJOR** | Removing a tool, renaming a variable in vars.yml that requires manual migration |
+| New tool or significant new behaviour | **MINOR** | Adding a new Ansible task, new stow package, new hook |
+| Fix or small tweak | **PATCH** | Bugfix in an existing task, config value adjustment |
+
+**When releasing a new version:**
+
+1. Move entries from `[Unreleased]` to a new versioned section with today's date
+2. Update the comparison links at the bottom of `CHANGELOG.md`
+3. Commit the changelog update
+4. Run `./scripts/release.sh` — it prompts for the version (`X.Y.Z`), creates an annotated tag, pushes commits, and pushes the tag
+
+The user may ask Claude to run `./scripts/release.sh` directly. Before doing so, ensure steps 1–3 are complete (changelog updated and committed).
+
+**Changelog section types** (only include sections that apply):
+- `Added` — new features
+- `Changed` — changes to existing functionality
+- `Deprecated` — features to be removed in a future version
+- `Removed` — features removed in this version
+- `Fixed` — bug fixes
+- `Security` — vulnerability fixes
+
 ## Development Workflow
 
 When modifying Claude Code settings:
