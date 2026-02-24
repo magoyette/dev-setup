@@ -21,6 +21,7 @@
     - import_tasks: tasks/apt-packages.yml
     - import_tasks: tasks/shell-config.yml
     - import_tasks: tasks/git.yml
+    - import_tasks: tasks/difftastic.yml
     - import_tasks: tasks/node.yml
     - import_tasks: tasks/zoxide.yml
     - import_tasks: tasks/bun.yml

@@ -1,0 +1,14 @@
+---
+- name: Ensure ~/.local/bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Download and install difftastic
+  ansible.builtin.shell: |
+    curl -sSfL "https://github.com/Wilfred/difftastic/releases/download/{{ difftastic_version }}/difft-x86_64-unknown-linux-gnu.tar.gz" -o /tmp/difft.tar.gz
+    tar -xzf /tmp/difft.tar.gz -C "{{ ansible_env.HOME }}/.local/bin/"
+    rm /tmp/difft.tar.gz
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/bin/difft"

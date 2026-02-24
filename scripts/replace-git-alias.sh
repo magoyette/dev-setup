@@ -32,13 +32,18 @@ git config --global alias.co 'commit'
 git config --global alias.coa 'commit --amend'
 
 git config --global alias.d 'diff'
+git config --global alias.dtd '-c diff.external=difft diff'
 git config --global alias.dl 'diff --cached HEAD^'
+git config --global alias.dtdl '-c diff.external=difft diff --cached HEAD^'
 git config --global alias.ds 'diff --staged'
+git config --global alias.dtds '-c diff.external=difft diff --staged'
+
 
 git config --global alias.f 'fetch'
 git config --global alias.fp 'fetch --prune'
 
 git config --global alias.l 'log'
+git config --global alias.dtl '-c diff.external=difft log -p --ext-diff'
 git config --global alias.lo 'log --oneline --decorate'
 git config --global alias.lg 'log --oneline --decorate --graph'
 git config --global alias.ll 'log --decorate --stat'

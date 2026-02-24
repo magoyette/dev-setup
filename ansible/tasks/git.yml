@@ -111,5 +111,5 @@
 # Removes and re-adds all aliases, so always reports changed.
 # The end result is always identical, making it effectively idempotent.
 - name: Configure git aliases
-  shell: "{{ playbook_dir }}/../scripts/git-config.sh"
+  shell: "{{ playbook_dir }}/../scripts/replace-git-alias.sh"
   changed_when: true

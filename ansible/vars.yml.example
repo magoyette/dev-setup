@@ -2,6 +2,7 @@
 git_user_name: "Your Name"
 git_user_email: "you@example.com"
 emacs_version: "30.2"
+difftastic_version: "0.67.0"
 
 # npm global packages required by Emacs LSP mode and formatting tools
 emacs_npm_packages:

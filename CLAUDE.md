@@ -12,12 +12,13 @@ This is a developer setup repository for WSL2 (Windows Subsystem for Linux v2). 
 dev-setup/
 ├── ansible/
 │   ├── playbook.yml              # Main Ansible playbook (localhost, connection: local)
-│   ├── vars.yml                  # User-specific variables (git name, email, emacs version)
+│   ├── vars.yml                  # User-specific variables (git name, email, emacs version, difftastic version)
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential)
 │       ├── shell-config.yml      # ~/.bashrc entries via lineinfile
 │       ├── git.yml               # git global config + aliases
+│       ├── difftastic.yml        # difftastic install (secondary diff tool)
 │       ├── node.yml              # fnm + Node LTS
 │       ├── zoxide.yml            # zoxide install
 │       ├── bun.yml               # bun install
@@ -34,7 +35,7 @@ dev-setup/
 │   ├── emacs-fix.md              # build-essential + dependency integration
 │   └── emacs-dependency-integration.md  # Detailed Emacs dependency migration
 ├── scripts/
-│   ├── git-config.sh             # Git alias definitions
+│   ├── replace-git-alias.sh      # Git alias definitions
 │   └── install-emacs-in-ubuntu.sh  # Emacs build script (download, configure, make, install only)
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
 └── claude-hooks.md               # Documentation for notification system
@@ -70,10 +71,11 @@ cp ansible/vars.yml.example ansible/vars.yml
 | apt packages        | `apt` module (built-in idempotency); includes `build-essential` for compilation tools             |
 | `~/.bashrc` entries | `lineinfile` module (checks before adding)                                                        |
 | git config          | `community.general.git_config` module                                                             |
-| git aliases         | `git-config.sh` always re-runs (always reports changed; end state is identical)                   |
+| git aliases         | `replace-git-alias.sh` always re-runs (always reports changed; end state is identical)             |
 | fnm                 | `creates:` pointing to `~/.local/share/fnm`                                                       |
 | Node LTS via fnm    | Checks `fnm list \| grep -q lts`; installs only if return code != 0                               |
 | zoxide, bun         | `creates:` pointing to the installed binary/directory                                             |
+| difftastic          | `creates:` pointing to `~/.local/bin/difft`                                                       |
 | Claude Code         | `which claude` check before install                                                               |
 | Emacs dependencies  | `replace` module for deb-src (only if needed); `apt` module for build-dep, libmagick, tree-sitter |
 | Emacs build         | `emacs --version` check; only builds if missing or version mismatch                               |
@@ -90,6 +92,23 @@ These entries are managed via `lineinfile` in `ansible/tasks/shell-config.yml`:
 - `eval "$(zoxide init bash)"`
 
 The fnm and bun installers add their own PATH/eval lines to `~/.bashrc` when they first run.
+
+### Difftastic (secondary diff tool)
+
+Difftastic (`difft`) is installed as a **secondary** diff tool alongside delta. Delta remains the default pager for all standard `git diff`, `git log`, and `git show` commands. Difftastic is invoked explicitly via git aliases only.
+
+**Git aliases (defined in `scripts/replace-git-alias.sh`):**
+
+| Alias | Command | Mirrors |
+|-------|---------|---------|
+| `git dtd` | difftastic diff | `git d` |
+| `git dtdl` | difftastic diff --cached HEAD^ | `git dl` |
+| `git dtds` | difftastic diff --staged | `git ds` |
+| `git dtl` | difftastic log with patches | `git l` |
+
+The `dt` prefix stands for difftastic and is prepended to the mirrored alias name (e.g. `dl` → `dtdl`). Each difftastic alias is defined immediately after its counterpart in the script. All aliases use `-c diff.external=difft` so the override applies only for that single command and never affects the delta pager globally.
+
+**Version:** controlled by `difftastic_version` in `ansible/vars.yml`. To upgrade, bump the version and delete `~/.local/bin/difft` before re-running the playbook.
 
 ### Emacs
 
@@ -158,10 +177,10 @@ The repository includes a notification system that bridges WSL2 to Windows nativ
 
 **Notification events:**
 
-| Event | Title | Sound | When |
-|-------|-------|-------|------|
-| `permission_prompt` | Permission Required | IM (urgent) | Claude needs approval to proceed |
-| `idle_prompt` | Input Waiting | IM (urgent) | Claude finished and is waiting for input |
+| Event               | Title               | Sound       | When                                     |
+| ------------------- | ------------------- | ----------- | ---------------------------------------- |
+| `permission_prompt` | Permission Required | IM (urgent) | Claude needs approval to proceed         |
+| `idle_prompt`       | Input Waiting       | IM (urgent) | Claude finished and is waiting for input |
 
 **Dependencies:**
 
@@ -199,11 +218,11 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html) wit
 
 **Version bump guidelines:**
 
-| Change type | Version bump | Examples |
-|---|---|---|
-| Breaking change to provisioning | **MAJOR** | Removing a tool, renaming a variable in vars.yml that requires manual migration |
-| New tool or significant new behaviour | **MINOR** | Adding a new Ansible task, new stow package, new hook |
-| Fix or small tweak | **PATCH** | Bugfix in an existing task, config value adjustment |
+| Change type                           | Version bump | Examples                                                                        |
+| ------------------------------------- | ------------ | ------------------------------------------------------------------------------- |
+| Breaking change to provisioning       | **MAJOR**    | Removing a tool, renaming a variable in vars.yml that requires manual migration |
+| New tool or significant new behaviour | **MINOR**    | Adding a new Ansible task, new stow package, new hook                           |
+| Fix or small tweak                    | **PATCH**    | Bugfix in an existing task, config value adjustment                             |
 
 **When releasing a new version:**
 
@@ -215,6 +234,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html) wit
 The user may ask Claude to run `./scripts/release.sh` directly. Before doing so, ensure steps 1–3 are complete (changelog updated and committed).
 
 **Changelog section types** (only include sections that apply):
+
 - `Added` — new features
 - `Changed` — changes to existing functionality
 - `Deprecated` — features to be removed in a future version
@@ -224,7 +244,18 @@ The user may ask Claude to run `./scripts/release.sh` directly. Before doing so,
 
 ## Development Workflow
 
-When modifying Claude Code settings:
+### Adding a new tool
+
+When adding a new tool to this repository (new Ansible task, new stow package, etc.), always update CLAUDE.md to reflect:
+
+- New task file in the repository structure tree
+- Idempotency mechanism in the idempotency table
+- Any new `vars.yml` variables in both the tree comment and the relevant tool section
+- Design decisions or conventions that would affect future work (e.g. secondary vs. primary tool, alias naming conventions)
+
+**Claude must review and update CLAUDE.md as part of every new tool addition, without waiting to be asked.**
+
+### Modifying Claude Code settings
 
 1. Edit `claude/.claude/settings.json` directly in this repository
 2. Changes are immediately reflected in `~/.claude/settings.json` via symlink

@@ -14,9 +14,8 @@
 ## CLI
 
 - TODO Try bat-extras: https://github.com/eth-p/bat-extras/tree/master
-- TODO Try difftastic https://github.com/Wilfred/difftastic avec git alias pour difftastic: https://difftastic.wilfred.me.uk/git.html
-  - TODO Emacs difftastic https://github.com/pkryger/difftastic.el
+- TODO Emacs difftastic https://github.com/pkryger/difftastic.el
 
 ## Environnement de développement
 
-- TODO Try socket.dev for NPM packags security checks https://socket.dev/features/cli https://socket.dev/features/github
+- TODO Try socket.dev for NPM packages security checks https://socket.dev/features/cli https://socket.dev/features/github
