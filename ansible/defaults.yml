@@ -1,0 +1,19 @@
+---
+emacs_version: "30.2"
+difftastic_version: "0.67.0"
+
+# npm global packages required by Emacs LSP mode and formatting tools
+emacs_npm_packages:
+  - "@astrojs/language-server"
+  - bash-language-server
+  - eslint
+  - js-yaml
+  - prettier
+  - prettier-plugin-astro
+  - prettier-plugin-tailwindcss
+  - stylelint
+  - stylelint-config-standard
+  - typescript
+  - typescript-language-server
+  - vscode-langservers-extracted
+  - yaml-language-server

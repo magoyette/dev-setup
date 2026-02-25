@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 if [ ! -f ansible/vars.yml ]; then
   cp ansible/vars.yml.example ansible/vars.yml
   echo "Created ansible/vars.yml from vars.yml.example"
-  echo "Edit ansible/vars.yml with your values before continuing."
+  echo "Edit ansible/vars.yml with your git_user_name and git_user_email before continuing."
   exit 1
 fi
 

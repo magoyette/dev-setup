@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-02-24
+
+### Changed
+
+- Split `ansible/vars.yml` into `ansible/defaults.yml` (tool versions and npm packages, checked in) and `ansible/vars.yml` (git identity only, gitignored)
+
 ## [1.4.0] - 2026-02-24
 
 ### Added
@@ -52,7 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/magoyette/dev-setup/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/magoyette/dev-setup/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/magoyette/dev-setup/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/magoyette/dev-setup/compare/v1.1.0...v1.2.0

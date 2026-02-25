@@ -12,7 +12,8 @@ This is a developer setup repository for WSL2 (Windows Subsystem for Linux v2). 
 dev-setup/
 ├── ansible/
 │   ├── playbook.yml              # Main Ansible playbook (localhost, connection: local)
-│   ├── vars.yml                  # User-specific variables (git name, email, emacs version, difftastic version)
+│   ├── defaults.yml              # Non-user-configurable defaults (emacs version, difftastic version, npm packages)
+│   ├── vars.yml                  # User-specific variables (git name, email) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential)
@@ -64,14 +65,16 @@ dev-setup/
 
 The playbook is idempotent — safe to re-run.
 
-**Before running**, copy `ansible/vars.yml.example` to `ansible/vars.yml` and fill in your values:
+**Before running**, copy `ansible/vars.yml.example` to `ansible/vars.yml` and set your git identity:
 
 ```bash
 cp ansible/vars.yml.example ansible/vars.yml
-# then edit ansible/vars.yml with your real values
+# then edit ansible/vars.yml with your git_user_name and git_user_email
 ```
 
 `ansible/vars.yml` is gitignored so your personal values are never committed. `install.sh` will auto-create it on first run and prompt you to fill it in.
+
+Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do not need user configuration.
 
 **If your user does not have passwordless sudo**, add `--ask-become-pass` to the `ansible-playbook` call at the bottom of `install.sh`.
 
@@ -125,7 +128,7 @@ Difftastic (`difft`) is installed as a **secondary** diff tool alongside delta. 
 
 The `dt` prefix stands for difftastic and is prepended to the mirrored alias name (e.g. `dl` → `dtdl`). Each difftastic alias is defined immediately after its counterpart in the script. All aliases use `-c diff.external=difft` so the override applies only for that single command and never affects the delta pager globally.
 
-**Version:** controlled by `difftastic_version` in `ansible/vars.yml`. To upgrade, bump the version and delete `~/.local/bin/difft` before re-running the playbook.
+**Version:** controlled by `difftastic_version` in `ansible/defaults.yml`. To upgrade, bump the version and delete `~/.local/bin/difft` before re-running the playbook.
 
 ### Emacs
 
@@ -141,7 +144,7 @@ Built from source in two phases:
 
 **Phase 2: Build (via `scripts/install-emacs-in-ubuntu.sh`)**
 
-- Downloads Emacs source tarball (version controlled by `emacs_version` in `ansible/vars.yml`)
+- Downloads Emacs source tarball (version controlled by `emacs_version` in `ansible/defaults.yml`)
 - Configures with: native compilation (AOT), tree-sitter, imagemagick, modules, threads, lucid toolkit
 - Compiles with `make -j12` (12 parallel jobs)
 - Installs to `/usr/local` via `sudo make install`
@@ -312,7 +315,7 @@ When adding a new tool to this repository (new Ansible task, new stow package, e
 
 - New task file in the repository structure tree
 - Idempotency mechanism in the idempotency table
-- Any new `vars.yml` variables in both the tree comment and the relevant tool section
+- Any new `defaults.yml` variables (tool versions, package lists) in both the tree comment and the relevant tool section
 - Design decisions or conventions that would affect future work (e.g. secondary vs. primary tool, alias naming conventions)
 
 **Claude must review and update CLAUDE.md as part of every new tool addition, without waiting to be asked.**
