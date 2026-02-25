@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+"${repo_root}/scripts/check-agent-docs.sh" >/dev/null
+
+cd "${repo_root}"
+
+if git diff --cached --name-only --diff-filter=ACMR | grep -Eq '^ansible/.*\.ya?ml$'; then
+  echo "Running Ansible syntax check (staged ansible/*.yml changes detected)..."
+  ansible-playbook ansible/playbook.yml --syntax-check >/dev/null
+fi

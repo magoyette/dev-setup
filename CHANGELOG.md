@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-02-25
+
+### Added
+
+- Add `scripts/sync-agent-docs.sh` to generate `AGENTS.md` from `CLAUDE.md`
+- Add `scripts/check-agent-docs.sh` to validate `AGENTS.md` is in sync and show diffs (using `delta` when available)
+- Add `.githooks/pre-commit` to enforce agent-doc sync and run `ansible-playbook ansible/playbook.yml --syntax-check` when staged files include `ansible/*.yml`
+- Add `scripts/install-git-hooks.sh` to configure `core.hooksPath=.githooks`
+
 ## [1.6.0] - 2026-02-24
 
 ### Added
@@ -65,7 +74,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/magoyette/dev-setup/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/magoyette/dev-setup/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/magoyette/dev-setup/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/magoyette/dev-setup/compare/v1.3.0...v1.4.0
