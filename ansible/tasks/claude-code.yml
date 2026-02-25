@@ -9,6 +9,7 @@
   shell: curl -fsSL https://claude.ai/install.sh | bash
   when: claude_check.rc != 0
 
+
 - name: Deploy Claude dotfiles with stow
   command: >
     stow

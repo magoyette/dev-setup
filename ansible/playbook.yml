@@ -27,3 +27,4 @@
     - import_tasks: tasks/bun.yml
     - import_tasks: tasks/claude-code.yml
     - import_tasks: tasks/emacs.yml
+    - import_tasks: tasks/agent-skills.yml

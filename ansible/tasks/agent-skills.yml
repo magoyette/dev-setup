@@ -1,0 +1,60 @@
+---
+- name: Update external skills to latest upstream
+  command:
+    cmd: git submodule update --init --remote --merge
+    chdir: "{{ playbook_dir }}/.."
+  changed_when: false
+
+- name: Find external skills
+  find:
+    paths: "{{ playbook_dir }}/../external-skills"
+    file_type: directory
+    recurse: false
+  register: external_skill_dirs
+
+- name: Find own skills
+  find:
+    paths: "{{ playbook_dir }}/../skills"
+    file_type: directory
+    recurse: false
+  register: own_skill_dirs
+
+- name: Create Claude Code skills directory
+  file:
+    path: "{{ ansible_env.HOME }}/.claude/skills"
+    state: directory
+    mode: '0755'
+
+- name: Link external skills to Claude Code skills directory
+  file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.claude/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ external_skill_dirs.files }}"
+
+- name: Link own skills to Claude Code skills directory
+  file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.claude/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ own_skill_dirs.files }}"
+
+- name: Create Gemini CLI skills directory
+  file:
+    path: "{{ ansible_env.HOME }}/.gemini/skills"
+    state: directory
+    mode: '0755'
+
+- name: Link external skills to Gemini CLI skills directory
+  file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.gemini/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ external_skill_dirs.files }}"
+
+- name: Link own skills to Gemini CLI skills directory
+  file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.gemini/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ own_skill_dirs.files }}"

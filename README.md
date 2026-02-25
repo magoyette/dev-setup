@@ -27,13 +27,7 @@ git clone <repo-url> dev-setup
 cd dev-setup
 ```
 
-Edit `ansible/vars.yml` with your personal values:
-
-```yaml
-git_user_name: "Your Name"
-git_user_email: "you@example.com"
-emacs_version: "30.2"
-```
+Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values.
 
 Run the bootstrap script:
 
@@ -72,6 +66,8 @@ It will prompt for the version in `X.Y.Z` format (e.g. `1.2.0`), create an annot
 ### Utilities
 
 - bat : cat with syntax highlight
+- Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
+- git-delta : diff tool (primary pager for git commands)
 - jq : for JSON manipulation
 - Pandoc : for Markdown support
 - ripgrep : for file search
@@ -90,4 +86,3 @@ It will prompt for the version in `X.Y.Z` format (e.g. `1.2.0`), create an annot
   - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
 - Emacs : text editor
 - Gemini CLI : coding agent
-- git-delta : better git diff
