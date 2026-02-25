@@ -58,3 +58,23 @@
     dest: "{{ ansible_env.HOME }}/.gemini/skills/{{ item.path | basename }}"
     state: link
   loop: "{{ own_skill_dirs.files }}"
+
+- name: Create Codex skills directory
+  file:
+    path: "{{ ansible_env.HOME }}/.agents/skills"
+    state: directory
+    mode: '0755'
+
+- name: Link external skills to Codex skills directory
+  file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.agents/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ external_skill_dirs.files }}"
+
+- name: Link own skills to Codex skills directory
+  file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.agents/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ own_skill_dirs.files }}"

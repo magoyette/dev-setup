@@ -24,8 +24,9 @@ dev-setup/
 │       ├── zoxide.yml            # zoxide install
 │       ├── bun.yml               # bun install
 │       ├── claude-code.yml       # Claude Code install + stow deploy
+│       ├── codex.yml             # Codex CLI install/update via npm (always runs)
 │       ├── emacs.yml             # Emacs dependencies + build from source
-│       ├── agent-skills.yml      # Agent skills: submodule init/update + symlinks for Claude Code and Gemini CLI
+│       ├── agent-skills.yml      # Agent skills: submodule init/update + symlinks for Claude Code, Gemini CLI, and Codex
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 │   └── .gitkeep
 ├── claude/                       # Stow package for Claude Code config
@@ -33,7 +34,7 @@ dev-setup/
 │       ├── settings.json         # Claude Code settings
 │       └── hooks/
 │           └── wsl-notify.sh     # WSL-to-Windows notification hook
-├── external-skills/              # Third-party skills (git submodules, deployed to Claude Code and Gemini CLI)
+├── external-skills/              # Third-party skills (git submodules, deployed to Claude Code, Gemini CLI, and Codex)
 │   └── humanizer/                # git submodule (https://github.com/blader/humanizer)
 ├── llm-docs/                     # LLM-readable documentation for fixes and troubleshooting
 │   ├── node-fix.md               # fnm Node LTS detection fix
@@ -93,10 +94,11 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 | zoxide, bun         | `creates:` pointing to the installed binary/directory                                             |
 | difftastic          | `creates:` pointing to `~/.local/bin/difft`                                                       |
 | Claude Code         | `which claude` check before install                                                               |
+| Codex CLI           | `npm install -g @openai/codex` always runs (no guard); updates on every playbook run (`changed_when: false`) |
 | Emacs dependencies  | `replace` module for deb-src (only if needed); `apt` module for build-dep, libmagick, tree-sitter |
 | Emacs build         | `emacs --version` check; only builds if missing or version mismatch                               |
 | External skills update | `git submodule update --init --remote --merge` always runs (`changed_when: false`)                              |
-| `~/.claude/skills/` and `~/.gemini/skills/` directories | `file` module with `state: directory`                              |
+| `~/.claude/skills/`, `~/.gemini/skills/`, and `~/.agents/skills/` directories | `file` module with `state: directory` |
 | External skill symlinks | `file` module with `state: link` (no-op if symlink already correct)                           |
 | Own skill symlinks  | `file` module with `state: link` (no-op if symlink already correct)                           |
 | Stow                | Idempotent by nature (no-op if symlinks already correct)                                          |
@@ -213,21 +215,27 @@ The repository includes a notification system that bridges WSL2 to Windows nativ
 ONLY_WHEN_UNFOCUSED=false
 ```
 
+## Codex Configuration
+
+Codex CLI (`@openai/codex`) is installed via npm. Unlike other npm tools that check before installing, Codex always runs `npm install -g @openai/codex` on every playbook run. This ensures it is always on the latest version, which is appropriate since Codex upgrades are managed manually rather than by pinning a version.
+
+Skills are deployed to the Codex User scope at `~/.agents/skills/` — this covers all repositories the user works in.
+
 ### Skills Management
 
-Skills are deployed to both Claude Code (`~/.claude/skills/`) and Gemini CLI (`~/.gemini/skills/`) by Ansible. Both tools use the same Agent Skills open standard (SKILL.md format), so the same skill directories work for both.
+Skills are deployed to Claude Code (`~/.claude/skills/`), Gemini CLI (`~/.gemini/skills/`), and Codex (`~/.agents/skills/`) by Ansible. All tools use the same Agent Skills open standard (SKILL.md format), so the same skill directories work for all of them.
 
 This repository supports two kinds of skills:
 
-**Own skills** (in `skills/`): Tool-agnostic, intended to be shared across multiple AI coding assistants. Ansible creates symlinks from `~/.claude/skills/<name>` and `~/.gemini/skills/<name>` to the skill directory.
+**Own skills** (in `skills/`): Tool-agnostic, intended to be shared across multiple AI coding assistants. Ansible creates symlinks from `~/.claude/skills/<name>`, `~/.gemini/skills/<name>`, and `~/.agents/skills/<name>` to the skill directory.
 
-**External skills** (in `external-skills/`): Third-party skill repos added as git submodules. Ansible creates symlinks from `~/.claude/skills/<name>` and `~/.gemini/skills/<name>` to the submodule directory.
+**External skills** (in `external-skills/`): Third-party skill repos added as git submodules. Ansible creates symlinks from `~/.claude/skills/<name>`, `~/.gemini/skills/<name>`, and `~/.agents/skills/<name>` to the submodule directory.
 
 **How skill directories are managed:**
 
-`~/.claude/skills/` and `~/.gemini/skills/` are **real directories** created by Ansible. Both own and external skills are symlinked into each by Ansible.
+`~/.claude/skills/`, `~/.gemini/skills/`, and `~/.agents/skills/` are **real directories** created by Ansible. Both own and external skills are symlinked into each by Ansible.
 
-At runtime in `~/.claude/skills/` and `~/.gemini/skills/`:
+At runtime in each skills directory:
 - Own skills: symlinked by Ansible (`~/.claude/skills/my-skill` → `dev-setup/skills/my-skill`)
 - External skills: symlinked by Ansible (`~/.claude/skills/humanizer` → `dev-setup/external-skills/humanizer`)
 

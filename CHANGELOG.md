@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-02-24
+
+### Added
+
+- Add Codex CLI (`@openai/codex`) installed via npm, always updated on every playbook run
+- Deploy agent skills to Codex User scope (`~/.agents/skills/`)
+
 ## [1.5.0] - 2026-02-24
 
 ### Changed
@@ -58,7 +65,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/magoyette/dev-setup/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/magoyette/dev-setup/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/magoyette/dev-setup/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/magoyette/dev-setup/compare/v1.2.0...v1.3.0

@@ -24,6 +24,7 @@
     - import_tasks: tasks/git.yml
     - import_tasks: tasks/difftastic.yml
     - import_tasks: tasks/node.yml
+    - import_tasks: tasks/codex.yml
     - import_tasks: tasks/zoxide.yml
     - import_tasks: tasks/bun.yml
     - import_tasks: tasks/claude-code.yml
