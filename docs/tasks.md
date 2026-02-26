@@ -18,7 +18,6 @@
 ## CLI
 
 - TODO Add playwright cli, install skill to use it (Codex has one)
-- TODO Try bat-extras: https://github.com/eth-p/bat-extras/tree/master
 - TODO Recursive directory diff tool that can invoke delta or difftastic for each file comparison
 - TODO Emacs difftastic https://github.com/pkryger/difftastic.el
 

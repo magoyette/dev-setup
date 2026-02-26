@@ -121,6 +121,7 @@ These entries are managed via `lineinfile` in `ansible/tasks/shell-config.yml`:
 - `export PATH="$HOME/.local/bin:$PATH"` (for zoxide and other user binaries)
 - `export COLORTERM=truecolor`
 - `alias bat="batcat"`
+- `batrg() { rg --pretty "$@" | bat --plain; }` (shell function for ripgrep output with bat syntax highlighting)
 - `export BAT_THEME=OneHalfDark`
 - `eval "$(zoxide init bash)"`
 

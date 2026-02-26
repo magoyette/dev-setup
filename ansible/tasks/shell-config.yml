@@ -17,6 +17,12 @@
     line: 'alias bat="batcat"'
     state: present
 
+- name: Add batrg function
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "batrg() { rg --pretty \"$@\" | bat --plain; }"
+    state: present
+
 - name: Set BAT_THEME
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
