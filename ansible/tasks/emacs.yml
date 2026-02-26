@@ -42,3 +42,5 @@
 - name: Install Emacs {{ emacs_version }} from source
   shell: "{{ playbook_dir }}/../scripts/install-emacs-in-ubuntu.sh {{ emacs_version }}"
   when: emacs_version_output.rc != 0 or emacs_version not in emacs_version_output.stdout
+
+- import_tasks: emacs-node.yml

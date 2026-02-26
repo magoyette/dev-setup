@@ -18,18 +18,6 @@
   environment:
     PATH: "{{ ansible_env.HOME }}/.local/share/fnm:{{ ansible_env.PATH }}"
 
-# Packages are defined in vars.yml under emacs_npm_packages.
-# npm list -g returns rc != 0 if any package is missing, triggering a full install.
-- name: Check if Emacs LSP npm packages are installed
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using=lts-latest -- npm list -g {{ emacs_npm_packages | join(' ') }}"
-  register: emacs_npm_check
-  failed_when: false
-  changed_when: false
-
-- name: Install Emacs LSP npm packages
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using=lts-latest -- npm install -g {{ emacs_npm_packages | join(' ') }}"
-  when: emacs_npm_check.rc != 0
-
 - name: Check if Gemini CLI is installed
   shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using=lts-latest -- npm list -g @google/gemini-cli"
   register: gemini_check

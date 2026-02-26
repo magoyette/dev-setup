@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-02-25
+
+### Changed
+
+- Emacs installation is now opt-in: set `install_emacs: true` in `ansible/vars.yml` to build Emacs from source (default: `false`)
+
 ## [1.8.0] - 2026-02-25
 
 ### Added
@@ -80,7 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/magoyette/dev-setup/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/magoyette/dev-setup/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/magoyette/dev-setup/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/magoyette/dev-setup/compare/v1.5.0...v1.6.0

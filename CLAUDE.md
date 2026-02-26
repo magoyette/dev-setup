@@ -18,7 +18,7 @@ dev-setup/
 ├── ansible/
 │   ├── playbook.yml              # Main Ansible playbook (localhost, connection: local)
 │   ├── defaults.yml              # Non-user-configurable defaults (emacs version, difftastic version, npm packages)
-│   ├── vars.yml                  # User-specific variables (git name, email) — gitignored, copied from example
+│   ├── vars.yml                  # User-specific variables (git name, email, install_emacs) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential)
@@ -30,7 +30,8 @@ dev-setup/
 │       ├── bun.yml               # bun install
 │       ├── claude-code.yml       # Claude Code install + stow deploy
 │       ├── codex.yml             # Codex CLI install/update via npm (always runs)
-│       ├── emacs.yml             # Emacs dependencies + build from source
+│       ├── emacs.yml             # Emacs dependencies + build from source (conditional on install_emacs)
+│       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml, gated by install_emacs)
 │       ├── agent-skills.yml      # Agent skills: submodule init/update + symlinks for Claude Code, Gemini CLI, and Codex
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 │   └── .gitkeep
@@ -74,14 +75,18 @@ dev-setup/
 
 The playbook is idempotent — safe to re-run.
 
-**Before running**, copy `ansible/vars.yml.example` to `ansible/vars.yml` and set your git identity:
+**Before running**, copy `ansible/vars.yml.example` to `ansible/vars.yml` and set your preferences:
 
 ```bash
 cp ansible/vars.yml.example ansible/vars.yml
-# then edit ansible/vars.yml with your git_user_name and git_user_email
+# then edit ansible/vars.yml with your git_user_name, git_user_email, and install_emacs
 ```
 
 `ansible/vars.yml` is gitignored so your personal values are never committed. `install.sh` will auto-create it on first run and prompt you to fill it in.
+
+User-configurable variables in `vars.yml`:
+- `git_user_name` / `git_user_email` — git identity
+- `install_emacs` — set to `true` to build Emacs from source (default: `false`)
 
 Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do not need user configuration.
 
@@ -103,8 +108,10 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 | difftastic          | `creates:` pointing to `~/.local/bin/difft`                                                       |
 | Claude Code         | `which claude` check before install                                                               |
 | Codex CLI           | `npm install -g @openai/codex` always runs (no guard); updates on every playbook run (`changed_when: false`) |
+| Emacs (entire section) | `when: install_emacs \| default(false)` on `import_tasks` in `playbook.yml`; skipped when `false` |
 | Emacs dependencies  | `replace` module for deb-src (only if needed); `apt` module for build-dep, libmagick, tree-sitter |
 | Emacs build         | `emacs --version` check; only builds if missing or version mismatch                               |
+| Emacs LSP npm packages | `npm list -g` check; install only if missing (in `emacs-node.yml`, imported by `emacs.yml`)    |
 | External skills update | `git submodule update --init --remote --merge` always runs (`changed_when: false`)                              |
 | `~/.claude/skills/`, `~/.gemini/skills/`, and `~/.agents/skills/` directories | `file` module with `state: directory` |
 | External skill symlinks | `file` module with `state: link` (no-op if symlink already correct)                           |
@@ -144,6 +151,8 @@ The `dt` prefix stands for difftastic and is prepended to the mirrored alias nam
 
 ### Emacs
 
+Emacs is **opt-in**. Set `install_emacs: true` in `ansible/vars.yml` to enable it. When `install_emacs` is `false` (the default), all Emacs tasks — including LSP npm packages — are skipped.
+
 Built from source in two phases:
 
 **Phase 1: Dependencies (in `ansible/tasks/emacs.yml`)**
@@ -163,6 +172,12 @@ Built from source in two phases:
 - Build is skipped if `emacs --version` already reports the expected version
 
 This separation ensures dependencies are managed by Ansible (idempotent) while the build script focuses solely on compilation.
+
+**Phase 3: LSP npm packages (in `ansible/tasks/emacs-node.yml`)**
+
+- Imported at the end of `emacs.yml`, so it is also gated by `install_emacs`
+- Checks installed npm globals with `npm list -g`; installs only if any package is missing
+- Package list defined in `emacs_npm_packages` in `ansible/defaults.yml`
 
 ## GNU Stow & Dotfiles
 
