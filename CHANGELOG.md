@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-02-26
+
+### Added
+
+- Add Apache License 2.0
+
 ## [1.11.0] - 2026-02-26
 
 ### Added
@@ -106,7 +112,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.11.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.12.0...HEAD
+[1.12.0]: https://github.com/magoyette/dev-setup/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/magoyette/dev-setup/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/magoyette/dev-setup/compare/v1.9.1...v1.10.0
 [1.9.1]: https://github.com/magoyette/dev-setup/compare/v1.9.0...v1.9.1
