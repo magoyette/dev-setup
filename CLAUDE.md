@@ -17,8 +17,8 @@ dev-setup/
 │   └── pre-commit                # Enforces AGENTS.md sync and Ansible syntax checks before commit
 ├── ansible/
 │   ├── playbook.yml              # Main Ansible playbook (localhost, connection: local)
-│   ├── defaults.yml              # Non-user-configurable defaults (emacs version, difftastic version, npm packages)
-│   ├── vars.yml                  # User-specific variables (git name, email, install_emacs) — gitignored, copied from example
+│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, difftastic version, npm packages)
+│   ├── vars.yml                  # User-specific variables (git name, email, install_emacs, playwright_browsers) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential)
@@ -30,6 +30,7 @@ dev-setup/
 │       ├── bun.yml               # bun install
 │       ├── claude-code.yml       # Claude Code install + stow deploy
 │       ├── codex.yml             # Codex CLI install/update via npm (always runs)
+│       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
 │       ├── emacs.yml             # Emacs dependencies + build from source (conditional on install_emacs)
 │       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml, gated by install_emacs)
 │       ├── agent-skills.yml      # Agent skills: submodule init/update + symlinks for Claude Code, Gemini CLI, and Codex
@@ -52,7 +53,8 @@ dev-setup/
 │   ├── install-emacs-in-ubuntu.sh  # Emacs build script (download, configure, make, install only)
 │   ├── sync-agent-docs.sh        # Generates AGENTS.md from CLAUDE.md (full body)
 │   ├── check-agent-docs.sh       # Validates AGENTS.md is in sync with CLAUDE.md
-│   └── install-git-hooks.sh      # Configures local git hooks path to .githooks
+│   ├── install-git-hooks.sh      # Configures local git hooks path to .githooks
+│   └── download-playwright-skill.sh  # Downloads Playwright skill from GitHub into skills/playwright/
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
 └── claude-hooks.md               # Documentation for notification system
 ```
@@ -87,6 +89,7 @@ cp ansible/vars.yml.example ansible/vars.yml
 User-configurable variables in `vars.yml`:
 - `git_user_name` / `git_user_email` — git identity
 - `install_emacs` — set to `true` to build Emacs from source (default: `false`)
+- `playwright_browsers` — list of browsers to install (default: `["chromium"]`; options: `chromium`, `firefox`, `webkit`)
 
 Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do not need user configuration.
 
@@ -103,11 +106,16 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 | git config          | `community.general.git_config` module                                                             |
 | git aliases         | `replace-git-alias.sh` always re-runs (always reports changed; end state is identical)             |
 | fnm                 | `creates:` pointing to `~/.local/share/fnm`                                                       |
-| Node LTS via fnm    | Checks `fnm list \| grep -q lts`; installs only if return code != 0                               |
+| Node LTS via fnm    | Checks `fnm list \| grep -q {{ fnm_node_version }}`; installs only if return code != 0 (`fnm_node_version` in `defaults.yml`) |
 | zoxide, bun         | `creates:` pointing to the installed binary/directory                                             |
 | difftastic          | `creates:` pointing to `~/.local/bin/difft`                                                       |
 | Claude Code         | `which claude` check before install                                                               |
 | Codex CLI           | `npm install -g @openai/codex` always runs (no guard); updates on every playbook run (`changed_when: false`) |
+| Playwright          | `npm list -g playwright` check; install only if missing                                           |
+| Playwright CLI      | `npm list -g @playwright/cli` check; install only if missing                                      |
+| Playwright system deps | `npx playwright install-deps` always runs (`changed_when: false`); apt-based, inherently idempotent |
+| Playwright browsers | `npx playwright install <browser>` always runs per browser in `playwright_browsers` list (`changed_when: false`) |
+| Playwright skill         | Downloaded from GitHub via `download-playwright-skill.sh` (`creates:` on `SKILL.md`); auto-symlinked by `agent-skills.yml` |
 | Emacs (entire section) | `when: install_emacs \| default(false)` on `import_tasks` in `playbook.yml`; skipped when `false` |
 | Emacs dependencies  | `replace` module for deb-src (only if needed); `apt` module for build-dep, libmagick, tree-sitter |
 | Emacs build         | `emacs --version` check; only builds if missing or version mismatch                               |
@@ -245,6 +253,21 @@ ONLY_WHEN_UNFOCUSED=false
 1. Edit `claude/.claude/settings.json` directly in this repository
 2. Changes are immediately reflected in `~/.claude/settings.json` via symlink
 3. Restart Claude Code session for hooks/settings changes to take effect
+
+## Playwright
+
+Playwright is installed globally via npm, providing browser automation for AI coding assistants to test front-end changes in Astro/Next.js apps from WSL2.
+
+**What gets installed:**
+
+1. **`playwright`** — the npm package (check-then-install via `npm list -g`)
+2. **`@playwright/cli`** — the `playwright-cli` command used by the Playwright skill (check-then-install via `npm list -g`)
+3. **System dependencies** — via `npx playwright install-deps` (runs apt under the hood)
+4. **Browsers** — from the `playwright_browsers` list in `ansible/vars.yml`
+
+**Browser list:** controlled by `playwright_browsers` in `ansible/vars.yml` (user-configurable). Default: `["chromium"]`. Add `"firefox"` and/or `"webkit"` as needed.
+
+**Skill deployment:** The skill is downloaded from the [Playwright repo](https://github.com/microsoft/playwright/tree/main/packages/playwright/src/skill) by `scripts/download-playwright-skill.sh` into `skills/playwright/` (gitignored). The Ansible task runs the script with `creates:` so it only downloads once. The skill is then auto-discovered and symlinked by `agent-skills.yml` into `~/.claude/skills/`, `~/.gemini/skills/`, and `~/.agents/skills/`. To update the skill, delete `skills/playwright/` and re-run the playbook.
 
 ## Codex Configuration
 

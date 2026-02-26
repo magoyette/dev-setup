@@ -5,7 +5,7 @@
     creates: "{{ ansible_env.HOME }}/.local/share/fnm"
 
 - name: Check if Node LTS is installed via fnm
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm list | grep -q lts"
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm list | grep -q {{ fnm_node_version }}"
   register: fnm_node_check
   failed_when: false
   changed_when: false
@@ -13,17 +13,17 @@
     PATH: "{{ ansible_env.HOME }}/.local/share/fnm:{{ ansible_env.PATH }}"
 
 - name: Install Node LTS
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm install --lts"
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm install {{ fnm_node_version }}"
   when: fnm_node_check.rc != 0
   environment:
     PATH: "{{ ansible_env.HOME }}/.local/share/fnm:{{ ansible_env.PATH }}"
 
 - name: Check if Gemini CLI is installed
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using=lts-latest -- npm list -g @google/gemini-cli"
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @google/gemini-cli"
   register: gemini_check
   failed_when: false
   changed_when: false
 
 - name: Install Gemini CLI
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using=lts-latest -- npm install -g @google/gemini-cli"
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @google/gemini-cli"
   when: gemini_check.rc != 0

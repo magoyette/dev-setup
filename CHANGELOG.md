@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-02-26
+
+### Added
+
+- Add Playwright CLI with browser installation (`playwright_browsers` variable in `vars.yml`)
+- Deploy Playwright skill from Microsoft in Claude Code, Codex and Gemini CLI
+- Make fnm Node version configurable via `fnm_node_version` in `defaults.yml` (default: `lts-latest`)
+
 ## [1.10.0] - 2026-02-25
 
 ### Added
@@ -98,8 +106,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.9.1...HEAD
-[1.9.0]: https://github.com/magoyette/dev-setup/compare/v1.9.0...v1.9.1
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.11.0...HEAD
+[1.11.0]: https://github.com/magoyette/dev-setup/compare/v1.10.0...v1.11.0
+[1.10.0]: https://github.com/magoyette/dev-setup/compare/v1.9.1...v1.10.0
+[1.9.1]: https://github.com/magoyette/dev-setup/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/magoyette/dev-setup/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/magoyette/dev-setup/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/magoyette/dev-setup/compare/v1.6.0...v1.7.0

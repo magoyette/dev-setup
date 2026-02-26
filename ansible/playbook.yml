@@ -28,6 +28,7 @@
     - import_tasks: tasks/zoxide.yml
     - import_tasks: tasks/bun.yml
     - import_tasks: tasks/claude-code.yml
+    - import_tasks: tasks/playwright.yml
     - import_tasks: tasks/emacs.yml
       when: install_emacs | default(false)
     - import_tasks: tasks/agent-skills.yml

@@ -1,4 +1,4 @@
 ---
 - name: Update Codex CLI
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using=lts-latest -- npm install -g @openai/codex"
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @openai/codex"
   changed_when: false

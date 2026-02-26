@@ -1,0 +1,38 @@
+---
+- name: Check if Playwright is installed
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g playwright"
+  register: playwright_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Playwright
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g playwright"
+  when: playwright_check.rc != 0
+
+- name: Check if Playwright CLI is installed
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @playwright/cli"
+  register: playwright_cli_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Playwright CLI
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @playwright/cli"
+  when: playwright_cli_check.rc != 0
+
+- name: Install Playwright system dependencies
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npx --yes playwright install-deps"
+  become: true
+  changed_when: false
+  environment:
+    FNM_DIR: "{{ ansible_env.HOME }}/.local/share/fnm"
+    HOME: "{{ ansible_env.HOME }}"
+
+- name: Install Playwright browsers
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npx --yes playwright install {{ item }}"
+  loop: "{{ playwright_browsers }}"
+  changed_when: false
+
+- name: Download Playwright skill from GitHub
+  command:
+    cmd: "{{ playbook_dir }}/../scripts/download-playwright-skill.sh"
+    creates: "{{ playbook_dir }}/../skills/playwright/SKILL.md"

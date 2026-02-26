@@ -1,4 +1,5 @@
 ansible/vars.yml
+skills/playwright/
 claude/.claude/*
 !claude/.claude/settings.json
 !claude/.claude/hooks/

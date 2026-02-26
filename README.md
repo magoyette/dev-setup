@@ -27,7 +27,16 @@ git clone <repo-url> dev-setup
 cd dev-setup
 ```
 
-Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values.
+Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
+
+| Variable              | Description                        | Default             |
+| --------------------- | ---------------------------------- | ------------------- |
+| `git_user_name`       | Git identity name                  | `"Your Name"`       |
+| `git_user_email`      | Git identity email                 | `"you@example.com"` |
+| `install_emacs`       | Build Emacs from source            | `false`             |
+| `playwright_browsers` | Browsers to install for Playwright | `["chrome"]`        |
+
+`playwright_browsers` accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
 
 Run the bootstrap script:
 
@@ -97,9 +106,19 @@ It will prompt for the version in `X.Y.Z` format (e.g. `1.2.0`), create an annot
 - fnm : Node version manager
 - Node : JavaScript and Typescript runtime
 
+### Testing
+
+- Playwright CLI : browser automation for testing front-end changes
+
 ### Coding
 
 - Claude-Code : coding agent
   - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
+- Codex CLI : coding agent
 - Emacs : text editor
 - Gemini CLI : coding agent
+
+### Agent skills
+
+- [humanizer](https://github.com/blader/humanizer) : remove signs of AI-generated writing from text
+- [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright/src/skill) : browser automation skill (bundled with Playwright npm package)
