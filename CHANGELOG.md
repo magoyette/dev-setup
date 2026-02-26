@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-02-25
+
+### Added
+
+- Display start of `CHANGELOG.md` in `release.sh` script to help avoid mistakes
+
 ## [1.9.1] - 2026-02-25
 
 ### Changed

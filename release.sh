@@ -3,8 +3,10 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
+head -17 CHANGELOG.md
+
 # Prompt for version
-read -rp "Version (e.g. 1.2.0): " version
+read -rp "Version to release (e.g. 1.2.0): " version
 
 # Validate semver format X.Y.Z (no leading v)
 if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
