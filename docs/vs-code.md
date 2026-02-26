@@ -147,12 +147,9 @@ Apply the following user settings.
   "redhat.telemetry.enabled": false,
   "playwright.reuseBrowser": false,
   "playwright.showTrace": false,
-  "workbench.colorTheme": "GitHub Light Default",
-  "geminicodeassist.updateChannel": "Insiders"
+  "workbench.colorTheme": "GitHub Light Default"
 }
 ```
-
-Configure "Gemini Code Assist: Privacy Settings".
 
 ## Keybindings (for Windows)
 
@@ -289,17 +286,3 @@ Configure "Gemini Code Assist: Privacy Settings".
 | Tab          | Toggle fold of the current region          |
 | Ctrl+B       | Toggle bold                                |
 | Ctrl+I       | Toggle italic                              |
-
-## Java
-
-Use IntelliJ's formatting in VS Code:
-
-- Settings > Editor > Code Style > Java : Export to Eclipse XML Profile
-
-```json
-"java.format.enabled": true,
-"java.format.settings.url": "path-to-xml-file.xml",
-"[java]": {
-    "editor.defaultFormatter": "redhat.java"
-}
-```
