@@ -115,31 +115,31 @@ Apply the following user settings.
   },
   "todo-tree.highlights.customHighlight": {
     "READ": {
-      "foreground": "#bc4c00"
+      "foreground": "#d19a66"
     },
     "IDEA": {
-      "foreground": "#bc4c00"
+      "foreground": "#d19a66"
     },
     "TODO": {
-      "foreground": "#bc4c00"
+      "foreground": "#d19a66"
     },
     "NEXT": {
-      "foreground": "#0969da"
+      "foreground": "#61afef"
     },
     "DOING": {
-      "foreground": "#8250df"
+      "foreground": "#c678dd"
     },
     "STARTED": {
-      "foreground": "#8250df"
+      "foreground": "#c678dd"
     },
     "READING": {
-      "foreground": "#8250df"
+      "foreground": "#c678dd"
     },
     "WAIT": {
-      "foreground": "#57606a"
+      "foreground": "#56b6c2"
     },
     "DONE": {
-      "foreground": "#1a7f37"
+      "foreground": "#98c379"
     }
   },
   "projectManager.git.baseFolders": ["*****TODO Add folder of projects*****"],
