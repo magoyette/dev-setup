@@ -1,4 +1,10 @@
 ---
-- name: Update Codex CLI
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @openai/codex"
+- name: Check if Codex CLI is installed
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @openai/codex"
+  register: codex_check
+  failed_when: false
   changed_when: false
+
+- name: Install Codex CLI
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @openai/codex"
+  when: codex_check.rc != 0

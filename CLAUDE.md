@@ -29,7 +29,7 @@ dev-setup/
 │       ├── zoxide.yml            # zoxide install
 │       ├── bun.yml               # bun install
 │       ├── claude-code.yml       # Claude Code install + stow deploy
-│       ├── codex.yml             # Codex CLI install/update via npm (always runs)
+│       ├── codex.yml             # Codex CLI install via npm (check-then-install)
 │       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
 │       ├── emacs.yml             # Emacs dependencies + build from source (conditional on install_emacs)
 │       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml, gated by install_emacs)
@@ -110,7 +110,7 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 | zoxide, bun         | `creates:` pointing to the installed binary/directory                                             |
 | difftastic          | `creates:` pointing to `~/.local/bin/difft`                                                       |
 | Claude Code         | `which claude` check before install                                                               |
-| Codex CLI           | `npm install -g @openai/codex` always runs (no guard); updates on every playbook run (`changed_when: false`) |
+| Codex CLI           | `npm list -g @openai/codex` check; install only if missing                                                   |
 | Playwright          | `npm list -g playwright` check; install only if missing                                           |
 | Playwright CLI      | `npm list -g @playwright/cli` check; install only if missing                                      |
 | Playwright system deps | `npx playwright install-deps` always runs (`changed_when: false`); apt-based, inherently idempotent |
@@ -271,7 +271,7 @@ Playwright is installed globally via npm, providing browser automation for AI co
 
 ## Codex Configuration
 
-Codex CLI (`@openai/codex`) is installed via npm. Unlike other npm tools that check before installing, Codex always runs `npm install -g @openai/codex` on every playbook run. This ensures it is always on the latest version, which is appropriate since Codex upgrades are managed manually rather than by pinning a version.
+Codex CLI (`@openai/codex`) is installed via npm using a check-then-install pattern (`npm list -g @openai/codex`), so Ansible installs it when missing and otherwise leaves upgrades to Codex's built-in update flow.
 
 Skills are deployed to the Codex User scope at `~/.agents/skills/` — this covers all repositories the user works in.
 
