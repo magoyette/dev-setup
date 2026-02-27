@@ -1,3 +1,6 @@
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
 vim.opt.termguicolors = true
 vim.opt.background = "dark"
 
@@ -23,6 +26,27 @@ require("lazy").setup({
         style = "dark",
       })
       require("onedark").load()
+    end,
+  },
+  {
+    "NeogitOrg/neogit",
+    lazy = true,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "esmuellert/codediff.nvim",
+      "nvim-telescope/telescope.nvim",
+    },
+    cmd = "Neogit",
+    keys = {
+      { "<leader>gg", "<cmd>Neogit<CR>", desc = "Show Neogit UI" },
+    },
+    config = function()
+      require("neogit").setup({
+        integrations = {
+          telescope = true,
+          diffview = false,
+        },
+      })
     end,
   },
 })
