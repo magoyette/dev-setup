@@ -147,7 +147,12 @@ Apply the following user settings.
   "redhat.telemetry.enabled": false,
   "playwright.reuseBrowser": false,
   "playwright.showTrace": false,
-  "workbench.colorTheme": "GitHub Light Default"
+  "workbench.colorTheme": "One Dark Pro",
+  "claudeCode.preferredLocation": "panel",
+  "claudeCode.useTerminal": true,
+  "remote.extensionKind": {
+    "alefragnani.project-manager": ["workspace"]
+  }
 }
 ```
 
