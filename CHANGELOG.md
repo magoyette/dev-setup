@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.1] - 2026-02-26
+
+### Added
+
+- Display start of `CHANGELOG.md` with syntax highlighting in `release.sh`
+
 ## [1.13.0] - 2026-02-26
 
 ### Added
@@ -127,7 +133,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.13.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.13.1...HEAD
+[1.13.1]: https://github.com/magoyette/dev-setup/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/magoyette/dev-setup/compare/v1.12.1...v1.13.0
 [1.12.1]: https://github.com/magoyette/dev-setup/compare/v1.12.0...v1.12.1
 [1.12.0]: https://github.com/magoyette/dev-setup/compare/v1.11.0...v1.12.0
