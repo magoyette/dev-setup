@@ -34,6 +34,8 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 | `git_user_name`       | Git identity name                  | `"Your Name"`       |
 | `git_user_email`      | Git identity email                 | `"you@example.com"` |
 | `install_emacs`       | Build Emacs from source            | `false`             |
+| `install_neovim`      | Install Neovim from GitHub release | `true`              |
+| `git_core_editor`     | Optional Git `core.editor` override (`nvim` is a possible value) | `""`                |
 | `playwright_browsers` | Browsers to install for Playwright | `["chrome"]`        |
 
 `playwright_browsers` accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
@@ -116,6 +118,7 @@ It will prompt for the version in `X.Y.Z` format (e.g. `1.2.0`), create an annot
   - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
 - Codex CLI : coding agent
 - Emacs : text editor
+- Neovim : terminal text editor (One Dark dark variant)
 - Gemini CLI : coding agent
 
 ### Agent skills

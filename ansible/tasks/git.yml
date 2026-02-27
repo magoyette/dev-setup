@@ -77,6 +77,13 @@
     scope: global
     value: "vscode://file/{path}:{line}"
 
+- name: Configure optional git core editor
+  community.general.git_config:
+    name: core.editor
+    scope: global
+    value: "{{ git_core_editor }}"
+  when: (git_core_editor | default('') | trim | length) > 0
+
 - name: Check if Git for Windows credential manager exists
   ansible.builtin.stat:
     path: "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"

@@ -2,6 +2,8 @@
 fnm_node_version: lts-latest
 emacs_version: "30.2"
 difftastic_version: "0.67.0"
+neovim_version: "v0.11.6"
+neovim_archive_name: "nvim-linux-x86_64.tar.gz"
 
 # npm global packages required by Emacs LSP mode and formatting tools
 emacs_npm_packages:

@@ -19,8 +19,8 @@ dev-setup/
 │   └── pre-commit                # Enforces AGENTS.md sync and Ansible syntax checks before commit
 ├── ansible/
 │   ├── playbook.yml              # Main Ansible playbook (localhost, connection: local)
-│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, difftastic version, npm packages)
-│   ├── vars.yml                  # User-specific variables (git name, email, install_emacs, playwright_browsers) — gitignored, copied from example
+│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, difftastic version, neovim version, npm packages)
+│   ├── vars.yml                  # User-specific variables (git name, email, install_emacs, install_neovim, git_core_editor, playwright_browsers) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential)
@@ -30,12 +30,17 @@ dev-setup/
 │       ├── node.yml              # fnm + Node LTS
 │       ├── zoxide.yml            # zoxide install
 │       ├── bun.yml               # bun install
+│       ├── neovim.yml            # Neovim install from GitHub release + stow deploy
 │       ├── claude-code.yml       # Claude Code install + stow deploy
 │       ├── codex.yml             # Codex CLI install via npm (check-then-install)
 │       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
 │       ├── emacs.yml             # Emacs dependencies + build from source (conditional on install_emacs)
 │       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml, gated by install_emacs)
 │       ├── agent-skills.yml      # Agent skills: submodule init/update + symlinks for Claude Code, Gemini CLI, and Codex
+├── nvim/                         # Stow package for Neovim config
+│   └── .config/
+│       └── nvim/
+│           └── init.lua          # lazy.nvim bootstrap + onedark dark variant
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 │   └── .gitkeep
 ├── claude/                       # Stow package for Claude Code config
@@ -83,7 +88,7 @@ The playbook is idempotent — safe to re-run.
 
 ```bash
 cp ansible/vars.yml.example ansible/vars.yml
-# then edit ansible/vars.yml with your git_user_name, git_user_email, and install_emacs
+# then edit ansible/vars.yml with your git_user_name, git_user_email, and preferences
 ```
 
 `ansible/vars.yml` is gitignored so your personal values are never committed. `install.sh` will auto-create it on first run and prompt you to fill it in.
@@ -91,7 +96,11 @@ cp ansible/vars.yml.example ansible/vars.yml
 User-configurable variables in `vars.yml`:
 - `git_user_name` / `git_user_email` — git identity
 - `install_emacs` — set to `true` to build Emacs from source (default: `false`)
+- `install_neovim` — set to `false` to skip Neovim installation and stow deployment (default: `true`)
+- `git_core_editor` — optional git `core.editor` override; empty string means no change (possible value: `nvim`)
 - `playwright_browsers` — list of browsers to install (default: `["chromium"]`; options: `chromium`, `firefox`, `webkit`)
+
+`install_neovim` uses `| default(true)` in the playbook. Existing users who do not add this key to their personal `ansible/vars.yml` will get Neovim on the next playbook run.
 
 Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do not need user configuration.
 
@@ -106,11 +115,14 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 | apt packages        | `apt` module (built-in idempotency); includes `build-essential` for compilation tools             |
 | `~/.bashrc` entries | `lineinfile` module (checks before adding)                                                        |
 | git config          | `community.general.git_config` module                                                             |
+| git core.editor     | Conditionally set via `git_core_editor`; skipped when empty string                               |
 | git aliases         | `replace-git-alias.sh` always re-runs (always reports changed; end state is identical)             |
 | fnm                 | `creates:` pointing to `~/.local/share/fnm`                                                       |
 | Node LTS via fnm    | Checks `fnm list \| grep -q {{ fnm_node_version }}`; installs only if return code != 0 (`fnm_node_version` in `defaults.yml`) |
 | zoxide, bun         | `creates:` pointing to the installed binary/directory                                             |
 | difftastic          | `creates:` pointing to `~/.local/bin/difft`                                                       |
+| Neovim install      | Checks `~/.local/bin/nvim --version`; downloads release tarball from GitHub only when missing/version mismatch (`neovim_version` in `defaults.yml`) |
+| Neovim config       | Stow package `nvim` (`changed_when: false`)                                                       |
 | Claude Code         | `which claude` check before install                                                               |
 | Codex CLI           | `npm list -g @openai/codex` check; install only if missing                                                   |
 | Playwright          | `npm list -g playwright` check; install only if missing                                           |
@@ -158,6 +170,23 @@ Difftastic (`difft`) is installed as a **secondary** diff tool alongside delta. 
 The `dt` prefix stands for difftastic and is prepended to the mirrored alias name (e.g. `dl` → `dtdl`). Each difftastic alias is defined immediately after its counterpart in the script. All aliases use `-c diff.external=difft` so the override applies only for that single command and never affects the delta pager globally.
 
 **Version:** controlled by `difftastic_version` in `ansible/defaults.yml`. To upgrade, bump the version and delete `~/.local/bin/difft` before re-running the playbook.
+
+### Neovim
+
+Neovim is **opt-out**. By default it is installed (`install_neovim: true` in `ansible/vars.yml.example`).
+
+Installed from official GitHub releases in `ansible/tasks/neovim.yml`:
+
+- Downloads `https://github.com/neovim/neovim/releases/download/{{ neovim_version }}/{{ neovim_archive_name }}`
+- Extracts to `~/.local/opt/nvim`
+- Symlinks `~/.local/bin/nvim` to the installed binary
+- Reinstalls only when missing or when `nvim --version` does not match `neovim_version`
+
+**Version:** controlled by `neovim_version` in `ansible/defaults.yml`. To upgrade, bump the version and re-run the playbook.
+
+Configuration is tracked in this repository under `nvim/.config/nvim/init.lua` and deployed with Stow. The config bootstraps `lazy.nvim` and applies `navarasu/onedark.nvim` with `style = "dark"` for terminal-first WSL usage. No GUI Neovim client is installed.
+
+No `.stow-local-ignore` file is required for the `nvim` package because it contains only config files.
 
 ### Emacs
 

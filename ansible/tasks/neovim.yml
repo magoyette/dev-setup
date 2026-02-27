@@ -1,0 +1,49 @@
+---
+- name: Ensure ~/.local/bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Ensure ~/.local/opt directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/opt"
+    state: directory
+    mode: "0755"
+
+- name: Check installed Neovim version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/nvim --version"
+  register: neovim_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Download and install Neovim {{ neovim_version }}
+  ansible.builtin.shell: |
+    set -euo pipefail
+
+    tmp_dir="$(mktemp -d)"
+    trap 'rm -rf "${tmp_dir}"' EXIT
+
+    curl -sSfL "https://github.com/neovim/neovim/releases/download/{{ neovim_version }}/{{ neovim_archive_name }}" \
+      -o "${tmp_dir}/nvim.tar.gz"
+
+    rm -rf "{{ ansible_env.HOME }}/.local/opt/nvim"
+    tar -xzf "${tmp_dir}/nvim.tar.gz" -C "${tmp_dir}"
+    mv "${tmp_dir}/{{ neovim_archive_name | replace('.tar.gz', '') }}" "{{ ansible_env.HOME }}/.local/opt/nvim"
+  args:
+    executable: /bin/bash
+  when: neovim_version_output.rc != 0 or ("NVIM " ~ neovim_version) not in neovim_version_output.stdout
+
+- name: Link Neovim binary into ~/.local/bin
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.local/opt/nvim/bin/nvim"
+    dest: "{{ ansible_env.HOME }}/.local/bin/nvim"
+    state: link
+
+- name: Deploy Neovim dotfiles with stow
+  ansible.builtin.command: >
+    stow
+    --dir="{{ playbook_dir }}/.."
+    --target="{{ ansible_env.HOME }}"
+    nvim
+  changed_when: false

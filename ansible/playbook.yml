@@ -27,6 +27,8 @@
     - import_tasks: tasks/codex.yml
     - import_tasks: tasks/zoxide.yml
     - import_tasks: tasks/bun.yml
+    - import_tasks: tasks/neovim.yml
+      when: install_neovim | default(true)
     - import_tasks: tasks/claude-code.yml
     - import_tasks: tasks/playwright.yml
     - import_tasks: tasks/emacs.yml
