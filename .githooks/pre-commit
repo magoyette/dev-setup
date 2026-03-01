@@ -2,7 +2,6 @@
 set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
-"${repo_root}/scripts/check-agent-docs.sh" >/dev/null
 
 cd "${repo_root}"
 

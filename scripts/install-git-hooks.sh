@@ -12,7 +12,6 @@ if [[ ! -f "${pre_commit_hook}" ]]; then
 fi
 
 chmod +x "${pre_commit_hook}"
-chmod +x "${repo_root}/scripts/sync-agent-docs.sh" "${repo_root}/scripts/check-agent-docs.sh"
 
 git -C "${repo_root}" config core.hooksPath .githooks
 

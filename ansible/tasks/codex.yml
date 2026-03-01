@@ -8,3 +8,40 @@
 - name: Install Codex CLI
   shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @openai/codex"
   when: codex_check.rc != 0
+
+- name: Ensure Codex config directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.codex"
+    state: directory
+    mode: "0755"
+
+- name: Ensure Codex config file exists
+  copy:
+    content: ""
+    dest: "{{ ansible_env.HOME }}/.codex/config.toml"
+    force: false
+    mode: "0644"
+
+- name: Remove existing Codex project doc fallback filenames entries
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/config.toml"
+    regexp: "^project_doc_fallback_filenames\\s*="
+    state: absent
+
+- name: Remove existing Codex project doc max bytes entries
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/config.toml"
+    regexp: "^project_doc_max_bytes\\s*="
+    state: absent
+
+- name: Configure Codex project doc fallback filenames at TOML root
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/config.toml"
+    insertbefore: BOF
+    line: 'project_doc_fallback_filenames = ["CLAUDE.md"]'
+
+- name: Configure Codex project doc max bytes at TOML root
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/config.toml"
+    insertbefore: BOF
+    line: "project_doc_max_bytes = {{ codex_project_doc_max_bytes }}"

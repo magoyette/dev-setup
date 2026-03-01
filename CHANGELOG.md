@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-03-01
+
+### Changed
+
+- Configure Codex in `~/.codex/config.toml` with `project_doc_fallback_filenames = ["CLAUDE.md"]`
+- Configure Codex `project_doc_max_bytes` to `1073741824` (1 GiB) to load `CLAUDE.md` without any limit like Claude Code
+
+### Removed
+
+- Remove `AGENTS.md` from the repository to use `CLAUDE.md` as the only project instruction file
+- Remove `scripts/sync-agent-docs.sh` and `scripts/check-agent-docs.sh`
+
 ## [2.0.0] - 2026-03-01
 
 ### Removed

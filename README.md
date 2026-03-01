@@ -55,22 +55,20 @@ This installs Ansible via apt, then runs the Ansible playbook. The playbook is i
 git alias
 ```
 
-## Agent context files (`CLAUDE.md` and `AGENTS.md`)
+## Agent context file (`CLAUDE.md`)
 
 `CLAUDE.md` is the canonical source for shared agent guidance in this repository.
-`AGENTS.md` is generated from `CLAUDE.md` and should not be edited manually.
-The sync script mirrors the full `CLAUDE.md` body (all `##` sections), including Claude Code configuration context.
 
-When updating shared guidance:
+Codex is configured by Ansible in `~/.codex/config.toml` with:
 
-```sh
-./scripts/sync-agent-docs.sh
-./scripts/check-agent-docs.sh
-```
+- `project_doc_fallback_filenames = ["CLAUDE.md"]`
+- `project_doc_max_bytes = 1073741824` (1 GiB)
+
+Codex applies `project_doc_max_bytes` cumulatively across discovered instruction files; this repo uses only `CLAUDE.md`, so 1 GiB is effectively non-limiting.
 
 The local pre-commit hook is configured automatically by Ansible.
 
-The pre-commit hook checks that `AGENTS.md` is in sync with `CLAUDE.md`. It also runs `ansible-playbook ansible/playbook.yml --syntax-check` when staged files include `ansible/*.yml`.
+The pre-commit hook runs `ansible-playbook ansible/playbook.yml --syntax-check` when staged files include `ansible/*.yml`.
 
 ## Releasing a new version
 
