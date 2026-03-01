@@ -17,13 +17,3 @@
   when: fnm_node_check.rc != 0
   environment:
     PATH: "{{ ansible_env.HOME }}/.local/share/fnm:{{ ansible_env.PATH }}"
-
-- name: Check if Gemini CLI is installed
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @google/gemini-cli"
-  register: gemini_check
-  failed_when: false
-  changed_when: false
-
-- name: Install Gemini CLI
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @google/gemini-cli"
-  when: gemini_check.rc != 0

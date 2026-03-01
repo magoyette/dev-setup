@@ -119,7 +119,6 @@ It will prompt for the version in `X.Y.Z` format (e.g. `1.2.0`), create an annot
 - Codex CLI : coding agent
 - Emacs : text editor
 - Neovim : terminal text editor (One Dark dark variant)
-- Gemini CLI : coding agent
 
 ### Agent skills
 

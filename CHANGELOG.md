@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-03-01
+
+### Removed
+
+- Remove Gemini CLI. To manually uninstall, run: `npm uninstall -g @google/gemini-cli && rm -rf ~/.gemini`.
+
 ## [1.14.0] - 2026-02-26
 
 ### Added
@@ -141,7 +147,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v1.14.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/magoyette/dev-setup/compare/v1.14.0...v2.0.0
 [1.14.0]: https://github.com/magoyette/dev-setup/compare/v1.13.1...v1.14.0
 [1.13.1]: https://github.com/magoyette/dev-setup/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/magoyette/dev-setup/compare/v1.12.1...v1.13.0
