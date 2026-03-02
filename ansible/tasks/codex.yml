@@ -45,3 +45,23 @@
     path: "{{ ansible_env.HOME }}/.codex/config.toml"
     insertbefore: BOF
     line: "project_doc_max_bytes = {{ codex_project_doc_max_bytes }}"
+
+- name: Ensure Codex settings file exists
+  copy:
+    content: ""
+    dest: "{{ ansible_env.HOME }}/.codex/settings.toml"
+    force: false
+    mode: "0644"
+
+- name: Ensure Codex TUI section exists in settings
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/settings.toml"
+    regexp: "^\\[tui\\]\\s*$"
+    line: "[tui]"
+
+- name: Configure Codex status line in settings
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/settings.toml"
+    regexp: "^\\s*status_line\\s*="
+    insertafter: "^\\[tui\\]\\s*$"
+    line: "status_line = {{ codex_status_line | to_json }}"

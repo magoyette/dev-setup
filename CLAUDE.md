@@ -15,7 +15,7 @@ dev-setup/
 │   └── pre-commit                # Runs Ansible syntax checks before commit when ansible/*.yml is staged
 ├── ansible/
 │   ├── playbook.yml              # Main Ansible playbook (localhost, connection: local)
-│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, difftastic version, neovim version, codex project doc max bytes, npm packages)
+│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, difftastic version, neovim version, codex project doc max bytes, codex status line, npm packages)
 │   ├── vars.yml                  # User-specific variables (git name, email, install_emacs, install_neovim, git_core_editor, playwright_browsers) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
@@ -28,7 +28,7 @@ dev-setup/
 │       ├── bun.yml               # bun install
 │       ├── neovim.yml            # Neovim install from GitHub release + stow deploy
 │       ├── claude-code.yml       # Claude Code install + stow deploy + partial settings management (hooks/statusLine)
-│       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings in ~/.codex/config.toml
+│       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings in ~/.codex/config.toml + status line settings in ~/.codex/settings.toml
 │       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
 │       ├── emacs.yml             # Emacs dependencies + build from source (conditional on install_emacs)
 │       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml, gated by install_emacs)
@@ -121,6 +121,7 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 | Claude settings (`hooks`, `statusLine`) | `scripts/merge-claude-settings.sh` merges only managed keys into `~/.claude/settings.json` via `jq`; exits changed only when content differs |
 | Codex CLI           | `npm list -g @openai/codex` check; install only if missing                                                   |
 | Codex project doc config | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (`project_doc_fallback_filenames`, `project_doc_max_bytes`) |
+| Codex status line config | `copy`/`lineinfile` for `~/.codex/settings.toml` (`[tui]`, `status_line`) |
 | Playwright          | `npm list -g playwright` check; install only if missing                                           |
 | Playwright CLI      | `npm list -g @playwright/cli` check; install only if missing                                      |
 | Playwright system deps | `npx playwright install-deps` always runs (`changed_when: false`); apt-based, inherently idempotent |
@@ -307,6 +308,11 @@ Codex project docs are configured by Ansible in `~/.codex/config.toml`:
 
 - `project_doc_fallback_filenames = ["CLAUDE.md"]`
 - `project_doc_max_bytes = 1073741824` (from `codex_project_doc_max_bytes` in `ansible/defaults.yml`)
+
+Codex status line is configured by Ansible in `~/.codex/settings.toml`:
+
+- `[tui]`
+- `status_line = ["model-with-reasoning", "git-branch", "context-used", "five-hour-limit", "weekly-limit"]` (from `codex_status_line` in `ansible/defaults.yml`)
 
 This repository uses `CLAUDE.md` as the only project instruction file. A large `project_doc_max_bytes` value makes Codex's behavior align with Claude Code in normal cases where instruction files should not be truncated.
 Codex applies `project_doc_max_bytes` as a cumulative limit across discovered project docs; with only `CLAUDE.md` in this repo, `1073741824` is effectively non-limiting.
