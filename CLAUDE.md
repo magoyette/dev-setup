@@ -27,7 +27,7 @@ dev-setup/
 │       ├── zoxide.yml            # zoxide install
 │       ├── bun.yml               # bun install
 │       ├── neovim.yml            # Neovim install from GitHub release + stow deploy
-│       ├── claude-code.yml       # Claude Code install + stow deploy
+│       ├── claude-code.yml       # Claude Code install + stow deploy + partial settings management (hooks/statusLine)
 │       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings in ~/.codex/config.toml
 │       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
 │       ├── emacs.yml             # Emacs dependencies + build from source (conditional on install_emacs)
@@ -41,7 +41,6 @@ dev-setup/
 │   └── .gitkeep
 ├── claude/                       # Stow package for Claude Code config
 │   └── .claude/
-│       ├── settings.json         # Claude Code settings
 │       └── hooks/
 │           └── wsl-notify.sh     # WSL-to-Windows notification hook
 ├── external-skills/              # Third-party skills (git submodules, deployed to Claude Code and Codex)
@@ -55,6 +54,7 @@ dev-setup/
 │   ├── replace-git-alias.sh      # Git alias definitions
 │   ├── install-emacs-in-ubuntu.sh  # Emacs build script (download, configure, make, install only)
 │   ├── install-git-hooks.sh      # Configures local git hooks path to .githooks
+│   ├── merge-claude-settings.sh  # Merges managed Claude settings fields (hooks/statusLine) without touching other keys
 │   └── download-playwright-skill.sh  # Downloads Playwright skill from GitHub into skills/playwright/
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
 └── claude-hooks.md               # Documentation for notification system
@@ -118,6 +118,7 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 | Neovim install      | Checks `~/.local/bin/nvim --version`; downloads release tarball from GitHub only when missing/version mismatch (`neovim_version` in `defaults.yml`) |
 | Neovim config       | Stow package `nvim` (`changed_when: false`)                                                       |
 | Claude Code         | `which claude` check before install                                                               |
+| Claude settings (`hooks`, `statusLine`) | `scripts/merge-claude-settings.sh` merges only managed keys into `~/.claude/settings.json` via `jq`; exits changed only when content differs |
 | Codex CLI           | `npm list -g @openai/codex` check; install only if missing                                                   |
 | Codex project doc config | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (`project_doc_fallback_filenames`, `project_doc_max_bytes`) |
 | Playwright          | `npm list -g playwright` check; install only if missing                                           |
@@ -233,13 +234,14 @@ This means editing files under the corresponding repo directory immediately affe
 
 ## Claude Code Configuration
 
-### Settings (`claude/.claude/settings.json`)
+### Settings (`~/.claude/settings.json`)
 
-Current configuration:
+`settings.json` is not tracked in git. Ansible manages only these keys:
 
-- **Status line**: Custom command using `bunx -y ccstatusline@latest`
-- **Plugins**: TypeScript LSP enabled
-- **Hooks**: WSL notification hook enabled for permission and idle prompts
+- **`hooks`**: WSL notification hook for `permission_prompt` and `idle_prompt`
+- **`statusLine`**: custom command using `bunx -y ccstatusline@latest`
+
+All other keys (for example `model`, editor/UI preferences) are user-managed and preserved as-is on every playbook run.
 
 ### WSL-to-Windows Notification Hook
 
@@ -276,9 +278,9 @@ ONLY_WHEN_UNFOCUSED=false
 
 ### Modifying Claude Code settings
 
-1. Edit `claude/.claude/settings.json` directly in this repository
-2. Changes are immediately reflected in `~/.claude/settings.json` via symlink
-3. Restart Claude Code session for hooks/settings changes to take effect
+1. To change managed fields (`hooks`/`statusLine`), edit `scripts/merge-claude-settings.sh` and re-run the playbook
+2. To change any other Claude setting, edit `~/.claude/settings.json` directly
+3. Restart Claude Code session for settings changes to take effect
 
 ## Playwright
 

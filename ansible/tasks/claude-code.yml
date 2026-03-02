@@ -26,6 +26,12 @@
     ccstatusline
   changed_when: false
 
+- name: Merge Claude settings for hooks and status line
+  command: "{{ playbook_dir }}/../scripts/merge-claude-settings.sh {{ ansible_env.HOME }}/.claude/settings.json"
+  register: claude_settings_merge
+  changed_when: claude_settings_merge.rc == 2
+  failed_when: claude_settings_merge.rc not in [0, 2]
+
 - name: Add ccstatusline alias
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
