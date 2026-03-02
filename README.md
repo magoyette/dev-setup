@@ -7,10 +7,6 @@ My personal developer setup for WSL2 (Windows Subsystem for Linux v2).
 - Set the Font to `DejaVuSansM Nerd Font Mono` at `13 pt`
 - Set the Theme to `One Half Dark`
 
-## Powershell
-
-- Add the following line to the Powershell profile file (`echo $PROFILE`) : `$env:COLORTERM = "truecolor"`
-
 ## Installation
 
 Install WSL and Ubuntu.
@@ -29,14 +25,14 @@ cd dev-setup
 
 Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 
-| Variable              | Description                        | Default             |
-| --------------------- | ---------------------------------- | ------------------- |
-| `git_user_name`       | Git identity name                  | `"Your Name"`       |
-| `git_user_email`      | Git identity email                 | `"you@example.com"` |
-| `install_emacs`       | Build Emacs from source            | `false`             |
-| `install_neovim`      | Install Neovim from GitHub release | `true`              |
-| `git_core_editor`     | Optional Git `core.editor` override (`nvim` is a possible value) | `""`                |
-| `playwright_browsers` | Browsers to install for Playwright | `["chrome"]`        |
+| Variable              | Description                                                        | Default             |
+| --------------------- | ------------------------------------------------------------------ | ------------------- |
+| `git_user_name`       | Git identity name                                                  | `"Your Name"`       |
+| `git_user_email`      | Git identity email                                                 | `"you@example.com"` |
+| `install_emacs`       | Build Emacs from source                                            | `false`             |
+| `install_neovim`      | Install Neovim from GitHub release                                 | `true`              |
+| `git_core_editor`     | Optional Git `core.editor` override (`nvim` is the suggested value | `""`                |
+| `playwright_browsers` | Browsers to install for Playwright                                 | `["chrome"]`        |
 
 `playwright_browsers` accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
 
@@ -55,18 +51,19 @@ This installs Ansible via apt, then runs the Ansible playbook. The playbook is i
 git alias
 ```
 
-## Agent context file (`CLAUDE.md`)
+## Shell aliases
 
-`CLAUDE.md` is the canonical source for shared agent guidance in this repository.
+- `e` : open Emacs with the daemon
+- `emacs` : open Emacs in terminal mode
+- `ccstatusline` : configure the Claude Code status line
 
-Codex is configured by Ansible in `~/.codex/config.toml` with:
+## CLAUDE.md
 
-- `project_doc_fallback_filenames = ["CLAUDE.md"]`
-- `project_doc_max_bytes = 1073741824` (1 GiB)
+`CLAUDE.md` is the context file for coding agents in this repository.
 
-Codex applies `project_doc_max_bytes` cumulatively across discovered instruction files; this repo uses only `CLAUDE.md`, so 1 GiB is effectively non-limiting.
+Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code.
 
-The local pre-commit hook is configured automatically by Ansible.
+## Pre-commit hook
 
 The pre-commit hook runs `ansible-playbook ansible/playbook.yml --syntax-check` when staged files include `ansible/*.yml`.
 
@@ -115,8 +112,8 @@ It will prompt for the version in `X.Y.Z` format (e.g. `1.2.0`), create an annot
 - Claude-Code : coding agent
   - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
 - Codex CLI : coding agent
-- Emacs : text editor
-- Neovim : terminal text editor (One Dark dark variant)
+- Emacs : terminal text editor
+- Neovim : terminal text editor
 
 ### Agent skills
 
