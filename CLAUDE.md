@@ -28,7 +28,7 @@ dev-setup/
 │       ├── bun.yml               # bun install
 │       ├── neovim.yml            # Neovim install from GitHub release + stow deploy
 │       ├── claude-code.yml       # Claude Code install + stow deploy + partial settings management (hooks/statusLine)
-│       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings in ~/.codex/config.toml + status line settings in ~/.codex/settings.toml
+│       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings and status line settings in ~/.codex/config.toml
 │       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
 │       ├── emacs.yml             # Emacs dependencies + build from source (conditional on install_emacs)
 │       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml, gated by install_emacs)
@@ -120,8 +120,8 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 | Claude Code         | `which claude` check before install                                                               |
 | Claude settings (`hooks`, `statusLine`) | `scripts/merge-claude-settings.sh` merges only managed keys into `~/.claude/settings.json` via `jq`; exits changed only when content differs |
 | Codex CLI           | `npm list -g @openai/codex` check; install only if missing                                                   |
-| Codex project doc config | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (`project_doc_fallback_filenames`, `project_doc_max_bytes`) |
-| Codex status line config | `copy`/`lineinfile` for `~/.codex/settings.toml` (`[tui]`, `status_line`) |
+| Codex project doc config | `file`/`copy`/`lineinfile` (regexp+insertBOF) for `~/.codex/config.toml` (`project_doc_fallback_filenames`, `project_doc_max_bytes`) |
+| Codex status line config | `lineinfile` for `~/.codex/config.toml` (`[tui]`, `status_line`) |
 | Playwright          | `npm list -g playwright` check; install only if missing                                           |
 | Playwright CLI      | `npm list -g @playwright/cli` check; install only if missing                                      |
 | Playwright system deps | `npx playwright install-deps` always runs (`changed_when: false`); apt-based, inherently idempotent |
@@ -309,7 +309,7 @@ Codex project docs are configured by Ansible in `~/.codex/config.toml`:
 - `project_doc_fallback_filenames = ["CLAUDE.md"]`
 - `project_doc_max_bytes = 1073741824` (from `codex_project_doc_max_bytes` in `ansible/defaults.yml`)
 
-Codex status line is configured by Ansible in `~/.codex/settings.toml`:
+Codex status line is configured by Ansible in `~/.codex/config.toml`:
 
 - `[tui]`
 - `status_line = ["model-with-reasoning", "git-branch", "context-used", "five-hour-limit", "weekly-limit"]` (from `codex_status_line` in `ansible/defaults.yml`)
