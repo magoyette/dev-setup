@@ -15,11 +15,19 @@ Install WSL and Ubuntu.
 wsl --install
 ```
 
-Login to WSL. Clone this repository:
+Enable networkingMode mirrored. Create a file named `.wslconfig` in your Windows home directory (`$HOME`).
+
+```conf
+[wsl2]
+networkingMode=mirrored
+```
+
+Shutdown WSL. Login to WSL. Clone this repository:
 
 ```sh
+wsl --shutdown
 mkdir -p ~/repos && cd ~/repos
-git clone <repo-url> dev-setup
+git clone https://github.com/magoyette/dev-setup.git
 cd dev-setup
 ```
 
