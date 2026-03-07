@@ -452,6 +452,8 @@ The user may ask an agent to run `./scripts/release.sh` directly. Before doing s
 
 Do not add entries to `CHANGELOG.md` for documentation-only edits to `README.md` or `CLAUDE.md`.
 
+Changelog entries must be concise: describe **what** changed, not **how**. Do not explain implementation details.
+
 **Changelog section types** (only include sections that apply):
 
 - `Added` — new features

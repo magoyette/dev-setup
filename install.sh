@@ -13,12 +13,22 @@ fi
 
 PLAYBOOK="ansible/${1:-playbook}.yml"
 
+# Prompt for sudo password and validate it before starting the playbook
+# to avoid the playbook hanging indefinitely on an incorrect password
+read -rsp "BECOME password: " become_pass
+echo >&2
+
+if ! printf '%s\n' "$become_pass" | timeout 5 sudo -S true 2>/dev/null; then
+  echo "Error: incorrect sudo password" >&2
+  exit 1
+fi
+
 echo "Installing Ansible"
-sudo apt update
-sudo apt install -y ansible
+printf '%s\n' "$become_pass" | sudo -S apt update
+printf '%s\n' "$become_pass" | sudo -S apt install -y ansible
 
 echo "Installing Ansible collections"
 ansible-galaxy collection install -r ansible/requirements.yml
 
 echo "Running Ansible playbook: ${PLAYBOOK}"
-ansible-playbook --ask-become-pass "${PLAYBOOK}"
+ANSIBLE_BECOME_PASS="$become_pass" ansible-playbook "${PLAYBOOK}"
