@@ -38,12 +38,15 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 | `git_user_name`              | Git identity name                                                   | `"Your Name"`                                |
 | `git_user_email`             | Git identity email                                                  | `"you@example.com"`                          |
 | `git_core_editor`            | Optional Git `core.editor` override (`nvim` is the suggested value) | `""`                                         |
+| `install_git_aliases`        | Install and manage this repo's Git aliases                          | `true`                                       |
 | `playwright_browsers`        | Browsers to install for Playwright                                  | `["chrome"]`                                 |
 | `playbooks_in_main_playbook` | Sub-playbooks to run when invoking the main playbook                | `[core, node, ai-assistants, emacs, neovim]` |
 
 `playwright_browsers` accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
 
 `playbooks_in_main_playbook` controls which sub-playbooks run. Remove a name from the list to skip that tool group entirely.
+
+`install_git_aliases: false` skips Git alias management and leaves any existing aliases untouched.
 
 Some sub-playbooks depend on others:
 
@@ -106,6 +109,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 
 - bat : cat with syntax highlight
 - build-essential: to build Emacs and other tools from source
+- Git : installed from `ppa:git-core/ppa`
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
 - git-delta : diff tool (primary pager for git commands)
 - jq : for JSON manipulation

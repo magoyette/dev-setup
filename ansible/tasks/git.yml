@@ -115,11 +115,12 @@
     msg: "Git for Windows credential manager not found at /mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe - skipping credential helper setup"
   when: not gcm_stat.stat.exists
 
-# Removes and re-adds all aliases, so always reports changed.
-# The end result is always identical, making it effectively idempotent.
 - name: Configure git aliases
-  shell: "{{ playbook_dir }}/../scripts/replace-git-alias.sh"
-  changed_when: true
+  command: "{{ playbook_dir }}/../scripts/sync-git-aliases.sh"
+  register: git_alias_sync
+  changed_when: git_alias_sync.rc == 10
+  failed_when: git_alias_sync.rc not in [0, 10]
+  when: install_git_aliases | default(true)
 
 - name: Check repository hooks path
   command: git -C "{{ playbook_dir }}/.." config --local --get core.hooksPath

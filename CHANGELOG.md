@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-03-07
+
+### Added
+
+- Add `install_git_aliases` variable in `ansible/vars.yml` to allow skipping Git alias installation while preserving existing aliases
+
+### Changed
+
+- Install a more recent version of Git from `ppa:git-core/ppa`
+- Replace the Git alias script with an idempotent script
+
 ## [3.0.0] - 2026-03-07
 
 ### Changed
@@ -198,7 +209,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/magoyette/dev-setup/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/magoyette/dev-setup/compare/v2.3.1...v3.0.0
 [2.3.1]: https://github.com/magoyette/dev-setup/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/magoyette/dev-setup/compare/v2.2.1...v2.3.0

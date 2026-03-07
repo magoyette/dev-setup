@@ -21,7 +21,7 @@ dev-setup/
 │   ├── emacs.yml                 # Emacs sub-playbook: emacs (skipped via playbooks_in_main_playbook)
 │   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
 │   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, difftastic version, neovim version, codex project doc max bytes, codex status line, npm packages)
-│   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
+│   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, install_git_aliases, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential)
@@ -56,7 +56,7 @@ dev-setup/
 │   ├── emacs-fix.md              # build-essential + dependency integration
 │   └── emacs-dependency-integration.md  # Detailed Emacs dependency migration
 ├── scripts/
-│   ├── replace-git-alias.sh      # Git alias definitions
+│   ├── sync-git-aliases.sh       # Idempotent Git alias sync using git config subcommands
 │   ├── install-emacs-in-ubuntu.sh  # Emacs build script (download, configure, make, install only)
 │   ├── install-git-hooks.sh      # Configures local git hooks path to .githooks
 │   ├── merge-claude-settings.sh  # Merges managed Claude settings fields (hooks/statusLine) without touching other keys
@@ -107,6 +107,7 @@ cp ansible/vars.yml.example ansible/vars.yml
 User-configurable variables in `vars.yml`:
 - `git_user_name` / `git_user_email` — git identity
 - `git_core_editor` — optional git `core.editor` override; empty string means no change (possible value: `nvim`)
+- `install_git_aliases` — whether to install and manage the repository's Git aliases; default `true`; when `false`, alias management is skipped and existing aliases are preserved
 - `playwright_browsers` — list of browsers to install (default: `["chromium"]`; options: `chromium`, `firefox`, `webkit`)
 - `playbooks_in_main_playbook` — list of sub-playbook names to run when `playbook.yml` (or `run-ansible.sh` without arguments) is invoked; omit a name to skip that sub-playbook entirely; when the variable is absent all sub-playbooks run (see `vars.yml.example` for the default list)
 
@@ -136,11 +137,11 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 
 | Concern             | Mechanism                                                                                         |
 | ------------------- | ------------------------------------------------------------------------------------------------- |
-| apt packages        | `apt` module (built-in idempotency); includes `build-essential` for compilation tools             |
+| apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, and includes `build-essential` for compilation tools             |
 | `~/.bashrc` entries | `lineinfile` module (checks before adding)                                                        |
 | git config          | `community.general.git_config` module                                                             |
 | git core.editor     | Conditionally set via `git_core_editor`; skipped when empty string                               |
-| git aliases         | `replace-git-alias.sh` always re-runs (always reports changed; end state is identical)             |
+| git aliases         | `sync-git-aliases.sh` upserts only managed aliases, removes only obsolete managed aliases, preserves user aliases, and exits changed only when content differs; skipped when `install_git_aliases` is `false` |
 | fnm                 | `creates:` pointing to `~/.local/share/fnm`                                                       |
 | Node LTS via fnm    | Checks `fnm list \| grep -q {{ fnm_node_version }}`; installs only if return code != 0 (`fnm_node_version` in `defaults.yml`) |
 | zoxide, bun         | `creates:` pointing to the installed binary/directory                                             |
@@ -186,11 +187,23 @@ Entries in `ansible/tasks/emacs.yml` (applied when `emacs` is in `playbooks_in_m
 
 The fnm and bun installers add their own PATH/eval lines to `~/.bashrc` when they first run.
 
+### Git
+
+Git is installed from `ppa:git-core/ppa` in `ansible/tasks/apt-packages.yml`, so the setup tracks newer upstream Git releases than the default Ubuntu package. The playbook lets apt handle upgrades naturally and does not remove the existing `git` package first.
+
+Git aliases are managed by `scripts/sync-git-aliases.sh`, which uses the newer `git config` subcommands to:
+
+- upsert only the aliases owned by this repository
+- preserve user-defined aliases outside the managed set
+- remove only aliases that were previously managed by this repository and are no longer desired
+
+Managed alias installation is controlled by `install_git_aliases` in `ansible/vars.yml`. The default is `true`. When set to `false`, the alias sync task is skipped and existing aliases are left untouched.
+
 ### Difftastic (secondary diff tool)
 
 Difftastic (`difft`) is installed as a **secondary** diff tool alongside delta. Delta remains the default pager for all standard `git diff`, `git log`, and `git show` commands. Difftastic is invoked explicitly via git aliases only.
 
-**Git aliases (defined in `scripts/replace-git-alias.sh`):**
+**Git aliases (defined in `scripts/sync-git-aliases.sh`):**
 
 | Alias | Command | Mirrors |
 |-------|---------|---------|
