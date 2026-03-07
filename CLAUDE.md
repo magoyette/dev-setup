@@ -41,7 +41,7 @@ dev-setup/
 ├── nvim/                         # Stow package for Neovim config
 │   └── .config/
 │       └── nvim/
-│           └── init.lua          # lazy.nvim bootstrap + onedark + Neogit (<Space>gg, Telescope picker, CodeDiff)
+│           └── init.lua          # lazy.nvim bootstrap + onedark + Neogit (<Space>gg, Telescope picker, CodeDiff); lazy-lock.json is intentionally untracked
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 │   └── .gitkeep
 ├── claude/                       # Stow package for Claude Code config
@@ -229,7 +229,7 @@ Installed from official GitHub releases in `ansible/tasks/neovim.yml`:
 
 **Version:** controlled by `neovim_version` in `ansible/defaults.yml`. To upgrade, bump the version and re-run the playbook.
 
-Configuration is tracked in this repository under `nvim/.config/nvim/init.lua` and deployed with Stow. The config bootstraps `lazy.nvim`, sets both `mapleader` and `maplocalleader` to space, applies `navarasu/onedark.nvim` with `style = "dark"` for terminal-first WSL usage, and installs Neogit with Telescope picker integration plus CodeDiff as the optional external diff backend (`<leader>gg` opens Neogit). No GUI Neovim client is installed.
+Configuration is tracked in this repository under `nvim/.config/nvim/init.lua` and deployed with Stow. The config bootstraps `lazy.nvim`, sets both `mapleader` and `maplocalleader` to space, applies `navarasu/onedark.nvim` with `style = "dark"` for terminal-first WSL usage, and installs Neogit with Telescope picker integration plus CodeDiff as the optional external diff backend (`<leader>gg` opens Neogit). `lazy-lock.json` is intentionally ignored by Git so plugin updates on different machines do not create repository diffs. No GUI Neovim client is installed.
 
 No `.stow-local-ignore` file is required for the `nvim` package because it contains only config files.
 
