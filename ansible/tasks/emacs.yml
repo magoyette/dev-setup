@@ -46,13 +46,15 @@
 - name: Add emacs terminal alias
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: '^alias emacs='
     line: 'alias emacs="emacs -nw"'
     state: present
 
-- name: Add emacsclient terminal alias
+- name: Add emacsclient scratch buffer alias
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
-    line: "alias e='emacsclient -t -a \"\" '"
+    regexp: '^alias e='
+    line: "alias e='emacsclient -t -a \"\" --eval \"(progn (switch-to-buffer \\\"*scratch*\\\") nil)\"'"
     state: present
 
 - import_tasks: emacs-node.yml

@@ -183,7 +183,7 @@ Entries in `ansible/tasks/shell-config.yml` (always applied via `core.yml`):
 Entries in `ansible/tasks/emacs.yml` (applied when `emacs` is in `playbooks_in_main_playbook`, via `emacs.yml`):
 
 - `alias emacs="emacs -nw"` (forces terminal Emacs when launched as `emacs`)
-- `alias e='emacsclient -t -a "" '` (opens terminal client and auto-starts daemon if needed)
+- `alias e='emacsclient -t -a "" --eval "(progn (switch-to-buffer \"*scratch*\") nil)"'` (opens a terminal `emacsclient` frame in `*scratch*` and auto-starts the daemon if needed)
 
 The fnm and bun installers add their own PATH/eval lines to `~/.bashrc` when they first run.
 
