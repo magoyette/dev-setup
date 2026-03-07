@@ -17,18 +17,6 @@
     line: 'alias bat="batcat"'
     state: present
 
-- name: Add emacs terminal alias
-  lineinfile:
-    path: "{{ ansible_env.HOME }}/.bashrc"
-    line: 'alias emacs="emacs -nw"'
-    state: present
-
-- name: Add emacsclient terminal alias
-  lineinfile:
-    path: "{{ ansible_env.HOME }}/.bashrc"
-    line: "alias e='emacsclient -t -a \"\" '"
-    state: present
-
 - name: Add batrg function
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"

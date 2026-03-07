@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-03-07
+
+### Changed
+
+- Split `playbook.yml` into five sub-playbooks (`core`, `node`, `ai-assistants`, `emacs`, `neovim`)
+- Main `playbook.yml` include by default all sub-playbooks
+- The variable `playbooks_in_main_playbook` allows to select which sub-playbooks to include in the main playbook
+- `install.sh` and `run-ansible.sh` now accept an optional sub-playbook name
+
+### Removed
+
+- Remove `install_emacs` and `install_neovim` variables since their installation can be disabled through their sub-playbooks
+
 ## [2.3.1] - 2026-03-05
 
 ### Fixed
@@ -185,7 +198,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v2.3.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/magoyette/dev-setup/compare/v2.3.1...v3.0.0
 [2.3.1]: https://github.com/magoyette/dev-setup/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/magoyette/dev-setup/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/magoyette/dev-setup/compare/v2.2.0...v2.2.1

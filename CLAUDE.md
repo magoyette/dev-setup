@@ -14,9 +14,14 @@ dev-setup/
 ├── .githooks/
 │   └── pre-commit                # Runs Ansible syntax checks before commit when ansible/*.yml is staged
 ├── ansible/
-│   ├── playbook.yml              # Main Ansible playbook (localhost, connection: local)
+│   ├── playbook.yml              # Main Ansible playbook — imports all sub-playbooks (core, node, ai-assistants, emacs, neovim)
+│   ├── core.yml                  # Core sub-playbook: apt-packages, shell-config, git, difftastic, zoxide
+│   ├── node.yml                  # Node sub-playbook: node, bun, playwright
+│   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, agent-skills
+│   ├── emacs.yml                 # Emacs sub-playbook: emacs (skipped via playbooks_in_main_playbook)
+│   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
 │   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, difftastic version, neovim version, codex project doc max bytes, codex status line, npm packages)
-│   ├── vars.yml                  # User-specific variables (git name, email, install_emacs, install_neovim, git_core_editor, playwright_browsers) — gitignored, copied from example
+│   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential)
@@ -30,8 +35,8 @@ dev-setup/
 │       ├── claude-code.yml       # Claude Code install + stow deploy + partial settings management (hooks/statusLine)
 │       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings and status line settings in ~/.codex/config.toml
 │       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
-│       ├── emacs.yml             # Emacs dependencies + build from source (conditional on install_emacs)
-│       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml, gated by install_emacs)
+│       ├── emacs.yml             # Emacs dependencies + build from source
+│       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml)
 │       ├── agent-skills.yml      # Agent skills: submodule init/update + symlinks for Claude Code and Codex
 ├── nvim/                         # Stow package for Neovim config
 │   └── .config/
@@ -76,6 +81,18 @@ dev-setup/
 ./run-ansible.sh
 ```
 
+Both scripts accept an optional playbook name argument (without `.yml`) to run only a specific sub-playbook:
+
+```bash
+./run-ansible.sh core          # run core sub-playbook only
+./run-ansible.sh node          # run node sub-playbook only
+./run-ansible.sh ai-assistants # run AI assistants sub-playbook only
+./run-ansible.sh emacs         # run emacs sub-playbook only
+./run-ansible.sh neovim        # run neovim sub-playbook only
+```
+
+`install.sh` accepts the same optional argument.
+
 The playbook is idempotent — safe to re-run.
 
 **Before running**, copy `ansible/vars.yml.example` to `ansible/vars.yml` and set your preferences:
@@ -89,18 +106,31 @@ cp ansible/vars.yml.example ansible/vars.yml
 
 User-configurable variables in `vars.yml`:
 - `git_user_name` / `git_user_email` — git identity
-- `install_emacs` — set to `true` to build Emacs from source (default: `false`)
-- `install_neovim` — set to `false` to skip Neovim installation and stow deployment (default: `true`)
 - `git_core_editor` — optional git `core.editor` override; empty string means no change (possible value: `nvim`)
 - `playwright_browsers` — list of browsers to install (default: `["chromium"]`; options: `chromium`, `firefox`, `webkit`)
-
-`install_neovim` uses `| default(true)` in the playbook. Existing users who do not add this key to their personal `ansible/vars.yml` will get Neovim on the next playbook run.
+- `playbooks_in_main_playbook` — list of sub-playbook names to run when `playbook.yml` (or `run-ansible.sh` without arguments) is invoked; omit a name to skip that sub-playbook entirely; when the variable is absent all sub-playbooks run (see `vars.yml.example` for the default list)
 
 Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do not need user configuration.
 
 **If your user does not have passwordless sudo**, add `--ask-become-pass` to the `ansible-playbook` call at the bottom of `install.sh`.
 
 ## Ansible Playbook Details
+
+### Playbook structure
+
+The playbook is split into a main `playbook.yml` and five sub-playbooks, each covering a logical group of tools:
+
+| Sub-playbook | Tasks included | Condition |
+|---|---|---|
+| `core.yml` | apt-packages, shell-config, git, difftastic, zoxide | always |
+| `node.yml` | node, bun, playwright | always |
+| `ai-assistants.yml` | claude-code, codex, agent-skills | always |
+| `emacs.yml` | emacs (includes emacs-node) | `playbooks_in_main_playbook` |
+| `neovim.yml` | neovim | `playbooks_in_main_playbook` |
+
+`playbook.yml` imports all sub-playbooks via `import_playbook`. Each sub-playbook checks `playbooks_in_main_playbook` at runtime via `meta: end_play` and skips itself if its name is absent from the list. When `playbooks_in_main_playbook` is not defined, all sub-playbooks run. Note: the check also applies to direct runs via `run-ansible.sh <name>` — if the variable is defined and excludes a playbook, running it directly will also skip it.
+
+Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `install.sh <name>`.
 
 ### Idempotency approach
 
@@ -127,7 +157,7 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 | Playwright system deps | `npx playwright install-deps` always runs (`changed_when: false`); apt-based, inherently idempotent |
 | Playwright browsers | `npx playwright install <browser>` always runs per browser in `playwright_browsers` list (`changed_when: false`) |
 | Playwright skill         | Downloaded from GitHub via `download-playwright-skill.sh` (`creates:` on `SKILL.md`); auto-symlinked by `agent-skills.yml` |
-| Emacs (entire section) | `when: install_emacs \| default(false)` on `import_tasks` in `playbook.yml`; skipped when `false` |
+| Emacs (entire section) | `meta: end_play` in `emacs.yml` when `'emacs' not in playbooks_in_main_playbook`; otherwise always runs |
 | Emacs dependencies  | `replace` module for deb-src (only if needed); `apt` module for build-dep, libmagick, tree-sitter |
 | Emacs build         | `emacs --version` check; only builds if missing or version mismatch                               |
 | Emacs LSP npm packages | `npm list -g` check; install only if missing (in `emacs-node.yml`, imported by `emacs.yml`)    |
@@ -140,16 +170,19 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 
 ### bashrc entries managed by Ansible
 
-These entries are managed via `lineinfile` in `ansible/tasks/shell-config.yml`:
+Entries in `ansible/tasks/shell-config.yml` (always applied via `core.yml`):
 
 - `export PATH="$HOME/.local/bin:$PATH"` (for zoxide and other user binaries)
 - `export COLORTERM=truecolor`
 - `alias bat="batcat"`
-- `alias emacs="emacs -nw"` (forces terminal Emacs when launched as `emacs`)
-- `alias e='emacsclient -t -a "" '` (opens terminal client and auto-starts daemon if needed)
 - `batrg() { rg --pretty "$@" | bat --plain; }` (shell function for ripgrep output with bat syntax highlighting)
 - `export BAT_THEME=OneHalfDark`
 - `eval "$(zoxide init bash)"`
+
+Entries in `ansible/tasks/emacs.yml` (applied when `emacs` is in `playbooks_in_main_playbook`, via `emacs.yml`):
+
+- `alias emacs="emacs -nw"` (forces terminal Emacs when launched as `emacs`)
+- `alias e='emacsclient -t -a "" '` (opens terminal client and auto-starts daemon if needed)
 
 The fnm and bun installers add their own PATH/eval lines to `~/.bashrc` when they first run.
 
@@ -172,7 +205,7 @@ The `dt` prefix stands for difftastic and is prepended to the mirrored alias nam
 
 ### Neovim
 
-Neovim is **opt-out**. By default it is installed (`install_neovim: true` in `ansible/vars.yml.example`).
+Neovim is installed by default. It is included in the default `playbooks_in_main_playbook` list in `ansible/vars.yml.example`. To skip Neovim, remove `neovim` from `playbooks_in_main_playbook` in `ansible/vars.yml`.
 
 Installed from official GitHub releases in `ansible/tasks/neovim.yml`:
 
@@ -189,7 +222,7 @@ No `.stow-local-ignore` file is required for the `nvim` package because it conta
 
 ### Emacs
 
-Emacs is **opt-in**. Set `install_emacs: true` in `ansible/vars.yml` to enable it. When `install_emacs` is `false` (the default), all Emacs tasks — including LSP npm packages — are skipped.
+Emacs is installed by default. It is included in the default `playbooks_in_main_playbook` list in `ansible/vars.yml.example`. To skip Emacs, remove `emacs` from `playbooks_in_main_playbook` in `ansible/vars.yml`. When skipped, all Emacs tasks — including LSP npm packages — are skipped.
 
 Built from source in two phases:
 
@@ -213,7 +246,7 @@ This separation ensures dependencies are managed by Ansible (idempotent) while t
 
 **Phase 3: LSP npm packages (in `ansible/tasks/emacs-node.yml`)**
 
-- Imported at the end of `emacs.yml`, so it is also gated by `install_emacs`
+- Imported at the end of `emacs.yml`, so it is also skipped when `emacs` is excluded from `playbooks_in_main_playbook`
 - Checks installed npm globals with `npm list -g`; installs only if any package is missing
 - Package list defined in `emacs_npm_packages` in `ansible/defaults.yml`
 

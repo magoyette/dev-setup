@@ -1,0 +1,30 @@
+---
+- name: Core setup for WSL2
+  hosts: localhost
+  connection: local
+  vars_files:
+    - defaults.yml
+    - vars.yml
+  tasks:
+    - name: Skip if not in playbooks_in_main_playbook
+      meta: end_play
+      when: playbooks_in_main_playbook is defined and 'core' not in playbooks_in_main_playbook
+
+    - name: Create ~/repos directory
+      file:
+        path: "{{ ansible_env.HOME }}/repos"
+        state: directory
+        mode: "0755"
+
+    - name: Disable login message
+      file:
+        path: "{{ ansible_env.HOME }}/.hushlogin"
+        state: touch
+        modification_time: preserve
+        access_time: preserve
+
+    - import_tasks: tasks/apt-packages.yml
+    - import_tasks: tasks/shell-config.yml
+    - import_tasks: tasks/git.yml
+    - import_tasks: tasks/difftastic.yml
+    - import_tasks: tasks/zoxide.yml

@@ -11,6 +11,8 @@ if [ ! -f ansible/vars.yml ]; then
   exit 1
 fi
 
+PLAYBOOK="ansible/${1:-playbook}.yml"
+
 echo "Installing Ansible"
 sudo apt update
 sudo apt install -y ansible
@@ -18,5 +20,5 @@ sudo apt install -y ansible
 echo "Installing Ansible collections"
 ansible-galaxy collection install -r ansible/requirements.yml
 
-echo "Running Ansible playbook"
-ansible-playbook --ask-become-pass ansible/playbook.yml
+echo "Running Ansible playbook: ${PLAYBOOK}"
+ansible-playbook --ask-become-pass "${PLAYBOOK}"

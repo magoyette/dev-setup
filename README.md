@@ -33,16 +33,27 @@ cd dev-setup
 
 Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 
-| Variable              | Description                                                        | Default             |
-| --------------------- | ------------------------------------------------------------------ | ------------------- |
-| `git_user_name`       | Git identity name                                                  | `"Your Name"`       |
-| `git_user_email`      | Git identity email                                                 | `"you@example.com"` |
-| `install_emacs`       | Build Emacs from source                                            | `false`             |
-| `install_neovim`      | Install Neovim from GitHub release                                 | `true`              |
-| `git_core_editor`     | Optional Git `core.editor` override (`nvim` is the suggested value | `""`                |
-| `playwright_browsers` | Browsers to install for Playwright                                 | `["chrome"]`        |
+| Variable                     | Description                                                         | Default                                      |
+| ---------------------------- | ------------------------------------------------------------------- | -------------------------------------------- |
+| `git_user_name`              | Git identity name                                                   | `"Your Name"`                                |
+| `git_user_email`             | Git identity email                                                  | `"you@example.com"`                          |
+| `git_core_editor`            | Optional Git `core.editor` override (`nvim` is the suggested value) | `""`                                         |
+| `playwright_browsers`        | Browsers to install for Playwright                                  | `["chrome"]`                                 |
+| `playbooks_in_main_playbook` | Sub-playbooks to run when invoking the main playbook                | `[core, node, ai-assistants, emacs, neovim]` |
 
 `playwright_browsers` accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
+
+`playbooks_in_main_playbook` controls which sub-playbooks run. Remove a name from the list to skip that tool group entirely.
+
+Some sub-playbooks depend on others:
+
+| Sub-playbook    | Dependency on another sub-playbook |
+| --------------- | ---------------------------------- |
+| `core`          | None                               |
+| `node`          | None                               |
+| `ai-assistants` | `core` for git, `node`             |
+| `emacs`         | `core` for git, `node`             |
+| `neovim`        | `code` for git                     |
 
 Run the bootstrap script:
 
@@ -89,41 +100,43 @@ It will prompt for the version in `X.Y.Z` format (e.g. `1.2.0`), create an annot
 
 ## Installed tools
 
-### Configuration management
+Ansible is installed to run the playbooks. Stow is used by Ansible to manage the dotfiles.
 
-- Ansible : to manage packages and configurations
-- Stow : to manage dotfiles
-
-### Utilities
+### core sub-playbook
 
 - bat : cat with syntax highlight
+- build-essential: to build Emacs and other tools from source
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
 - git-delta : diff tool (primary pager for git commands)
 - jq : for JSON manipulation
-- Pandoc : for Markdown support
+- pandoc : for Markdown support
 - ripgrep : for file search
-- ShellCheck : linter for Bash
+- shellcheck : linter for Bash
+- unzip: to unzip .zip files
 - Zoxide : alternative to cd
 
-### Node
+### node sub-playbook
 
 - bun : JavaScript and TypeScript toolkit
 - fnm : Node version manager
 - Node : JavaScript and Typescript runtime
-
-### Testing
-
 - Playwright CLI : browser automation for testing front-end changes
 
-### Coding
+### ai-assistants
 
 - Claude-Code : coding agent
   - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
 - Codex CLI : coding agent
+
+### emacs
+
 - Emacs : terminal text editor
+
+### neovim
+
 - Neovim : terminal text editor
 
 ### Agent skills
 
-- [humanizer](https://github.com/blader/humanizer) : remove signs of AI-generated writing from text
 - [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright/src/skill) : browser automation skill (bundled with Playwright npm package)
+- [humanizer](https://github.com/blader/humanizer) : remove signs of AI-generated writing from text

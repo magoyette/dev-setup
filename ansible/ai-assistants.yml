@@ -1,0 +1,15 @@
+---
+- name: AI assistants setup for WSL2
+  hosts: localhost
+  connection: local
+  vars_files:
+    - defaults.yml
+    - vars.yml
+  tasks:
+    - name: Skip if not in playbooks_in_main_playbook
+      meta: end_play
+      when: playbooks_in_main_playbook is defined and 'ai-assistants' not in playbooks_in_main_playbook
+
+    - import_tasks: tasks/claude-code.yml
+    - import_tasks: tasks/codex.yml
+    - import_tasks: tasks/agent-skills.yml
