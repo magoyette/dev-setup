@@ -96,7 +96,7 @@ Update `CHANGELOG.md` first: move entries from `[Unreleased]` to a new versioned
 Run the release script from the repo root:
 
 ```sh
-./scripts/release.sh
+./release.sh
 ```
 
 It will prompt for the version in `X.Y.Z` format (e.g. `1.2.0`), create an annotated git tag, push the commits, and push the tag.

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.2] - 2026-03-07
+
+### Fixed
+
+- Prevent `release.sh` from opening a pager for the changelog preview
+
 ## [3.1.1] - 2026-03-07
 
 ### Fixed
@@ -215,7 +221,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.1.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.1.2...HEAD
+[3.1.2]: https://github.com/magoyette/dev-setup/compare/v3.1.1...v3.1.2
 [3.1.1]: https://github.com/magoyette/dev-setup/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/magoyette/dev-setup/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/magoyette/dev-setup/compare/v2.3.1...v3.0.0

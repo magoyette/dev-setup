@@ -433,6 +433,8 @@ The `llm-docs/` directory contains detailed documentation about fixes applied to
 
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with Git tags, and maintains a `CHANGELOG.md` following the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) format.
 
+When editing `CHANGELOG.md`, always create or update a concrete SemVer release section in the form `## [X.Y.Z] - YYYY-MM-DD` using the appropriate major, minor, or patch bump. Do not leave user-facing changes only under `[Unreleased]`.
+
 **Version bump guidelines:**
 
 | Change type                           | Version bump | Examples                                                                        |
@@ -443,12 +445,12 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html) wit
 
 **When releasing a new version:**
 
-1. Move entries from `[Unreleased]` to a new versioned section with today's date
+1. Create or update a versioned section in `CHANGELOG.md` for the release using the correct major, minor, or patch bump and today's date
 2. Update the comparison links at the bottom of `CHANGELOG.md`
 3. Commit the changelog update
-4. Run `./scripts/release.sh` — it prompts for the version (`X.Y.Z`), creates an annotated tag, pushes commits, and pushes the tag
+4. Run `./release.sh` — it shows the start of `CHANGELOG.md` with `batcat --paging=never`, prompts for the version (`X.Y.Z`), creates an annotated tag, pushes commits, and pushes the tag
 
-The user may ask an agent to run `./scripts/release.sh` directly. Before doing so, ensure steps 1–3 are complete (changelog updated and committed).
+The user may ask an agent to run `./release.sh` directly. Before doing so, ensure steps 1–3 are complete (changelog updated and committed).
 
 Do not add entries to `CHANGELOG.md` for documentation-only edits to `README.md` or `CLAUDE.md`.
 
