@@ -135,6 +135,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 ### emacs
 
 - Emacs : terminal text editor
+- emacs-lsp-booster : better performance in lsp-mode
 
 ### neovim
 

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.5] - 2026-03-07
+
+### Added
+
+- Install `emacs-lsp-booster`
+
 ## [3.1.4] - 2026-03-07
 
 ### Fixed
@@ -233,7 +239,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.1.4...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.1.5...HEAD
+[3.1.5]: https://github.com/magoyette/dev-setup/compare/v3.1.4...v3.1.5
 [3.1.4]: https://github.com/magoyette/dev-setup/compare/v3.1.3...v3.1.4
 [3.1.3]: https://github.com/magoyette/dev-setup/compare/v3.1.2...v3.1.3
 [3.1.2]: https://github.com/magoyette/dev-setup/compare/v3.1.1...v3.1.2

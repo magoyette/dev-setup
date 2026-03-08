@@ -1,0 +1,47 @@
+---
+- name: Ensure ~/.local/bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Ensure emacs-lsp-booster is supported on this architecture
+  ansible.builtin.assert:
+    that:
+      - ansible_system == "Linux"
+      - ansible_architecture == "x86_64"
+    fail_msg: >-
+      emacs-lsp-booster is currently pinned only for Linux x86_64 because
+      ansible/defaults.yml uses the upstream x86_64 musl release asset.
+
+- name: Check installed emacs-lsp-booster version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/emacs-lsp-booster --version"
+  register: emacs_lsp_booster_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Download and install emacs-lsp-booster {{ emacs_lsp_booster_version }}
+  ansible.builtin.shell: |
+    set -euo pipefail
+
+    tmp_dir="$(mktemp -d)"
+    trap 'rm -rf "${tmp_dir}"' EXIT
+
+    archive_name="{{ emacs_lsp_booster_archive_name }}"
+    release_base_url="https://github.com/blahgeek/emacs-lsp-booster/releases/download/{{ emacs_lsp_booster_version }}"
+
+    curl -sSfL "${release_base_url}/${archive_name}" -o "${tmp_dir}/${archive_name}"
+    curl -sSfL "${release_base_url}/${archive_name}.sha256sum" -o "${tmp_dir}/${archive_name}.sha256sum"
+
+    (
+      cd "${tmp_dir}"
+      sha256sum -c "${archive_name}.sha256sum"
+      unzip -q "${archive_name}"
+    )
+
+    install -m 0755 "${tmp_dir}/emacs-lsp-booster" "{{ ansible_env.HOME }}/.local/bin/emacs-lsp-booster"
+  args:
+    executable: /bin/bash
+  when: >-
+    emacs_lsp_booster_version_output.rc != 0 or
+    (emacs_lsp_booster_version | regex_replace('^v', '')) not in emacs_lsp_booster_version_output.stdout
