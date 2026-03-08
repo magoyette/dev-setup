@@ -18,6 +18,7 @@ My personal VS Code setup.
 - [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker)
 - [Docker DX](https://marketplace.visualstudio.com/items?itemName=docker.docker)
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+- [Even Better TOML](https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml)
 - [Git Blame](https://marketplace.visualstudio.com/items?itemName=waderyan.gitblame)
 - [GitHub Theme](https://marketplace.visualstudio.com/items?itemName=GitHub.github-vscode-theme)
 - [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one)
