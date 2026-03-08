@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.1] - 2026-03-08
+
+### Fixed
+
+- Stop rewriting `~/.bashrc` on every playbook run when managing the Starship and zoxide
+- Stop reinstalling `emacs-lsp-booster` on every playbook run
+
 ## [3.6.0] - 2026-03-08
 
 ### Added
@@ -277,7 +284,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.6.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.6.1...HEAD
+[3.6.1]: https://github.com/magoyette/dev-setup/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/magoyette/dev-setup/compare/v3.5.1...v3.6.0
 [3.5.1]: https://github.com/magoyette/dev-setup/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/magoyette/dev-setup/compare/v3.4.0...v3.5.0

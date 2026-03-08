@@ -22,7 +22,7 @@ dev-setup/
 │   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, ast-grep, agent-skills
 │   ├── emacs.yml                 # Emacs sub-playbook: emacs (skipped via playbooks_in_main_playbook)
 │   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
-│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, claude sandbox enabled, npm packages)
+│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version/checksum, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, claude sandbox enabled, npm packages)
 │   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, install_git_aliases, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
@@ -179,7 +179,7 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | Emacs (entire section) | `meta: end_play` in `emacs.yml` when `'emacs' not in playbooks_in_main_playbook`; otherwise always runs |
 | Emacs dependencies  | `replace` module for deb-src (only if needed); `apt` module for build-dep, libmagick, tree-sitter |
 | Emacs build         | `emacs --version` check; only builds if missing or version mismatch                               |
-| emacs-lsp-booster   | `~/.local/bin/emacs-lsp-booster --version` check; downloads pinned GitHub release zip only when missing/version mismatch |
+| emacs-lsp-booster   | `stat` with pinned SHA-256 checksum; downloads pinned GitHub release zip only when missing/checksum mismatch |
 | Emacs LSP npm packages | `npm list -g` check; install only if missing (in `emacs-node.yml`, imported by `emacs.yml`)    |
 | External skills update | `git submodule update --init --remote --merge` always runs (`changed_when: false`)                              |
 | `~/.claude/skills/` and `~/.agents/skills/` directories | `file` module with `state: directory` |
@@ -302,8 +302,8 @@ This separation ensures dependencies are managed by Ansible (idempotent) while t
 
 - Installs the pinned upstream Linux release binary into `~/.local/bin/emacs-lsp-booster`
 - Verifies the download with the release `.sha256sum` file before installing
-- Reinstalls only when missing or when `emacs-lsp-booster --version` does not match `emacs_lsp_booster_version`
-- Version and archive name are defined in `ansible/defaults.yml`
+- Reinstalls only when missing or when the installed binary SHA-256 does not match `emacs_lsp_booster_binary_sha256`
+- Version, archive name, and pinned installed-binary checksum are defined in `ansible/defaults.yml`
 
 **Phase 4: LSP npm packages (in `ansible/tasks/emacs-node.yml`)**
 

@@ -14,11 +14,11 @@
       emacs-lsp-booster is currently pinned only for Linux x86_64 because
       ansible/defaults.yml uses the upstream x86_64 musl release asset.
 
-- name: Check installed emacs-lsp-booster version
-  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/emacs-lsp-booster --version"
-  register: emacs_lsp_booster_version_output
-  failed_when: false
-  changed_when: false
+- name: Check installed emacs-lsp-booster binary checksum
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/emacs-lsp-booster"
+    checksum_algorithm: sha256
+  register: emacs_lsp_booster_binary_stat
 
 - name: Download and install emacs-lsp-booster {{ emacs_lsp_booster_version }}
   ansible.builtin.shell: |
@@ -43,5 +43,5 @@
   args:
     executable: /bin/bash
   when: >-
-    emacs_lsp_booster_version_output.rc != 0 or
-    (emacs_lsp_booster_version | regex_replace('^v', '')) not in emacs_lsp_booster_version_output.stdout
+    (not emacs_lsp_booster_binary_stat.stat.exists) or
+    (emacs_lsp_booster_binary_stat.stat.checksum != emacs_lsp_booster_binary_sha256)

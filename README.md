@@ -76,7 +76,7 @@ Run the bootstrap script:
 ./install.sh
 ```
 
-This installs Ansible via apt, then runs the Ansible playbook. The playbook is idempotent (safe to re-run after changes).
+This installs Ansible via apt, then runs the Ansible playbook. The playbook is idempotent (safe to re-run after changes). Re-running it should normally report no changes unless a managed setting or pinned version/checksum actually differs.
 
 ## Useful commands
 
