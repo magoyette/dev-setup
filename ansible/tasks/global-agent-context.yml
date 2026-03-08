@@ -1,0 +1,14 @@
+---
+- name: Deploy shared global agent context for Claude Code
+  file:
+    src: "{{ playbook_dir }}/../global-agent-context.md"
+    dest: "{{ ansible_env.HOME }}/.claude/CLAUDE.md"
+    state: link
+    force: true
+
+- name: Deploy shared global agent context for Codex
+  file:
+    src: "{{ playbook_dir }}/../global-agent-context.md"
+    dest: "{{ ansible_env.HOME }}/.codex/AGENTS.md"
+    state: link
+    force: true

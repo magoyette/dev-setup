@@ -11,6 +11,7 @@ This is a developer setup repository for WSL2 (Windows Subsystem for Linux v2). 
 ```
 dev-setup/
 ├── CLAUDE.md                     # Canonical agent guidance source (this file)
+├── global-agent-context.md       # Shared global agent context deployed to ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md
 ├── .githooks/
 │   └── pre-commit                # Runs Ansible syntax checks before commit when ansible/*.yml is staged
 ├── ansible/
@@ -34,6 +35,7 @@ dev-setup/
 │       ├── neovim.yml            # Neovim install from GitHub release + stow deploy
 │       ├── claude-code.yml       # Claude Code install + stow deploy + partial settings management (hooks/statusLine)
 │       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings and status line settings in ~/.codex/config.toml
+│       ├── global-agent-context.yml # Shared global agent context symlinks for Claude Code and Codex
 │       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
 │       ├── emacs.yml             # Emacs dependencies + build from source
 │       ├── emacs-lsp-booster.yml # emacs-lsp-booster release binary install
@@ -154,6 +156,7 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | Codex CLI           | `npm list -g @openai/codex` check; install only if missing                                                   |
 | Codex project doc config | `file`/`copy`/`lineinfile` (regexp+insertBOF) for `~/.codex/config.toml` (`project_doc_fallback_filenames`, `project_doc_max_bytes`) |
 | Codex status line config | `lineinfile` for `~/.codex/config.toml` (`[tui]`, `status_line`) |
+| Shared global agent context | `file` module with `state: link` and `force: true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` pointing to `global-agent-context.md` |
 | Playwright          | `npm list -g playwright` check; install only if missing                                           |
 | Playwright CLI      | `npm list -g @playwright/cli` check; install only if missing                                      |
 | Playwright system deps | `npx playwright install-deps` always runs (`changed_when: false`); apt-based, inherently idempotent |
@@ -292,6 +295,10 @@ This means editing files under the corresponding repo directory immediately affe
 
 ## Claude Code Configuration
 
+### Global context (`~/.claude/CLAUDE.md`)
+
+Ansible manages Claude Code's global context file as a symlink to `global-agent-context.md` in this repository. The file contains a concise, repo-managed list of CLI tools installed by `dev-setup` so Claude Code knows they are available in every session.
+
 ### Settings (`~/.claude/settings.json`)
 
 `settings.json` is not tracked in git. Ansible manages only these keys:
@@ -358,6 +365,8 @@ Playwright is installed globally via npm, providing browser automation for AI co
 ## Codex Configuration
 
 Codex CLI (`@openai/codex`) is installed via npm using a check-then-install pattern (`npm list -g @openai/codex`), so Ansible installs it when missing and otherwise leaves upgrades to Codex's built-in update flow.
+
+Codex's global agent context file at `~/.codex/AGENTS.md` is managed by Ansible as a symlink to `global-agent-context.md` in this repository. This does not replace `AGENTS.md` discovery: Codex still prefers `AGENTS.md` over fallback filenames like `CLAUDE.md`, and the global `AGENTS.md` is loaded independently of project-level fallback behavior.
 
 Codex project docs are configured by Ansible in `~/.codex/config.toml`:
 

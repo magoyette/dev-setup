@@ -12,4 +12,5 @@
 
     - import_tasks: tasks/claude-code.yml
     - import_tasks: tasks/codex.yml
+    - import_tasks: tasks/global-agent-context.yml
     - import_tasks: tasks/agent-skills.yml
