@@ -20,7 +20,9 @@ else
   printf '{}\n' >"$tmp_input"
 fi
 
-jq '
+sandbox_enabled="${CLAUDE_SANDBOX_ENABLED:-true}"
+
+jq --argjson sandbox_enabled "$sandbox_enabled" '
   .hooks = {
     "Notification": [
       {
@@ -39,6 +41,7 @@ jq '
     "command": "bunx -y ccstatusline@latest",
     "padding": 0
   }
+  | .sandbox = ((.sandbox // {}) * {"enabled": $sandbox_enabled})
 ' "$tmp_input" >"$tmp_output"
 
 if [[ -f "$settings_file" ]] && cmp -s "$tmp_output" "$settings_file"; then

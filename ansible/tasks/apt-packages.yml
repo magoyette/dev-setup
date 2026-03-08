@@ -21,6 +21,7 @@
   apt:
     name:
       - bat
+      - bubblewrap
       - build-essential
       - fzf
       - git
@@ -29,6 +30,7 @@
       - pandoc
       - ripgrep
       - shellcheck
+      - socat
       - stow
       - unzip
     state: present

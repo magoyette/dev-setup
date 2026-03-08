@@ -22,11 +22,11 @@ dev-setup/
 │   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, agent-skills
 │   ├── emacs.yml                 # Emacs sub-playbook: emacs (skipped via playbooks_in_main_playbook)
 │   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
-│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, npm packages)
+│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, claude sandbox enabled, npm packages)
 │   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, install_git_aliases, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
-│       ├── apt-packages.yml      # apt update + package installation (includes build-essential)
+│       ├── apt-packages.yml      # apt update + package installation (includes build-essential, bubblewrap, socat)
 │       ├── shell-config.yml      # ~/.bashrc entries via lineinfile
 │       ├── git.yml               # git global config + aliases
 │       ├── difftastic.yml        # difftastic install (secondary diff tool)
@@ -35,7 +35,7 @@ dev-setup/
 │       ├── starship.yml          # Starship install from GitHub release + bash init + stow deploy
 │       ├── bun.yml               # bun install
 │       ├── neovim.yml            # Neovim install from GitHub release + stow deploy
-│       ├── claude-code.yml       # Claude Code install + stow deploy + partial settings management (hooks/statusLine)
+│       ├── claude-code.yml       # Claude Code install + stow deploy + sandbox-runtime npm install + partial settings management (hooks/statusLine/sandbox)
 │       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings and status line settings in ~/.codex/config.toml
 │       ├── global-agent-context.yml # Shared global agent context symlinks for Claude Code and Codex
 │       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
@@ -67,7 +67,7 @@ dev-setup/
 │   ├── sync-git-aliases.sh       # Idempotent Git alias sync using git config subcommands
 │   ├── install-emacs-in-ubuntu.sh  # Emacs build script (download, configure, make, install only)
 │   ├── install-git-hooks.sh      # Configures local git hooks path to .githooks
-│   ├── merge-claude-settings.sh  # Merges managed Claude settings fields (hooks/statusLine) without touching other keys
+│   ├── merge-claude-settings.sh  # Merges managed Claude settings fields (hooks/statusLine/sandbox) without touching other keys
 │   └── download-playwright-skill.sh  # Downloads Playwright skill from GitHub into skills/playwright/
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
 └── claude-hooks.md               # Documentation for notification system
@@ -147,7 +147,7 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 
 | Concern             | Mechanism                                                                                         |
 | ------------------- | ------------------------------------------------------------------------------------------------- |
-| apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, includes `build-essential` for compilation tools, and installs core CLI tools like `fzf` |
+| apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, includes `build-essential` for compilation tools, `bubblewrap` and `socat` for sandbox support, and installs core CLI tools like `fzf` |
 | `~/.bashrc` entries | `lineinfile` module (checks before adding)                                                        |
 | git config          | `community.general.git_config` module                                                             |
 | git core.editor     | Conditionally set via `git_core_editor`; skipped when empty string                               |
@@ -161,7 +161,8 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | Neovim install      | Checks `~/.local/bin/nvim --version`; downloads release tarball from GitHub only when missing/version mismatch (`neovim_version` in `defaults.yml`) |
 | Neovim config       | Stow package `nvim` (`changed_when: false`)                                                       |
 | Claude Code         | `which claude` check before install                                                               |
-| Claude settings (`hooks`, `statusLine`) | `scripts/merge-claude-settings.sh` merges only managed keys into `~/.claude/settings.json` via `jq`; exits changed only when content differs |
+| Claude settings (`hooks`, `statusLine`, `sandbox`) | `scripts/merge-claude-settings.sh` merges only managed keys into `~/.claude/settings.json` via `jq`; `sandbox.enabled` is managed but user keys like `sandbox.filesystem.*` are preserved via recursive merge; exits changed only when content differs |
+| Claude sandbox-runtime | `npm list -g @anthropic-ai/sandbox-runtime` check; install only if missing (seccomp filter for unix socket blocking) |
 | Codex CLI           | `npm list -g @openai/codex` check; install only if missing                                                   |
 | Codex project doc config | `file`/`copy`/`lineinfile` (regexp+insertBOF) for `~/.codex/config.toml` (`project_doc_fallback_filenames`, `project_doc_max_bytes`) |
 | Codex status line config | `lineinfile` for `~/.codex/config.toml` (`[tui]`, `status_line`) |
@@ -336,6 +337,7 @@ Ansible manages Claude Code's global context file as a symlink to `global-agent-
 
 - **`hooks`**: WSL notification hook for `permission_prompt` and `idle_prompt`
 - **`statusLine`**: custom command using `bunx -y ccstatusline@latest`
+- **`sandbox.enabled`**: OS-level sandboxing via bubblewrap + socat (default: `true` from `claude_sandbox_enabled` in `ansible/defaults.yml`); user customizations under `sandbox` (e.g. `sandbox.filesystem.allowWrite`) are preserved via recursive jq merge
 
 All other keys (for example `model`, editor/UI preferences) are user-managed and preserved as-is on every playbook run.
 
@@ -374,7 +376,7 @@ ONLY_WHEN_UNFOCUSED=false
 
 ### Modifying Claude Code settings
 
-1. To change managed fields (`hooks`/`statusLine`), edit `scripts/merge-claude-settings.sh` and re-run the playbook
+1. To change managed fields (`hooks`/`statusLine`/`sandbox.enabled`), edit `scripts/merge-claude-settings.sh` and re-run the playbook
 2. To change any other Claude setting, edit `~/.claude/settings.json` directly
 3. Restart Claude Code session for settings changes to take effect
 
@@ -516,21 +518,14 @@ Changelog entries must be concise: describe **what** changed, not **how**. Do no
 
 ## Development Workflow
 
-### Adding a new tool
+### Completion checklist
 
-When adding a new tool to this repository (new Ansible task, new stow package, etc.), always update `CLAUDE.md` to reflect:
+Every change to this repository **must** pass through this checklist before being considered done. Do not skip items — check each one and apply if relevant.
 
-- New task file in the repository structure tree
-- Idempotency mechanism in the idempotency table
-- Any new `defaults.yml` variables (tool versions, package lists) in both the tree comment and the relevant tool section
-- Design decisions or conventions that would affect future work (e.g. secondary vs. primary tool, alias naming conventions)
+- [ ] **`CLAUDE.md`** — update the repository structure tree, idempotency table, relevant tool sections, and `defaults.yml` variable descriptions
+- [ ] **`README.md`** — update the Installed tools list, vars table, or any other section affected by the change
+- [ ] **`CHANGELOG.md`** — add an entry under the correct version section (do not leave entries only under `[Unreleased]`)
+- [ ] **Ansible syntax check** — run `ansible-playbook ansible/playbook.yml --syntax-check` if any file under `ansible/` was modified
+- [ ] **shellcheck** — run `shellcheck <script>` if any `.sh` file was created or modified
 
-After updates, ensure `CLAUDE.md` remains the canonical and current source of agent guidance.
-
-If you modify `ansible/playbook.yml` or any file under `ansible/tasks/`, run:
-
-```bash
-ansible-playbook ansible/playbook.yml --syntax-check
-```
-
-**Any agent adding or changing behavior must update `CLAUDE.md` without waiting to be asked.**
+**Any agent adding or changing behavior must complete this checklist without waiting to be asked.**

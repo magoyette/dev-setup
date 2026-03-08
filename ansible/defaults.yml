@@ -8,6 +8,7 @@ starship_version: "v1.24.2"
 neovim_version: "v0.11.6"
 neovim_archive_name: "nvim-linux-x86_64.tar.gz"
 codex_project_doc_max_bytes: 1073741824
+claude_sandbox_enabled: true
 codex_status_line:
   - model-with-reasoning
   - git-branch
