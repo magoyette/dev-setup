@@ -21,8 +21,9 @@ else
 fi
 
 sandbox_enabled="${CLAUDE_SANDBOX_ENABLED:-true}"
+sandbox_allow_write="${CLAUDE_SANDBOX_ALLOW_WRITE:-[]}"
 
-jq --argjson sandbox_enabled "$sandbox_enabled" '
+jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$sandbox_allow_write" '
   .hooks = {
     "Notification": [
       {
@@ -41,7 +42,7 @@ jq --argjson sandbox_enabled "$sandbox_enabled" '
     "command": "bunx -y ccstatusline@latest",
     "padding": 0
   }
-  | .sandbox = ((.sandbox // {}) * {"enabled": $sandbox_enabled, "filesystem": {"allowWrite": ((.sandbox.filesystem.allowWrite // []) + ["~/.ansible/tmp"] | unique)}})
+  | .sandbox = ((.sandbox // {}) * {"enabled": $sandbox_enabled, "filesystem": ((.sandbox.filesystem // {}) * {"allowWrite": $sandbox_allow_write})})
 ' "$tmp_input" >"$tmp_output"
 
 if [[ -f "$settings_file" ]] && cmp -s "$tmp_output" "$settings_file"; then

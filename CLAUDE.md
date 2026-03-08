@@ -23,7 +23,7 @@ dev-setup/
 │   ├── emacs.yml                 # Emacs sub-playbook: emacs (skipped via playbooks_in_main_playbook)
 │   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
 │   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version/checksum, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, claude sandbox enabled, npm packages)
-│   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, install_git_aliases, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
+│   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, install_git_aliases, AI assistants sandbox writable roots, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential, bubblewrap, socat)
@@ -36,7 +36,7 @@ dev-setup/
 │       ├── bun.yml               # bun install
 │       ├── neovim.yml            # Neovim install from GitHub release + stow deploy
 │       ├── claude-code.yml       # Claude Code install + stow deploy + sandbox-runtime npm install + partial settings management (hooks/statusLine/sandbox)
-│       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings and status line settings in ~/.codex/config.toml
+│       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings, status line, and sandbox writable roots in ~/.codex/config.toml
 │       ├── global-agent-context.yml # Shared global agent context symlinks for Claude Code and Codex
 │       ├── playwright.yml        # Playwright CLI + browsers + skill deployment
 │       ├── emacs.yml             # Emacs dependencies + build from source
@@ -119,6 +119,7 @@ User-configurable variables in `vars.yml`:
 - `git_user_name` / `git_user_email` — git identity
 - `git_core_editor` — optional git `core.editor` override; empty string means no change (possible value: `nvim`)
 - `install_git_aliases` — whether to install and manage the repository's Git aliases; default `true`; when `false`, alias management is skipped and existing aliases are preserved
+- `ai_assistants_sandbox_writable_roots` — extra writable roots shared by Codex and Claude Code; used for Codex when `sandbox_mode = "workspace-write"` and for Claude Code `sandbox.filesystem.allowWrite`; default `[]`, so Codex `writable_roots` also defaults to `[]`
 - `playwright_browsers` — list of browsers to install (default: `["chromium"]`; options: `chromium`, `firefox`, `webkit`)
 - `playbooks_in_main_playbook` — list of sub-playbook names to run when `playbook.yml` (or `run-ansible.sh` without arguments) is invoked; omit a name to skip that sub-playbook entirely; when the variable is absent all sub-playbooks run (see `vars.yml.example` for the default list)
 
@@ -163,11 +164,12 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | Neovim install      | Checks `~/.local/bin/nvim --version`; downloads release tarball from GitHub only when missing/version mismatch (`neovim_version` in `defaults.yml`) |
 | Neovim config       | Stow package `nvim` (`changed_when: false`)                                                       |
 | Claude Code         | `which claude` check before install                                                               |
-| Claude settings (`hooks`, `statusLine`, `sandbox`) | `scripts/merge-claude-settings.sh` merges only managed keys into `~/.claude/settings.json` via `jq`; `sandbox.enabled` and `sandbox.filesystem.allowWrite` (with `~/.ansible/tmp`) are managed; user paths in `allowWrite` and other `sandbox` keys are preserved via recursive merge; exits changed only when content differs |
+| Claude settings (`hooks`, `statusLine`, `sandbox`) | `scripts/merge-claude-settings.sh` merges only managed keys into `~/.claude/settings.json` via `jq`; `sandbox.enabled` and `sandbox.filesystem.allowWrite` (from `ai_assistants_sandbox_writable_roots`) are managed; `allowWrite` is set exactly to the configured list while other user `sandbox` keys are preserved via recursive merge; exits changed only when content differs |
 | Claude sandbox-runtime | `npm list -g @anthropic-ai/sandbox-runtime` check; install only if missing (seccomp filter for unix socket blocking) |
 | Codex CLI           | `npm list -g @openai/codex` check; install only if missing                                                   |
 | Codex project doc config | `file`/`copy`/`lineinfile` (regexp+insertBOF) for `~/.codex/config.toml` (`project_doc_fallback_filenames`, `project_doc_max_bytes`) |
 | Codex status line config | `lineinfile` for `~/.codex/config.toml` (`[tui]`, `status_line`) |
+| Codex sandbox writable roots | `lineinfile` for `~/.codex/config.toml` (`[sandbox_workspace_write]`, `writable_roots`) from `ai_assistants_sandbox_writable_roots` in `ansible/vars.yml` |
 | Shared global agent context | `file` module with `state: link` and `force: true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` pointing to `global-agent-context.md` |
 | Playwright          | `npm list -g playwright` check; install only if missing                                           |
 | Playwright CLI      | `npm list -g @playwright/cli` check; install only if missing                                      |
@@ -342,7 +344,7 @@ Ansible manages Claude Code's global context file as a symlink to `global-agent-
 - **`hooks`**: WSL notification hook for `permission_prompt` and `idle_prompt`
 - **`statusLine`**: custom command using `bunx -y ccstatusline@latest`
 - **`sandbox.enabled`**: OS-level sandboxing via bubblewrap + socat (default: `true` from `claude_sandbox_enabled` in `ansible/defaults.yml`)
-- **`sandbox.filesystem.allowWrite`**: managed paths (`~/.ansible/tmp`) are merged with any user-added paths via `unique`; other user keys under `sandbox` (e.g. `sandbox.filesystem.denyWrite`) are preserved via recursive jq merge
+- **`sandbox.filesystem.allowWrite`**: managed paths from `ai_assistants_sandbox_writable_roots` in `ansible/vars.yml`; the list is written exactly as configured, while other user keys under `sandbox` (e.g. `sandbox.filesystem.denyWrite`) are preserved via recursive jq merge
 
 All other keys (for example `model`, editor/UI preferences) are user-managed and preserved as-is on every playbook run.
 
@@ -415,6 +417,13 @@ Codex status line is configured by Ansible in `~/.codex/config.toml`:
 
 - `[tui]`
 - `status_line = ["model-with-reasoning", "git-branch", "context-used", "five-hour-limit", "weekly-limit"]` (from `codex_status_line` in `ansible/defaults.yml`)
+
+Codex workspace-write sandbox writable roots are configured by Ansible in `~/.codex/config.toml`:
+
+- `[sandbox_workspace_write]`
+- `writable_roots = []` by default (from `ai_assistants_sandbox_writable_roots` in `ansible/vars.yml`)
+
+Claude Code uses the same `ai_assistants_sandbox_writable_roots` variable for `sandbox.filesystem.allowWrite`, keeping both assistants aligned for Ansible workflows. Codex applies the setting only when `sandbox_mode = "workspace-write"`, which is Codex's documented default local sandbox mode.
 
 This repository uses `CLAUDE.md` as the only project instruction file. A large `project_doc_max_bytes` value makes Codex's behavior align with Claude Code in normal cases where instruction files should not be truncated.
 Codex applies `project_doc_max_bytes` as a cumulative limit across discovered project docs; with only `CLAUDE.md` in this repo, `1073741824` is effectively non-limiting.

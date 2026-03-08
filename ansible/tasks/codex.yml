@@ -48,3 +48,16 @@
     regexp: "^\\s*status_line\\s*="
     insertafter: "^\\[tui\\]\\s*$"
     line: "status_line = {{ codex_status_line | to_json }}"
+
+- name: Ensure Codex sandbox workspace-write section exists in config
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/config.toml"
+    regexp: "^\\[sandbox_workspace_write\\]\\s*$"
+    line: "[sandbox_workspace_write]"
+
+- name: Configure Codex sandbox writable roots in config
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/config.toml"
+    regexp: "^\\s*writable_roots\\s*="
+    insertafter: "^\\[sandbox_workspace_write\\]\\s*$"
+    line: "writable_roots = {{ ai_assistants_sandbox_writable_roots | to_json }}"

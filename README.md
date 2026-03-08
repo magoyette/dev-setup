@@ -44,31 +44,31 @@ cd dev-setup
 
 Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 
-| Variable                     | Description                                                         | Default                                                |
-| ---------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------ |
-| `git_user_name`              | Git identity name                                                   | `"Your Name"`                                          |
-| `git_user_email`             | Git identity email                                                  | `"you@example.com"`                                    |
-| `git_core_editor`            | Optional Git `core.editor` override (`nvim` is the suggested value) | `""`                                                   |
-| `install_git_aliases`        | Install and manage this repo's Git aliases                          | `true`                                                 |
-| `playwright_browsers`        | Browsers to install for Playwright                                  | `["chrome"]`                                           |
-| `playbooks_in_main_playbook` | Sub-playbooks to run when invoking the main playbook                | `[core, starship, node, ai-assistants, emacs, neovim]` |
-
-`playwright_browsers` accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
-
-`playbooks_in_main_playbook` controls which sub-playbooks run. Remove a name from the list to skip that tool group entirely.
-
-`install_git_aliases: false` skips Git alias management and leaves any existing aliases untouched.
+- `git_user_name`
+  Git identity name. Default: `"Your Name"`.
+- `git_user_email`
+  Git identity email. Default: `"you@example.com"`.
+- `git_core_editor`
+  Optional Git `core.editor` override. `nvim` is the suggested value. Default: `""`.
+- `install_git_aliases`
+  Install and manage this repo's Git aliases. Default: `true`. Set to `false` to skip Git alias management.
+- `ai_assistants_sandbox_writable_roots`
+  Extra writable roots for the sandboxes of Codex (`writable_roots`) and Claude Code (`sandbox.filesystem.allowWrite`). Default: `[]`.
+- `playwright_browsers`
+  Browsers to install for Playwright. Default: `["chrome"]`. Accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
+- `playbooks_in_main_playbook`
+  Sub-playbooks to run when invoking the main playbook. Default: `[core, starship, node, ai-assistants, emacs, neovim]`.
 
 Some sub-playbooks depend on others:
 
 | Sub-playbook    | Dependency on another sub-playbook |
 | --------------- | ---------------------------------- |
 | `core`          | None                               |
-| `starship`      | `core` for PATH setup and Stow     |
-| `node`          | None                               |
-| `ai-assistants` | `core` for git, `node`             |
-| `emacs`         | `core` for git, `node`             |
-| `neovim`        | `core` for git                     |
+| `starship`      | `core`                             |
+| `node`          | `core`                             |
+| `ai-assistants` | `core`, `node`                     |
+| `emacs`         | `core`, `node`                     |
+| `neovim`        | `core`                             |
 
 Run the bootstrap script:
 
@@ -97,7 +97,7 @@ git alias
 
 Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code.
 
-For global user-level context, Ansible also deploys [`global-agent-context.md`](global-agent-context.md) to both `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. That file is a concise shared list of the CLI tools installed by this setup.
+For global user-level context, Ansible also deploys [`global-agent-context.md`](global-agent-context.md) to both `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. That file is a concise shared list of the CLI tools installed by this setup that are useful for an AI agent and doesn't have an Agent Skill.
 
 ## Pre-commit hook
 

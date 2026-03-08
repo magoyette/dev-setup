@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.0] - 2026-03-08
+
+### Added
+
+- New variable `ai_assistants_sandbox_writable_roots` in `ansible/vars.yml` allows Codex and Claude Code to write in additional directories outside of their sandbox.
+
+### Removed
+
+- `~/.ansible/tmp` as a writable directory outside the sandbox for Claude Code. Ansible playbook syntax check requires other directories to run without a permission prompt.
+
 ## [3.6.1] - 2026-03-08
 
 ### Fixed
@@ -284,7 +294,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.6.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.7.0...HEAD
+[3.7.0]: https://github.com/magoyette/dev-setup/compare/v3.6.1...v3.7.0
 [3.6.1]: https://github.com/magoyette/dev-setup/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/magoyette/dev-setup/compare/v3.5.1...v3.6.0
 [3.5.1]: https://github.com/magoyette/dev-setup/compare/v3.5.0...v3.5.1
