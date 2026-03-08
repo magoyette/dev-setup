@@ -114,6 +114,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - Git : installed from `ppa:git-core/ppa`
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
 - git-delta : diff tool (primary pager for git commands)
+- fzf : interactive fuzzy finder for shell workflows
 - jq : for JSON manipulation
 - pandoc : for Markdown support
 - ripgrep : for file search

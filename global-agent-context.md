@@ -10,5 +10,6 @@ Check `--help` for exact flags when needed.
 - `jq`: parse and edit JSON.
 - `shellcheck`: lint shell scripts, should be used after a `.sh` file has been created or modified.
 - `difft`: syntax-aware diff.
+- `fzf`: interactive fuzzy finder.
 - `playwright` and `playwright-cli`: browser automation and front-end smoke tests. There's an agent skill for Playwright.
 - `pandoc`: convert Markdown and other document formats.

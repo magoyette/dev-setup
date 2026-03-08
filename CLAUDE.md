@@ -140,7 +140,7 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 
 | Concern             | Mechanism                                                                                         |
 | ------------------- | ------------------------------------------------------------------------------------------------- |
-| apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, and includes `build-essential` for compilation tools             |
+| apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, includes `build-essential` for compilation tools, and installs core CLI tools like `fzf` |
 | `~/.bashrc` entries | `lineinfile` module (checks before adding)                                                        |
 | git config          | `community.general.git_config` module                                                             |
 | git core.editor     | Conditionally set via `git_core_editor`; skipped when empty string                               |
@@ -220,6 +220,10 @@ Difftastic (`difft`) is installed as a **secondary** diff tool alongside delta. 
 The `dt` prefix stands for difftastic and is prepended to the mirrored alias name (e.g. `dl` → `dtdl`). Each difftastic alias is defined immediately after its counterpart in the script. All aliases use `-c diff.external=difft` so the override applies only for that single command and never affects the delta pager globally.
 
 **Version:** controlled by `difftastic_version` in `ansible/defaults.yml`. To upgrade, bump the version and delete `~/.local/bin/difft` before re-running the playbook.
+
+### fzf
+
+`fzf` is installed as part of the `core` sub-playbook through `ansible/tasks/apt-packages.yml`. It is available as an interactive fuzzy finder for shell workflows.
 
 ### Neovim
 

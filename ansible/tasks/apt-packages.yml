@@ -22,6 +22,7 @@
     name:
       - bat
       - build-essential
+      - fzf
       - git
       - git-delta
       - jq
