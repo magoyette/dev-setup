@@ -109,40 +109,40 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 
 ### core sub-playbook
 
-- bat : cat with syntax highlight
-- build-essential: to build Emacs and other tools from source
-- Git : installed from `ppa:git-core/ppa`
+- [bat](https://github.com/sharkdp/bat) : cat with syntax highlight
+- build-essential: C & C++ compilers, make and other tools to build from source
+- [delta](https://github.com/dandavison/delta) : diff tool (primary pager for git commands)
+- [git](https://git-scm.com/) : installed from `ppa:git-core/ppa`
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
-- git-delta : diff tool (primary pager for git commands)
-- fzf : interactive fuzzy finder for shell workflows
-- jq : for JSON manipulation
-- pandoc : for Markdown support
-- ripgrep : for file search
-- shellcheck : linter for Bash
+- [fzf](https://github.com/junegunn/fzf) : interactive fuzzy finder for shell workflows
+- [jq](https://jqlang.org/) : for JSON manipulation
+- [pandoc](https://pandoc.org/) : for Markdown support
+- [ripgrep](https://github.com/BurntSushi/ripgrep) : for file search
+- [shellcheck](https://github.com/koalaman/shellcheck) : linter for Bash
 - unzip: to unzip .zip files
-- Zoxide : alternative to cd
+- [Zoxide](https://github.com/ajeetdsouza/zoxide) : alternative to cd
 
 ### node sub-playbook
 
-- bun : JavaScript and TypeScript toolkit
-- fnm : Node version manager
-- Node : JavaScript and Typescript runtime
-- Playwright CLI : browser automation for testing front-end changes
+- [bun](https://bun.com/) : JavaScript and TypeScript toolkit
+- [fnm](https://github.com/Schniz/fnm) : Node version manager
+- [Node](https://nodejs.org) : JavaScript and Typescript runtime
+- [playwright-cli](https://github.com/microsoft/playwright-cli) : browser automation for testing front-end changes
 
 ### ai-assistants
 
-- Claude-Code : coding agent
-  - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
-- Codex CLI : coding agent
+- [claude-code](https://github.com/anthropics/claude-code) : coding agent
+- [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
+- [codex](https://github.com/openai/codex) : coding agent
 
 ### emacs
 
-- Emacs : terminal text editor
-- emacs-lsp-booster : better performance in lsp-mode
+- [Emacs](https://www.gnu.org/software/emacs/) : terminal text editor configured with [my personal configuration](https://github.com/magoyette/.emacs.d)
+- [emacs-lsp-booster](https://github.com/blahgeek/emacs-lsp-booster) : better performance in lsp-mode
 
 ### neovim
 
-- Neovim : terminal text editor
+- [Neovim](https://neovim.io/) : terminal text editor
 
 ### Agent skills
 
