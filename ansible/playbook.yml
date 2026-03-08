@@ -1,5 +1,6 @@
 ---
 - import_playbook: core.yml
+- import_playbook: starship.yml
 - import_playbook: node.yml
 - import_playbook: ai-assistants.yml
 - import_playbook: emacs.yml

@@ -2,27 +2,38 @@
 
 My personal developer setup for WSL2 (Windows Subsystem for Linux v2).
 
-## Windows Terminal
+## WSL Installation
 
-- Set the Font to `DejaVuSansM Nerd Font Mono` at `13 pt`
-- Set the Theme to `One Half Dark`
+Install Ubuntu in WSL: `wsl --install`.
 
-## Installation
-
-Install WSL and Ubuntu.
-
-```sh
-wsl --install
-```
-
-Enable networkingMode mirrored. Create a file named `.wslconfig` in your Windows home directory (`$HOME`).
+Enable the mirrored networking mode. Create a file named `.wslconfig` in your Windows home directory (`$HOME`).
 
 ```conf
 [wsl2]
 networkingMode=mirrored
 ```
 
-Shutdown WSL. Login to WSL. Clone this repository:
+Shutdown WSL.
+
+```sh
+wsl --shutdown
+```
+
+## Nerd Font
+
+- Install a [Nerd Font](https://www.nerdfonts.com/font-downloads) in Windows
+  - ccstatusline and Starship both requires a Nerd Font
+  - My Emacs configuration is configured to use `DejaVuSansM Nerd Font Mono`
+
+## Windows Terminal
+
+- Configure the Windows Terminal for Ubuntu
+  - I set Windows Terminal to `DejaVuSansM Nerd Font Mono` at `13 pt`
+  - I set the Theme to `One Half Dark`. Neovim uses One Dark, while Bat uses One Half Dark.
+
+## Dev Setup
+
+Login to WSL. Clone this repository:
 
 ```sh
 wsl --shutdown
@@ -33,14 +44,14 @@ cd dev-setup
 
 Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 
-| Variable                     | Description                                                         | Default                                      |
-| ---------------------------- | ------------------------------------------------------------------- | -------------------------------------------- |
-| `git_user_name`              | Git identity name                                                   | `"Your Name"`                                |
-| `git_user_email`             | Git identity email                                                  | `"you@example.com"`                          |
-| `git_core_editor`            | Optional Git `core.editor` override (`nvim` is the suggested value) | `""`                                         |
-| `install_git_aliases`        | Install and manage this repo's Git aliases                          | `true`                                       |
-| `playwright_browsers`        | Browsers to install for Playwright                                  | `["chrome"]`                                 |
-| `playbooks_in_main_playbook` | Sub-playbooks to run when invoking the main playbook                | `[core, node, ai-assistants, emacs, neovim]` |
+| Variable                     | Description                                                         | Default                                                |
+| ---------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------ |
+| `git_user_name`              | Git identity name                                                   | `"Your Name"`                                          |
+| `git_user_email`             | Git identity email                                                  | `"you@example.com"`                                    |
+| `git_core_editor`            | Optional Git `core.editor` override (`nvim` is the suggested value) | `""`                                                   |
+| `install_git_aliases`        | Install and manage this repo's Git aliases                          | `true`                                                 |
+| `playwright_browsers`        | Browsers to install for Playwright                                  | `["chrome"]`                                           |
+| `playbooks_in_main_playbook` | Sub-playbooks to run when invoking the main playbook                | `[core, starship, node, ai-assistants, emacs, neovim]` |
 
 `playwright_browsers` accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
 
@@ -53,10 +64,11 @@ Some sub-playbooks depend on others:
 | Sub-playbook    | Dependency on another sub-playbook |
 | --------------- | ---------------------------------- |
 | `core`          | None                               |
+| `starship`      | `core` for PATH setup and Stow     |
 | `node`          | None                               |
 | `ai-assistants` | `core` for git, `node`             |
 | `emacs`         | `core` for git, `node`             |
-| `neovim`        | `code` for git                     |
+| `neovim`        | `core` for git                     |
 
 Run the bootstrap script:
 
@@ -121,6 +133,10 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [shellcheck](https://github.com/koalaman/shellcheck) : linter for Bash
 - unzip: to unzip .zip files
 - [Zoxide](https://github.com/ajeetdsouza/zoxide) : alternative to cd
+
+### starship
+
+- [Starship](https://starship.rs/) : cross-shell prompt configured for Bash in WSL2
 
 ### node sub-playbook
 

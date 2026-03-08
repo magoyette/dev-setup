@@ -5,6 +5,7 @@ git_core_editor: "" # possible value: nvim
 install_git_aliases: true
 playbooks_in_main_playbook:
   - core
+  - starship
   - node
   - ai-assistants
   - emacs

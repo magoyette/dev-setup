@@ -29,8 +29,16 @@
     line: "export BAT_THEME=OneHalfDark"
     state: present
 
+- name: Remove existing zoxide init from bashrc
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: '^eval "\$\(zoxide init bash\)"$'
+    state: absent
+
 - name: Add zoxide init to bashrc
   lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: '^eval "\$\(zoxide init bash\)"$'
     line: 'eval "$(zoxide init bash)"'
+    insertafter: EOF
     state: present

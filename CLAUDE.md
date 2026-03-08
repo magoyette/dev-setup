@@ -15,13 +15,14 @@ dev-setup/
 ├── .githooks/
 │   └── pre-commit                # Runs Ansible syntax checks before commit when ansible/*.yml is staged
 ├── ansible/
-│   ├── playbook.yml              # Main Ansible playbook — imports all sub-playbooks (core, node, ai-assistants, emacs, neovim)
+│   ├── playbook.yml              # Main Ansible playbook — imports all sub-playbooks (core, starship, node, ai-assistants, emacs, neovim)
 │   ├── core.yml                  # Core sub-playbook: apt-packages, shell-config, git, difftastic, zoxide
+│   ├── starship.yml              # Starship sub-playbook: starship install, bash init, stow deploy
 │   ├── node.yml                  # Node sub-playbook: node, bun, playwright
 │   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, agent-skills
 │   ├── emacs.yml                 # Emacs sub-playbook: emacs (skipped via playbooks_in_main_playbook)
 │   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
-│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version, difftastic version, neovim version, codex project doc max bytes, codex status line, npm packages)
+│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, npm packages)
 │   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, install_git_aliases, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
 │   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
@@ -31,6 +32,7 @@ dev-setup/
 │       ├── difftastic.yml        # difftastic install (secondary diff tool)
 │       ├── node.yml              # fnm + Node LTS
 │       ├── zoxide.yml            # zoxide install
+│       ├── starship.yml          # Starship install from GitHub release + bash init + stow deploy
 │       ├── bun.yml               # bun install
 │       ├── neovim.yml            # Neovim install from GitHub release + stow deploy
 │       ├── claude-code.yml       # Claude Code install + stow deploy + partial settings management (hooks/statusLine)
@@ -45,6 +47,9 @@ dev-setup/
 │   └── .config/
 │       └── nvim/
 │           └── init.lua          # lazy.nvim bootstrap + onedark + Neogit (<Space>gg, Telescope picker, CodeDiff); lazy-lock.json is intentionally untracked
+├── starship/                     # Stow package for Starship prompt config
+│   └── .config/
+│       └── starship.toml         # Repo-managed Starship prompt configuration for Bash in WSL2
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 │   └── .gitkeep
 ├── claude/                       # Stow package for Claude Code config
@@ -88,6 +93,7 @@ Both scripts accept an optional playbook name argument (without `.yml`) to run o
 
 ```bash
 ./run-ansible.sh core          # run core sub-playbook only
+./run-ansible.sh starship      # run starship sub-playbook only
 ./run-ansible.sh node          # run node sub-playbook only
 ./run-ansible.sh ai-assistants # run AI assistants sub-playbook only
 ./run-ansible.sh emacs         # run emacs sub-playbook only
@@ -122,11 +128,12 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in) and do
 
 ### Playbook structure
 
-The playbook is split into a main `playbook.yml` and five sub-playbooks, each covering a logical group of tools:
+The playbook is split into a main `playbook.yml` and six sub-playbooks, each covering a logical group of tools:
 
 | Sub-playbook | Tasks included | Condition |
 |---|---|---|
 | `core.yml` | apt-packages, shell-config, git, difftastic, zoxide | always |
+| `starship.yml` | starship | `playbooks_in_main_playbook` |
 | `node.yml` | node, bun, playwright | always |
 | `ai-assistants.yml` | claude-code, codex, agent-skills | always |
 | `emacs.yml` | emacs (includes emacs-node) | `playbooks_in_main_playbook` |
@@ -149,6 +156,8 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | Node LTS via fnm    | Checks `fnm list \| grep -q {{ fnm_node_version }}`; installs only if return code != 0 (`fnm_node_version` in `defaults.yml`) |
 | zoxide, bun         | `creates:` pointing to the installed binary/directory                                             |
 | difftastic          | `creates:` pointing to `~/.local/bin/difft`                                                       |
+| Starship install    | Checks `~/.local/bin/starship --version`; downloads the pinned GitHub release tarball only when missing/version mismatch (`starship_version` in `defaults.yml`) |
+| Starship config     | Stow package `starship` (`changed_when: false`)                                                   |
 | Neovim install      | Checks `~/.local/bin/nvim --version`; downloads release tarball from GitHub only when missing/version mismatch (`neovim_version` in `defaults.yml`) |
 | Neovim config       | Stow package `nvim` (`changed_when: false`)                                                       |
 | Claude Code         | `which claude` check before install                                                               |
@@ -190,6 +199,10 @@ Entries in `ansible/tasks/emacs.yml` (applied when `emacs` is in `playbooks_in_m
 - `alias emacs="emacs -nw"` (forces terminal Emacs when launched as `emacs`)
 - `alias e='emacsclient -t -a "" --eval "(progn (switch-to-buffer \"*scratch*\") nil)"'` (opens a terminal `emacsclient` frame in `*scratch*` and auto-starts the daemon if needed)
 
+Entries in `ansible/tasks/starship.yml` (applied when `starship` is in `playbooks_in_main_playbook`, via `starship.yml`):
+
+- `eval "$(starship init bash)"` (inserted immediately before zoxide so zoxide remains the final shell init line)
+
 The fnm and bun installers add their own PATH/eval lines to `~/.bashrc` when they first run.
 
 ### Git
@@ -224,6 +237,20 @@ The `dt` prefix stands for difftastic and is prepended to the mirrored alias nam
 ### fzf
 
 `fzf` is installed as part of the `core` sub-playbook through `ansible/tasks/apt-packages.yml`. It is available as an interactive fuzzy finder for shell workflows.
+
+### Starship
+
+Starship is installed by default. It is included in the default `playbooks_in_main_playbook` list in `ansible/vars.yml.example`. To skip Starship, remove `starship` from `playbooks_in_main_playbook` in `ansible/vars.yml`.
+
+Installed from official GitHub releases in `ansible/tasks/starship.yml`:
+
+- Downloads `https://github.com/starship/starship/releases/download/{{ starship_version }}/starship-x86_64-unknown-linux-musl.tar.gz`
+- Installs the binary into `~/.local/bin/starship`
+- Reinstalls only when missing or when `starship --version` does not match `starship_version`
+
+**Version:** controlled by `starship_version` in `ansible/defaults.yml`. To upgrade, bump the version and re-run the playbook.
+
+Configuration is tracked in this repository under `starship/.config/starship.toml` and deployed with Stow. The current config uses `format = "$all"`, keeps the full directory path, removes the Git branch symbol, enables `git_metrics`, and disables `git_status`. It also keeps `add_newline = true` and a colored prompt character. It uses Nerd Font glyphs, so Windows Terminal must be configured with a Nerd Font for the Ubuntu profile. For Bash compatibility with zoxide, the Starship init line is inserted immediately before zoxide and zoxide remains the final managed line in `~/.bashrc`.
 
 ### Neovim
 
