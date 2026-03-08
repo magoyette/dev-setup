@@ -161,7 +161,7 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | Neovim install      | Checks `~/.local/bin/nvim --version`; downloads release tarball from GitHub only when missing/version mismatch (`neovim_version` in `defaults.yml`) |
 | Neovim config       | Stow package `nvim` (`changed_when: false`)                                                       |
 | Claude Code         | `which claude` check before install                                                               |
-| Claude settings (`hooks`, `statusLine`, `sandbox`) | `scripts/merge-claude-settings.sh` merges only managed keys into `~/.claude/settings.json` via `jq`; `sandbox.enabled` is managed but user keys like `sandbox.filesystem.*` are preserved via recursive merge; exits changed only when content differs |
+| Claude settings (`hooks`, `statusLine`, `sandbox`) | `scripts/merge-claude-settings.sh` merges only managed keys into `~/.claude/settings.json` via `jq`; `sandbox.enabled` and `sandbox.filesystem.allowWrite` (with `~/.ansible/tmp`) are managed; user paths in `allowWrite` and other `sandbox` keys are preserved via recursive merge; exits changed only when content differs |
 | Claude sandbox-runtime | `npm list -g @anthropic-ai/sandbox-runtime` check; install only if missing (seccomp filter for unix socket blocking) |
 | Codex CLI           | `npm list -g @openai/codex` check; install only if missing                                                   |
 | Codex project doc config | `file`/`copy`/`lineinfile` (regexp+insertBOF) for `~/.codex/config.toml` (`project_doc_fallback_filenames`, `project_doc_max_bytes`) |
@@ -337,7 +337,8 @@ Ansible manages Claude Code's global context file as a symlink to `global-agent-
 
 - **`hooks`**: WSL notification hook for `permission_prompt` and `idle_prompt`
 - **`statusLine`**: custom command using `bunx -y ccstatusline@latest`
-- **`sandbox.enabled`**: OS-level sandboxing via bubblewrap + socat (default: `true` from `claude_sandbox_enabled` in `ansible/defaults.yml`); user customizations under `sandbox` (e.g. `sandbox.filesystem.allowWrite`) are preserved via recursive jq merge
+- **`sandbox.enabled`**: OS-level sandboxing via bubblewrap + socat (default: `true` from `claude_sandbox_enabled` in `ansible/defaults.yml`)
+- **`sandbox.filesystem.allowWrite`**: managed paths (`~/.ansible/tmp`) are merged with any user-added paths via `unique`; other user keys under `sandbox` (e.g. `sandbox.filesystem.denyWrite`) are preserved via recursive jq merge
 
 All other keys (for example `model`, editor/UI preferences) are user-managed and preserved as-is on every playbook run.
 

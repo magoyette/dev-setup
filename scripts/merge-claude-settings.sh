@@ -41,7 +41,7 @@ jq --argjson sandbox_enabled "$sandbox_enabled" '
     "command": "bunx -y ccstatusline@latest",
     "padding": 0
   }
-  | .sandbox = ((.sandbox // {}) * {"enabled": $sandbox_enabled})
+  | .sandbox = ((.sandbox // {}) * {"enabled": $sandbox_enabled, "filesystem": {"allowWrite": ((.sandbox.filesystem.allowWrite // []) + ["~/.ansible/tmp"] | unique)}})
 ' "$tmp_input" >"$tmp_output"
 
 if [[ -f "$settings_file" ]] && cmp -s "$tmp_output" "$settings_file"; then
