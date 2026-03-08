@@ -1,0 +1,15 @@
+---
+- name: Check if ast-grep is installed
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @ast-grep/cli"
+  register: ast_grep_check
+  failed_when: false
+  changed_when: false
+
+- name: Install ast-grep
+  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @ast-grep/cli"
+  when: ast_grep_check.rc != 0
+
+- name: Download ast-grep skill from GitHub
+  command:
+    cmd: "{{ playbook_dir }}/../scripts/download-ast-grep-skill.sh"
+    creates: "{{ playbook_dir }}/../skills/ast-grep/SKILL.md"

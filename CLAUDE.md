@@ -19,7 +19,7 @@ dev-setup/
 │   ├── core.yml                  # Core sub-playbook: apt-packages, shell-config, git, difftastic, zoxide
 │   ├── starship.yml              # Starship sub-playbook: starship install, bash init, stow deploy
 │   ├── node.yml                  # Node sub-playbook: node, bun, playwright
-│   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, agent-skills
+│   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, ast-grep, agent-skills
 │   ├── emacs.yml                 # Emacs sub-playbook: emacs (skipped via playbooks_in_main_playbook)
 │   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
 │   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, claude sandbox enabled, npm packages)
@@ -42,6 +42,7 @@ dev-setup/
 │       ├── emacs.yml             # Emacs dependencies + build from source
 │       ├── emacs-lsp-booster.yml # emacs-lsp-booster release binary install
 │       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml)
+│       ├── ast-grep.yml          # ast-grep CLI install via npm (check-then-install) + skill download from GitHub
 │       ├── agent-skills.yml      # Agent skills: submodule init/update + symlinks for Claude Code and Codex
 ├── nvim/                         # Stow package for Neovim config
 │   └── .config/
@@ -68,7 +69,8 @@ dev-setup/
 │   ├── install-emacs-in-ubuntu.sh  # Emacs build script (download, configure, make, install only)
 │   ├── install-git-hooks.sh      # Configures local git hooks path to .githooks
 │   ├── merge-claude-settings.sh  # Merges managed Claude settings fields (hooks/statusLine/sandbox) without touching other keys
-│   └── download-playwright-skill.sh  # Downloads Playwright skill from GitHub into skills/playwright/
+│   ├── download-playwright-skill.sh  # Downloads Playwright skill from GitHub into skills/playwright/
+│   └── download-ast-grep-skill.sh  # Downloads ast-grep skill from GitHub into skills/ast-grep/
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
 └── claude-hooks.md               # Documentation for notification system
 ```
@@ -135,7 +137,7 @@ The playbook is split into a main `playbook.yml` and six sub-playbooks, each cov
 | `core.yml` | apt-packages, shell-config, git, difftastic, zoxide | always |
 | `starship.yml` | starship | `playbooks_in_main_playbook` |
 | `node.yml` | node, bun, playwright | always |
-| `ai-assistants.yml` | claude-code, codex, agent-skills | always |
+| `ai-assistants.yml` | claude-code, codex, ast-grep, agent-skills | always |
 | `emacs.yml` | emacs (includes emacs-node) | `playbooks_in_main_playbook` |
 | `neovim.yml` | neovim | `playbooks_in_main_playbook` |
 
@@ -172,6 +174,8 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | Playwright system deps | `npx playwright install-deps` always runs (`changed_when: false`); apt-based, inherently idempotent |
 | Playwright browsers | `npx playwright install <browser>` always runs per browser in `playwright_browsers` list (`changed_when: false`) |
 | Playwright skill         | Downloaded from GitHub via `download-playwright-skill.sh` (`creates:` on `SKILL.md`); auto-symlinked by `agent-skills.yml` |
+| ast-grep CLI             | `npm list -g @ast-grep/cli` check; install only if missing                                                                  |
+| ast-grep skill           | Downloaded from GitHub via `download-ast-grep-skill.sh` (`creates:` on `SKILL.md`); auto-symlinked by `agent-skills.yml`    |
 | Emacs (entire section) | `meta: end_play` in `emacs.yml` when `'emacs' not in playbooks_in_main_playbook`; otherwise always runs |
 | Emacs dependencies  | `replace` module for deb-src (only if needed); `apt` module for build-dep, libmagick, tree-sitter |
 | Emacs build         | `emacs --version` check; only builds if missing or version mismatch                               |

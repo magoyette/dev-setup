@@ -150,6 +150,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [claude-code](https://github.com/anthropics/claude-code) : coding agent (with [sandboxing](https://code.claude.com/docs/en/sandboxing) enabled by default)
 - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
 - [codex](https://github.com/openai/codex) : coding agent
+- [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
 
 ### emacs
 
@@ -163,4 +164,5 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 ### Agent skills
 
 - [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright/src/skill) : browser automation skill (bundled with Playwright npm package)
+- [ast-grep](https://github.com/ast-grep/agent-skill) : AST-based structural code search skill
 - [humanizer](https://github.com/blader/humanizer) : remove signs of AI-generated writing from text
