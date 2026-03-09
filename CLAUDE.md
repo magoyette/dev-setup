@@ -16,13 +16,13 @@ dev-setup/
 │   └── pre-commit                # Runs Ansible syntax checks before commit when ansible/*.yml is staged
 ├── ansible/
 │   ├── playbook.yml              # Main Ansible playbook — imports all sub-playbooks (core, starship, node, ai-assistants, emacs, neovim)
-│   ├── core.yml                  # Core sub-playbook: apt-packages, ansible-lint, shell-config, git, difftastic, zoxide
+│   ├── core.yml                  # Core sub-playbook: apt-packages, ansible-lint, shell-config, git, difftastic, tokei, zoxide
 │   ├── starship.yml              # Starship sub-playbook: starship install, bash init, stow deploy
 │   ├── node.yml                  # Node sub-playbook: node, bun, playwright
 │   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, ast-grep, agent-skills
 │   ├── emacs.yml                 # Emacs sub-playbook: emacs (skipped via playbooks_in_main_playbook)
 │   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
-│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version/checksum, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, claude sandbox enabled, npm packages)
+│   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version/checksum, difftastic version, tokei version, starship version, neovim version, codex project doc max bytes, codex status line, claude sandbox enabled, npm packages)
 │   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, install_git_aliases, AI assistants sandbox writable roots, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential, bubblewrap, eza, fd-find, socat, pipx)
@@ -30,6 +30,7 @@ dev-setup/
 │       ├── shell-config.yml      # ~/.bashrc entries via lineinfile
 │       ├── git.yml               # git global config + aliases
 │       ├── difftastic.yml        # difftastic install (secondary diff tool)
+│       ├── tokei.yml             # tokei install (code statistics tool)
 │       ├── node.yml              # fnm + Node LTS
 │       ├── zoxide.yml            # zoxide install
 │       ├── starship.yml          # Starship install from GitHub release + bash init + stow deploy
@@ -136,7 +137,7 @@ The playbook is split into a main `playbook.yml` and six sub-playbooks, each cov
 
 | Sub-playbook | Tasks included | Condition |
 |---|---|---|
-| `core.yml` | apt-packages, ansible-lint, shell-config, git, difftastic, zoxide | always |
+| `core.yml` | apt-packages, ansible-lint, shell-config, git, difftastic, tokei, zoxide | always |
 | `starship.yml` | starship | `playbooks_in_main_playbook` |
 | `node.yml` | node, bun, playwright | always |
 | `ai-assistants.yml` | claude-code, codex, ast-grep, agent-skills | always |
@@ -161,6 +162,7 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | Node LTS via fnm    | Checks `fnm list \| grep -q {{ fnm_node_version }}`; installs only if return code != 0 (`fnm_node_version` in `defaults.yml`) |
 | zoxide, bun         | `creates:` pointing to the installed binary/directory                                             |
 | difftastic          | `creates:` pointing to `~/.local/bin/difft`                                                       |
+| tokei               | Checks `~/.local/bin/tokei --version`; downloads the pinned GitHub release tarball only when missing/version mismatch (`tokei_version` in `defaults.yml`) |
 | Starship install    | Checks `~/.local/bin/starship --version`; downloads the pinned GitHub release tarball only when missing/version mismatch (`starship_version` in `defaults.yml`) |
 | Starship config     | Stow package `starship` (`changed_when: false`)                                                   |
 | Neovim install      | Checks `~/.local/bin/nvim --version`; downloads release tarball from GitHub only when missing/version mismatch (`neovim_version` in `defaults.yml`) |
@@ -247,6 +249,12 @@ The `dt` prefix stands for difftastic and is prepended to the mirrored alias nam
 ### fzf
 
 `fzf` is installed as part of the `core` sub-playbook through `ansible/tasks/apt-packages.yml`. It is available as an interactive fuzzy finder for shell workflows.
+
+### tokei
+
+`tokei` is installed as part of the `core` sub-playbook from an official GitHub release tarball in `ansible/tasks/tokei.yml`.
+
+**Version:** controlled by `tokei_version` in `ansible/defaults.yml`. To upgrade, bump the version and re-run the playbook.
 
 ### eza
 

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.11.0] - 2026-03-09
+
+### Added
+
+- Add `tokei` to the core sub-playbook
+
 ## [3.10.0] - 2026-03-09
 
 ### Added
@@ -326,7 +332,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.10.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.11.0...HEAD
+[3.11.0]: https://github.com/magoyette/dev-setup/compare/v3.10.0...v3.11.0
 [3.10.0]: https://github.com/magoyette/dev-setup/compare/v3.9.0...v3.10.0
 [3.9.0]: https://github.com/magoyette/dev-setup/compare/v3.8.1...v3.9.0
 [3.8.1]: https://github.com/magoyette/dev-setup/compare/v3.8.0...v3.8.1

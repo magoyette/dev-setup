@@ -14,3 +14,4 @@ Check `--help` for exact flags when needed.
 - `difft`: syntax-aware diff.
 - `fzf`: interactive fuzzy finder.
 - `pandoc`: convert Markdown and other document formats.
+- `tokei`: count files, lines, code, comments, and blanks by language.

@@ -137,6 +137,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [pandoc](https://pandoc.org/) : for Markdown support
 - [ripgrep](https://github.com/BurntSushi/ripgrep) : for file search
 - [shellcheck](https://github.com/koalaman/shellcheck) : linter for Bash
+- [tokei](https://github.com/XAMPPRocky/tokei) : count files, lines, code, comments, and blanks by language
 - unzip: to unzip .zip files
 - [Zoxide](https://github.com/ajeetdsouza/zoxide) : alternative to cd
 

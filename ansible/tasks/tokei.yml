@@ -1,0 +1,28 @@
+---
+- name: Ensure ~/.local/bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Check installed Tokei version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/tokei --version"
+  register: tokei_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Download and install Tokei {{ tokei_version }}
+  ansible.builtin.shell: |
+    set -euo pipefail
+
+    tmp_dir="$(mktemp -d)"
+    trap 'rm -rf "${tmp_dir}"' EXIT
+
+    curl -sSfL "https://github.com/XAMPPRocky/tokei/releases/download/{{ tokei_version }}/tokei-x86_64-unknown-linux-musl.tar.gz" \
+      -o "${tmp_dir}/tokei.tar.gz"
+
+    tar -xzf "${tmp_dir}/tokei.tar.gz" -C "${tmp_dir}"
+    install -m 0755 "${tmp_dir}/tokei" "{{ ansible_env.HOME }}/.local/bin/tokei"
+  args:
+    executable: /bin/bash
+  when: tokei_version_output.rc != 0 or ("tokei " ~ (tokei_version | regex_replace('^v', ''))) not in tokei_version_output.stdout
