@@ -1,12 +1,26 @@
 "$schema" = "https://starship.rs/config-schema.json"
 
-format = "$all"
+# $username   : show the current username during a SSH session or when the user is changed
+# $hostname   : show the hostname when connected to a SSH session
+# $directory  : path to the current directory
+# $git_branch : show branch name
+# $git_commit : show commit hash when in detached HEAD
+# $git_state  : show the current operation (ex: REBASING, MERGING, etc.)
+# $line_break : split the prompt in 2 lines
+# $container  : show the container name if inside a container
+# $character  : success status of last command
+format = """
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$line_break\
+$container\
+$character"""
 
 add_newline = true
-
-[character]
-success_symbol = "[❯](bold green)"
-error_symbol = "[❯](bold red)"
 
 [directory]
 truncation_length = 0
@@ -15,8 +29,6 @@ truncate_to_repo = false
 [git_branch]
 symbol = ""
 
-[git_metrics]
-disabled = false
-
-[git_status]
-disabled = true
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"

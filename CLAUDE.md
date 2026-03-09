@@ -269,7 +269,7 @@ Installed from official GitHub releases in `ansible/tasks/starship.yml`:
 
 **Version:** controlled by `starship_version` in `ansible/defaults.yml`. To upgrade, bump the version and re-run the playbook.
 
-Configuration is tracked in this repository under `starship/.config/starship.toml` and deployed with Stow. The current config uses `format = "$all"`, keeps the full directory path, removes the Git branch symbol, enables `git_metrics`, and disables `git_status`. It also keeps `add_newline = true` and a colored prompt character. It uses Nerd Font glyphs, so Windows Terminal must be configured with a Nerd Font for the Ubuntu profile. For Bash compatibility with zoxide, the Starship init line is inserted immediately before zoxide and zoxide remains the final managed line in `~/.bashrc`.
+Configuration is tracked in this repository under `starship/.config/starship.toml` and deployed with Stow. The current config uses an explicit prompt format with `username`, `hostname`, `directory`, `git_branch`, `git_commit`, `git_state`, `line_break`, `container`, and `character`. It keeps the full directory path, removes the Git branch symbol, keeps `add_newline = true`, and uses a colored prompt character. It uses Nerd Font glyphs, so Windows Terminal must be configured with a Nerd Font for the Ubuntu profile. For Bash compatibility with zoxide, the Starship init line is inserted immediately before zoxide and zoxide remains the final managed line in `~/.bashrc`.
 
 ### Neovim
 

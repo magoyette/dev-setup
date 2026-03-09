@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.8.1] - 2026-03-09
+
+### Changed
+
+- Simplify the Starship prompt to an explicit module list
+
 ## [3.8.0] - 2026-03-08
 
 ### Added
@@ -308,7 +314,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.8.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.8.1...HEAD
+[3.8.1]: https://github.com/magoyette/dev-setup/compare/v3.8.0...v3.8.1
 [3.8.0]: https://github.com/magoyette/dev-setup/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/magoyette/dev-setup/compare/v3.6.1...v3.7.0
 [3.6.1]: https://github.com/magoyette/dev-setup/compare/v3.6.0...v3.6.1
