@@ -5,3 +5,4 @@ nvim/.config/nvim/lazy-lock.json
 claude/.claude/*
 !claude/.claude/hooks/
 !claude/.claude/hooks/*
+.cache/

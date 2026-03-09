@@ -1,24 +1,24 @@
 ---
 - name: Add git-core PPA
   become: true
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: ppa:git-core/ppa
     state: present
 
 - name: Update apt cache
   become: true
-  apt:
+  ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
 
 - name: Upgrade apt packages
   become: true
-  apt:
+  ansible.builtin.apt:
     upgrade: safe
 
 - name: Install apt packages
   become: true
-  apt:
+  ansible.builtin.apt:
     name:
       - bat
       - bubblewrap
@@ -28,6 +28,7 @@
       - git-delta
       - jq
       - pandoc
+      - pipx
       - ripgrep
       - shellcheck
       - socat

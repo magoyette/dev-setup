@@ -1,17 +1,16 @@
 ---
 - name: Check if Claude Code is installed
-  command: which claude
+  ansible.builtin.command: which claude
   register: claude_check
   failed_when: false
   changed_when: false
 
 - name: Install Claude Code
-  shell: curl -fsSL https://claude.ai/install.sh | bash
+  ansible.builtin.shell: curl -fsSL https://claude.ai/install.sh | bash
   when: claude_check.rc != 0
 
-
 - name: Deploy Claude dotfiles with stow
-  command: >
+  ansible.builtin.command: >
     stow
     --dir="{{ playbook_dir }}/.."
     --target="{{ ansible_env.HOME }}"
@@ -19,7 +18,7 @@
   changed_when: false
 
 - name: Deploy ccstatusline dotfiles with stow
-  command: >
+  ansible.builtin.command: >
     stow
     --dir="{{ playbook_dir }}/.."
     --target="{{ ansible_env.HOME }}"
@@ -27,17 +26,17 @@
   changed_when: false
 
 - name: Check if sandbox-runtime is installed
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @anthropic-ai/sandbox-runtime"
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @anthropic-ai/sandbox-runtime"
   register: sandbox_runtime_check
   failed_when: false
   changed_when: false
 
 - name: Install sandbox-runtime for seccomp filter
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @anthropic-ai/sandbox-runtime"
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g @anthropic-ai/sandbox-runtime"
   when: sandbox_runtime_check.rc != 0
 
 - name: Merge Claude settings for hooks, status line, and sandbox
-  command: "{{ playbook_dir }}/../scripts/merge-claude-settings.sh {{ ansible_env.HOME }}/.claude/settings.json"
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/merge-claude-settings.sh {{ ansible_env.HOME }}/.claude/settings.json"
   environment:
     CLAUDE_SANDBOX_ENABLED: "{{ claude_sandbox_enabled | lower }}"
     CLAUDE_SANDBOX_ALLOW_WRITE: "{{ ai_assistants_sandbox_writable_roots | to_json }}"
@@ -46,7 +45,7 @@
   failed_when: claude_settings_merge.rc not in [0, 2]
 
 - name: Add ccstatusline alias
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: 'alias ccstatusline="bunx ccstatusline@latest"'
     state: present

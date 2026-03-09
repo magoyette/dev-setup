@@ -1,27 +1,27 @@
 ---
 - name: Enable deb-src repositories for Emacs dependencies
   become: true
-  replace:
+  ansible.builtin.replace:
     path: /etc/apt/sources.list.d/ubuntu.sources
-    regexp: '^Types: deb$'
-    replace: 'Types: deb deb-src'
+    regexp: "^Types: deb$"
+    replace: "Types: deb deb-src"
   register: deb_src_enabled
 
 - name: Update apt cache after enabling deb-src
   become: true
-  apt:
+  ansible.builtin.apt:
     update_cache: true
   when: deb_src_enabled.changed
 
 - name: Install Emacs build dependencies
   become: true
-  apt:
+  ansible.builtin.apt:
     name: emacs
     state: build-dep
 
 - name: Install libmagick development packages
   become: true
-  apt:
+  ansible.builtin.apt:
     name:
       - libmagickwand-dev
       - libmagickcore-dev
@@ -29,34 +29,33 @@
 
 - name: Install tree-sitter library
   become: true
-  apt:
+  ansible.builtin.apt:
     name: libtree-sitter0
     state: present
 
 - name: Check installed Emacs version
-  command: emacs --version
+  ansible.builtin.command: emacs --version
   register: emacs_version_output
   failed_when: false
   changed_when: false
 
 - name: Install Emacs {{ emacs_version }} from source
-  shell: "{{ playbook_dir }}/../scripts/install-emacs-in-ubuntu.sh {{ emacs_version }}"
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/install-emacs-in-ubuntu.sh {{ emacs_version }}"
   when: emacs_version_output.rc != 0 or emacs_version not in emacs_version_output.stdout
 
-- import_tasks: emacs-lsp-booster.yml
-
+- ansible.builtin.import_tasks: emacs-lsp-booster.yml
 - name: Add emacs terminal alias
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
-    regexp: '^alias emacs='
+    regexp: "^alias emacs="
     line: 'alias emacs="emacs -nw"'
     state: present
 
 - name: Add emacsclient scratch buffer alias
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
-    regexp: '^alias e='
+    regexp: "^alias e="
     line: "alias e='emacsclient -t -a \"\" --eval \"(progn (switch-to-buffer \\\"*scratch*\\\") nil)\"'"
     state: present
 
-- import_tasks: emacs-node.yml
+- ansible.builtin.import_tasks: emacs-node.yml

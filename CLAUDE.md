@@ -16,7 +16,7 @@ dev-setup/
 │   └── pre-commit                # Runs Ansible syntax checks before commit when ansible/*.yml is staged
 ├── ansible/
 │   ├── playbook.yml              # Main Ansible playbook — imports all sub-playbooks (core, starship, node, ai-assistants, emacs, neovim)
-│   ├── core.yml                  # Core sub-playbook: apt-packages, shell-config, git, difftastic, zoxide
+│   ├── core.yml                  # Core sub-playbook: apt-packages, ansible-lint, shell-config, git, difftastic, zoxide
 │   ├── starship.yml              # Starship sub-playbook: starship install, bash init, stow deploy
 │   ├── node.yml                  # Node sub-playbook: node, bun, playwright
 │   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, ast-grep, agent-skills
@@ -24,9 +24,9 @@ dev-setup/
 │   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
 │   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version/checksum, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, claude sandbox enabled, npm packages)
 │   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, install_git_aliases, AI assistants sandbox writable roots, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
-│   ├── requirements.yml          # Ansible Galaxy collections (community.general)
 │   └── tasks/
-│       ├── apt-packages.yml      # apt update + package installation (includes build-essential, bubblewrap, socat)
+│       ├── apt-packages.yml      # apt update + package installation (includes build-essential, bubblewrap, socat, pipx)
+│       ├── ansible-lint.yml      # ansible-lint install via pipx
 │       ├── shell-config.yml      # ~/.bashrc entries via lineinfile
 │       ├── git.yml               # git global config + aliases
 │       ├── difftastic.yml        # difftastic install (secondary diff tool)
@@ -44,6 +44,7 @@ dev-setup/
 │       ├── emacs-node.yml        # Emacs LSP npm packages (imported by emacs.yml)
 │       ├── ast-grep.yml          # ast-grep CLI install via npm (check-then-install) + skill download from GitHub
 │       ├── agent-skills.yml      # Agent skills: submodule init/update + symlinks for Claude Code and Codex
+├── requirements.yml              # Ansible Galaxy collections (community.general); top-level so ansible-lint can auto-discover it
 ├── nvim/                         # Stow package for Neovim config
 │   └── .config/
 │       └── nvim/
@@ -83,7 +84,7 @@ dev-setup/
 ./install.sh
 ```
 
-`install.sh` installs Ansible via apt, installs the `community.general` collection, then runs the Ansible playbook.
+`install.sh` installs Ansible via apt, installs the `community.general` collection from the repository-root `requirements.yml`, then runs the Ansible playbook.
 
 **Re-running the playbook** (after the first run): use `run-ansible.sh` instead — it skips the Ansible install step and avoids prompting for the sudo password twice:
 
@@ -135,7 +136,7 @@ The playbook is split into a main `playbook.yml` and six sub-playbooks, each cov
 
 | Sub-playbook | Tasks included | Condition |
 |---|---|---|
-| `core.yml` | apt-packages, shell-config, git, difftastic, zoxide | always |
+| `core.yml` | apt-packages, ansible-lint, shell-config, git, difftastic, zoxide | always |
 | `starship.yml` | starship | `playbooks_in_main_playbook` |
 | `node.yml` | node, bun, playwright | always |
 | `ai-assistants.yml` | claude-code, codex, ast-grep, agent-skills | always |
@@ -150,7 +151,8 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 
 | Concern             | Mechanism                                                                                         |
 | ------------------- | ------------------------------------------------------------------------------------------------- |
-| apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, includes `build-essential` for compilation tools, `bubblewrap` and `socat` for sandbox support, and installs core CLI tools like `fzf` |
+| apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, includes `build-essential` for compilation tools, `bubblewrap` and `socat` for sandbox support, and installs core CLI tools like `fzf` and `pipx` |
+| ansible-lint        | `pipx install ansible-lint` via `command` with `creates: ~/.local/bin/ansible-lint`; avoids `community.general.pipx` requiring a newer pipx than Ubuntu ships |
 | `~/.bashrc` entries | `lineinfile` module (checks before adding)                                                        |
 | git config          | `community.general.git_config` module                                                             |
 | git core.editor     | Conditionally set via `git_core_editor`; skipped when empty string                               |
@@ -244,6 +246,16 @@ The `dt` prefix stands for difftastic and is prepended to the mirrored alias nam
 ### fzf
 
 `fzf` is installed as part of the `core` sub-playbook through `ansible/tasks/apt-packages.yml`. It is available as an interactive fuzzy finder for shell workflows.
+
+### ansible-lint
+
+`ansible-lint` is installed as part of the `core` sub-playbook. The official `ansible-lint` docs recommend the broader `ansible-dev-tools` bundle for general Ansible content development, but this repository installs the narrower `ansible-lint` tool because the setup already bootstraps Ansible separately and only needs playbook linting.
+
+It is installed via the `pipx` CLI in `ansible/tasks/ansible-lint.yml`, which keeps the linter isolated from the apt-managed Ansible bootstrap and avoids `community.general.pipx` requiring a newer pipx than Ubuntu currently ships. The repo's Galaxy requirements live in the top-level `requirements.yml` so `ansible-lint` can auto-discover `community.general`.
+
+Use `ansible-lint ansible/` as advisory tooling for gradual cleanup. Do not treat its current output as a blocking check for unrelated work until the repository is substantially more lint-clean.
+
+For broad mechanical cleanup, start with `ansible-lint --fix ansible/` and then review the resulting changes manually. It can resolve a large share of formatting and FQCN issues quickly, but it should not be trusted as an unattended refactor for behavior-sensitive tasks.
 
 ### Starship
 

@@ -103,6 +103,8 @@ For global user-level context, Ansible also deploys [`global-agent-context.md`](
 
 The pre-commit hook runs `ansible-playbook ansible/playbook.yml --syntax-check` when staged files include `ansible/*.yml`.
 
+`ansible-lint ansible/` can also be used, but there's too many pre-existing lint violations to add it to the pre-commit hook.
+
 ## Releasing a new version
 
 Update `CHANGELOG.md` first: move entries from `[Unreleased]` to a new versioned section with today's date and update the comparison links at the bottom, then commit.
@@ -126,6 +128,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [delta](https://github.com/dandavison/delta) : diff tool (primary pager for git commands)
 - [git](https://git-scm.com/) : installed from `ppa:git-core/ppa`
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
+- [ansible-lint](https://docs.ansible.com/projects/lint/) : linter for Ansible playbooks and task files
 - [fzf](https://github.com/junegunn/fzf) : interactive fuzzy finder for shell workflows
 - [jq](https://jqlang.org/) : for JSON manipulation
 - [pandoc](https://pandoc.org/) : for Markdown support

@@ -28,7 +28,7 @@ printf '%s\n' "$become_pass" | sudo -S apt update
 printf '%s\n' "$become_pass" | sudo -S apt install -y ansible
 
 echo "Installing Ansible collections"
-ansible-galaxy collection install -r ansible/requirements.yml
+ansible-galaxy collection install -r requirements.yml
 
 echo "Running Ansible playbook: ${PLAYBOOK}"
 ANSIBLE_BECOME_PASS="$become_pass" ansible-playbook "${PLAYBOOK}"

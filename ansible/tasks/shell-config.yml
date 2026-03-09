@@ -1,36 +1,36 @@
 ---
 - name: Add ~/.local/bin to PATH
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: 'export PATH="$HOME/.local/bin:$PATH"'
     state: present
 
 - name: Set COLORTERM to truecolor
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: "export COLORTERM=truecolor"
     state: present
 
 - name: Add bat alias
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: 'alias bat="batcat"'
     state: present
 
 - name: Add batrg function
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: "batrg() { rg --pretty \"$@\" | bat --plain; }"
     state: present
 
 - name: Set BAT_THEME
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: "export BAT_THEME=OneHalfDark"
     state: present
 
 - name: Add zoxide init to bashrc
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     regexp: '^eval "\$\(zoxide init bash\)"$'
     line: 'eval "$(zoxide init bash)"'

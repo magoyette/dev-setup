@@ -7,9 +7,9 @@
     - vars.yml
   tasks:
     - name: Skip if not in playbooks_in_main_playbook
-      meta: end_play
+      ansible.builtin.meta: end_play
       when: playbooks_in_main_playbook is defined and 'node' not in playbooks_in_main_playbook
 
-    - import_tasks: tasks/node.yml
-    - import_tasks: tasks/bun.yml
-    - import_tasks: tasks/playwright.yml
+    - ansible.builtin.import_tasks: tasks/node.yml
+    - ansible.builtin.import_tasks: tasks/bun.yml
+    - ansible.builtin.import_tasks: tasks/playwright.yml

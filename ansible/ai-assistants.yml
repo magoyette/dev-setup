@@ -7,11 +7,11 @@
     - vars.yml
   tasks:
     - name: Skip if not in playbooks_in_main_playbook
-      meta: end_play
+      ansible.builtin.meta: end_play
       when: playbooks_in_main_playbook is defined and 'ai-assistants' not in playbooks_in_main_playbook
 
-    - import_tasks: tasks/claude-code.yml
-    - import_tasks: tasks/codex.yml
-    - import_tasks: tasks/global-agent-context.yml
-    - import_tasks: tasks/ast-grep.yml
-    - import_tasks: tasks/agent-skills.yml
+    - ansible.builtin.import_tasks: tasks/claude-code.yml
+    - ansible.builtin.import_tasks: tasks/codex.yml
+    - ansible.builtin.import_tasks: tasks/global-agent-context.yml
+    - ansible.builtin.import_tasks: tasks/ast-grep.yml
+    - ansible.builtin.import_tasks: tasks/agent-skills.yml

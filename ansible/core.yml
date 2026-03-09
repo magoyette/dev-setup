@@ -7,24 +7,25 @@
     - vars.yml
   tasks:
     - name: Skip if not in playbooks_in_main_playbook
-      meta: end_play
+      ansible.builtin.meta: end_play
       when: playbooks_in_main_playbook is defined and 'core' not in playbooks_in_main_playbook
 
     - name: Create ~/repos directory
-      file:
+      ansible.builtin.file:
         path: "{{ ansible_env.HOME }}/repos"
         state: directory
         mode: "0755"
 
     - name: Disable login message
-      file:
+      ansible.builtin.file:
         path: "{{ ansible_env.HOME }}/.hushlogin"
         state: touch
         modification_time: preserve
         access_time: preserve
 
-    - import_tasks: tasks/apt-packages.yml
-    - import_tasks: tasks/shell-config.yml
-    - import_tasks: tasks/git.yml
-    - import_tasks: tasks/difftastic.yml
-    - import_tasks: tasks/zoxide.yml
+    - ansible.builtin.import_tasks: tasks/apt-packages.yml
+    - ansible.builtin.import_tasks: tasks/ansible-lint.yml
+    - ansible.builtin.import_tasks: tasks/shell-config.yml
+    - ansible.builtin.import_tasks: tasks/git.yml
+    - ansible.builtin.import_tasks: tasks/difftastic.yml
+    - ansible.builtin.import_tasks: tasks/zoxide.yml

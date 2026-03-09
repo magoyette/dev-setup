@@ -1,6 +1,6 @@
 ---
 # The bun installer adds its own PATH entries to ~/.bashrc.
 - name: Install bun
-  shell: curl -fsSL https://bun.sh/install | bash
+  ansible.builtin.shell: curl -fsSL https://bun.sh/install | bash
   args:
     creates: "{{ ansible_env.HOME }}/.bun/bin/bun"

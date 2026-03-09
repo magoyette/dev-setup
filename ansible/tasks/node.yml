@@ -1,11 +1,11 @@
 ---
 - name: Install fnm
-  shell: curl -fsSL https://fnm.vercel.app/install | bash
+  ansible.builtin.shell: curl -fsSL https://fnm.vercel.app/install | bash
   args:
     creates: "{{ ansible_env.HOME }}/.local/share/fnm"
 
 - name: Check if Node LTS is installed via fnm
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm list | grep -q {{ fnm_node_version }}"
+  ansible.builtin.shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm list | grep -q {{ fnm_node_version }}"
   register: fnm_node_check
   failed_when: false
   changed_when: false
@@ -13,7 +13,7 @@
     PATH: "{{ ansible_env.HOME }}/.local/share/fnm:{{ ansible_env.PATH }}"
 
 - name: Install Node LTS
-  shell: "{{ ansible_env.HOME }}/.local/share/fnm/fnm install {{ fnm_node_version }}"
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm install {{ fnm_node_version }}"
   when: fnm_node_check.rc != 0
   environment:
     PATH: "{{ ansible_env.HOME }}/.local/share/fnm:{{ ansible_env.PATH }}"

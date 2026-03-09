@@ -116,18 +116,18 @@
   when: not gcm_stat.stat.exists
 
 - name: Configure git aliases
-  command: "{{ playbook_dir }}/../scripts/sync-git-aliases.sh"
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/sync-git-aliases.sh"
   register: git_alias_sync
   changed_when: git_alias_sync.rc == 10
   failed_when: git_alias_sync.rc not in [0, 10]
   when: install_git_aliases | default(true)
 
 - name: Check repository hooks path
-  command: git -C "{{ playbook_dir }}/.." config --local --get core.hooksPath
+  ansible.builtin.command: git -C "{{ playbook_dir }}/.." config --local --get core.hooksPath
   register: repo_hooks_path
   failed_when: false
   changed_when: false
 
 - name: Install repository git hooks
-  command: "{{ playbook_dir }}/../scripts/install-git-hooks.sh"
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/install-git-hooks.sh"
   when: repo_hooks_path.stdout != ".githooks"
