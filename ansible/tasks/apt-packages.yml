@@ -23,6 +23,7 @@
       - bat
       - bubblewrap
       - build-essential
+      - eza
       - fd-find
       - fzf
       - git

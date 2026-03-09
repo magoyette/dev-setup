@@ -127,6 +127,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [bat](https://github.com/sharkdp/bat) : cat with syntax highlight
 - build-essential: C & C++ compilers, make and other tools to build from source
 - [delta](https://github.com/dandavison/delta) : diff tool (primary pager for git commands)
+- [eza](https://github.com/eza-community/eza) : modern alternative to `ls`
 - [git](https://git-scm.com/) : installed from `ppa:git-core/ppa`
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
 - [ansible-lint](https://docs.ansible.com/projects/lint/) : linter for Ansible playbooks and task files

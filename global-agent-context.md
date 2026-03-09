@@ -6,6 +6,7 @@ Check `--help` for exact flags when needed.
 
 ## Available CLI Tools
 
+- `eza`: modern alternative to `ls`.
 - `fd`: fast alternative to `find`.
 - `rg`: fast recursive search. Prefer over `grep` for file and content search.
 - `jq`: parse and edit JSON.
