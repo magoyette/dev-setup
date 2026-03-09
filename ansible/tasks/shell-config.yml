@@ -17,6 +17,12 @@
     line: 'alias bat="batcat"'
     state: present
 
+- name: Add fd alias
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: 'alias fd="fdfind"'
+    state: present
+
 - name: Add batrg function
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"

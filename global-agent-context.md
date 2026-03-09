@@ -6,6 +6,7 @@ Check `--help` for exact flags when needed.
 
 ## Available CLI Tools
 
+- `fd`: fast alternative to `find`.
 - `rg`: fast recursive search. Prefer over `grep` for file and content search.
 - `jq`: parse and edit JSON.
 - `shellcheck`: lint shell scripts, should be used after a `.sh` file has been created or modified.

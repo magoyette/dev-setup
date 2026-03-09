@@ -25,7 +25,7 @@ dev-setup/
 │   ├── defaults.yml              # Non-user-configurable defaults (fnm node version, emacs version, emacs-lsp-booster version/checksum, difftastic version, starship version, neovim version, codex project doc max bytes, codex status line, claude sandbox enabled, npm packages)
 │   ├── vars.yml                  # User-specific variables (git name, email, git_core_editor, install_git_aliases, AI assistants sandbox writable roots, playwright_browsers, playbooks_in_main_playbook) — gitignored, copied from example
 │   └── tasks/
-│       ├── apt-packages.yml      # apt update + package installation (includes build-essential, bubblewrap, socat, pipx)
+│       ├── apt-packages.yml      # apt update + package installation (includes build-essential, bubblewrap, fd-find, socat, pipx)
 │       ├── ansible-lint.yml      # ansible-lint install via pipx
 │       ├── shell-config.yml      # ~/.bashrc entries via lineinfile
 │       ├── git.yml               # git global config + aliases
@@ -151,7 +151,7 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 
 | Concern             | Mechanism                                                                                         |
 | ------------------- | ------------------------------------------------------------------------------------------------- |
-| apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, includes `build-essential` for compilation tools, `bubblewrap` and `socat` for sandbox support, and installs core CLI tools like `fzf` and `pipx` |
+| apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, includes `build-essential` for compilation tools, `bubblewrap` and `socat` for sandbox support, and installs core CLI tools like `fd-find`, `fzf`, and `pipx` |
 | ansible-lint        | `pipx install ansible-lint` via `command` with `creates: ~/.local/bin/ansible-lint`; avoids `community.general.pipx` requiring a newer pipx than Ubuntu ships |
 | `~/.bashrc` entries | `lineinfile` module (checks before adding)                                                        |
 | git config          | `community.general.git_config` module                                                             |
@@ -199,6 +199,7 @@ Entries in `ansible/tasks/shell-config.yml` (always applied via `core.yml`):
 - `export PATH="$HOME/.local/bin:$PATH"` (for zoxide and other user binaries)
 - `export COLORTERM=truecolor`
 - `alias bat="batcat"`
+- `alias fd="fdfind"` (exposes the standard `fd` command name on Ubuntu)
 - `batrg() { rg --pretty "$@" | bat --plain; }` (shell function for ripgrep output with bat syntax highlighting)
 - `export BAT_THEME=OneHalfDark`
 - `eval "$(zoxide init bash)"`
@@ -246,6 +247,10 @@ The `dt` prefix stands for difftastic and is prepended to the mirrored alias nam
 ### fzf
 
 `fzf` is installed as part of the `core` sub-playbook through `ansible/tasks/apt-packages.yml`. It is available as an interactive fuzzy finder for shell workflows.
+
+### fd
+
+`fd` is installed as part of the `core` sub-playbook through Ubuntu's `fd-find` package in `ansible/tasks/apt-packages.yml`. The standard `fd` command name is exposed in Bash via `alias fd="fdfind"` in `ansible/tasks/shell-config.yml`.
 
 ### ansible-lint
 

@@ -90,6 +90,7 @@ git alias
 - `e` : open Emacs with the daemon
 - `emacs` : open Emacs in terminal mode
 - `ccstatusline` : configure the Claude Code status line
+- `fd` : alias to Ubuntu's `fdfind` binary
 
 ## CLAUDE.md
 
@@ -129,6 +130,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [git](https://git-scm.com/) : installed from `ppa:git-core/ppa`
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
 - [ansible-lint](https://docs.ansible.com/projects/lint/) : linter for Ansible playbooks and task files
+- [fd](https://github.com/sharkdp/fd) : fast alternative to `find`
 - [fzf](https://github.com/junegunn/fzf) : interactive fuzzy finder for shell workflows
 - [jq](https://jqlang.org/) : for JSON manipulation
 - [pandoc](https://pandoc.org/) : for Markdown support
