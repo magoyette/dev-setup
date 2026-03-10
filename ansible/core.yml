@@ -25,6 +25,7 @@
 
     - ansible.builtin.import_tasks: tasks/apt-packages.yml
     - ansible.builtin.import_tasks: tasks/ansible-lint.yml
+    - ansible.builtin.import_tasks: tasks/tldr.yml
     - ansible.builtin.import_tasks: tasks/shell-config.yml
     - ansible.builtin.import_tasks: tasks/git.yml
     - ansible.builtin.import_tasks: tasks/difftastic.yml

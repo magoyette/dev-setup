@@ -1,0 +1,21 @@
+---
+- name: Remove distro tldr clients
+  become: true
+  ansible.builtin.apt:
+    name:
+      - tealdeer
+      - tldr
+      - tldr-hs
+    state: absent
+
+- name: Install tldr with pipx
+  ansible.builtin.command:
+    argv:
+      - pipx
+      - install
+      - tldr
+    creates: "{{ ansible_env.HOME }}/.local/bin/tldr"
+  environment:
+    PIPX_HOME: "{{ ansible_env.HOME }}/.local/share/pipx"
+    PIPX_BIN_DIR: "{{ ansible_env.HOME }}/.local/bin"
+    PIPX_MAN_DIR: "{{ ansible_env.HOME }}/.local/share/man"

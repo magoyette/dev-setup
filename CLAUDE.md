@@ -16,7 +16,7 @@ dev-setup/
 │   └── pre-commit                # Runs Ansible syntax checks before commit when ansible/*.yml is staged
 ├── ansible/
 │   ├── playbook.yml              # Main Ansible playbook — imports all sub-playbooks (core, starship, node, ai-assistants, emacs, neovim)
-│   ├── core.yml                  # Core sub-playbook: apt-packages, ansible-lint, shell-config, git, difftastic, tokei, zoxide
+│   ├── core.yml                  # Core sub-playbook: apt-packages, ansible-lint, tldr, shell-config, git, difftastic, tokei, zoxide
 │   ├── starship.yml              # Starship sub-playbook: starship install, bash init, stow deploy
 │   ├── node.yml                  # Node sub-playbook: node, bun, playwright
 │   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, ast-grep, agent-skills
@@ -27,6 +27,7 @@ dev-setup/
 │   └── tasks/
 │       ├── apt-packages.yml      # apt update + package installation (includes build-essential, bubblewrap, eza, fd-find, socat, pipx)
 │       ├── ansible-lint.yml      # ansible-lint install via pipx
+│       ├── tldr.yml              # tldr install via pipx + removal of distro clients
 │       ├── shell-config.yml      # ~/.bashrc entries via lineinfile
 │       ├── git.yml               # git global config + aliases
 │       ├── difftastic.yml        # difftastic install (secondary diff tool)
@@ -137,7 +138,7 @@ The playbook is split into a main `playbook.yml` and six sub-playbooks, each cov
 
 | Sub-playbook | Tasks included | Condition |
 |---|---|---|
-| `core.yml` | apt-packages, ansible-lint, shell-config, git, difftastic, tokei, zoxide | always |
+| `core.yml` | apt-packages, ansible-lint, tldr, shell-config, git, difftastic, tokei, zoxide | always |
 | `starship.yml` | starship | `playbooks_in_main_playbook` |
 | `node.yml` | node, bun, playwright | always |
 | `ai-assistants.yml` | claude-code, codex, ast-grep, agent-skills | always |
@@ -154,6 +155,7 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | ------------------- | ------------------------------------------------------------------------------------------------- |
 | apt packages        | `apt_repository` + `apt` modules (built-in idempotency); adds `ppa:git-core/ppa`, installs `git`, includes `build-essential` for compilation tools, `bubblewrap` and `socat` for sandbox support, and installs core CLI tools like `eza`, `fd-find`, `fzf`, and `pipx` |
 | ansible-lint        | `pipx install ansible-lint` via `command` with `creates: ~/.local/bin/ansible-lint`; avoids `community.general.pipx` requiring a newer pipx than Ubuntu ships |
+| tldr                | Removes distro `tldr` clients with `apt state=absent`, then runs `pipx install tldr` via `command` with `creates: ~/.local/bin/tldr` |
 | `~/.bashrc` entries | `lineinfile` module (checks before adding)                                                        |
 | git config          | `community.general.git_config` module                                                             |
 | git core.editor     | Conditionally set via `git_core_editor`; skipped when empty string                               |
@@ -263,6 +265,10 @@ The `dt` prefix stands for difftastic and is prepended to the mirrored alias nam
 ### fd
 
 `fd` is installed as part of the `core` sub-playbook through Ubuntu's `fd-find` package in `ansible/tasks/apt-packages.yml`. The standard `fd` command name is exposed in Bash via `alias fd="fdfind"` in `ansible/tasks/shell-config.yml`.
+
+### tldr
+
+`tldr` is installed as part of the `core` sub-playbook through `pipx` in `ansible/tasks/tldr.yml`, using the official Python client. The playbook removes distro `tealdeer`, `tldr`, and `tldr-hs` packages first so existing machines migrate cleanly and `tldr -u` uses the maintained upstream client.
 
 ### ansible-lint
 
