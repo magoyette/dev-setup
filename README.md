@@ -133,6 +133,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [ansible-lint](https://docs.ansible.com/projects/lint/) : linter for Ansible playbooks and task files
 - [fd](https://github.com/sharkdp/fd) : fast alternative to `find`
 - [fzf](https://github.com/junegunn/fzf) : interactive fuzzy finder for shell workflows
+- [hadolint](https://github.com/hadolint/hadolint) : Dockerfile linter installed from the upstream Linux release binary
 - [jq](https://jqlang.org/) : for JSON manipulation
 - [pandoc](https://pandoc.org/) : for Markdown support
 - [ripgrep](https://github.com/BurntSushi/ripgrep) : for file search

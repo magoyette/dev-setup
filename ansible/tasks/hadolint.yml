@@ -1,0 +1,27 @@
+---
+- name: Ensure ~/.local/bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Check installed hadolint version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/hadolint --version"
+  register: hadolint_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Download and install hadolint {{ hadolint_version }}
+  ansible.builtin.shell: |
+    set -euo pipefail
+
+    tmp_dir="$(mktemp -d)"
+    trap 'rm -rf "${tmp_dir}"' EXIT
+
+    curl -sSfL "https://github.com/hadolint/hadolint/releases/download/{{ hadolint_version }}/hadolint-linux-x86_64" \
+      -o "${tmp_dir}/hadolint"
+
+    install -m 0755 "${tmp_dir}/hadolint" "{{ ansible_env.HOME }}/.local/bin/hadolint"
+  args:
+    executable: /bin/bash
+  when: hadolint_version_output.rc != 0 or (hadolint_version | regex_replace('^v', '')) not in hadolint_version_output.stdout

@@ -13,6 +13,7 @@ Check `--help` for exact flags when needed.
 - `shellcheck`: lint shell scripts, should be used after a `.sh` file has been created or modified.
 - `difft`: syntax-aware diff.
 - `fzf`: interactive fuzzy finder.
+- `hadolint`: lint Dockerfiles.
 - `pandoc`: convert Markdown and other document formats.
 - `tldr`: simplified command examples and quick references.
 - `tokei`: count files, lines, code, comments, and blanks by language.
