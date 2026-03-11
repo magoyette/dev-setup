@@ -12,6 +12,7 @@
 
     - ansible.builtin.import_tasks: tasks/claude-code.yml
     - ansible.builtin.import_tasks: tasks/codex.yml
+    - ansible.builtin.import_tasks: tasks/ccusage.yml
     - ansible.builtin.import_tasks: tasks/global-agent-context.yml
     - ansible.builtin.import_tasks: tasks/ast-grep.yml
     - ansible.builtin.import_tasks: tasks/agent-skills.yml

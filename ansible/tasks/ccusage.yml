@@ -1,0 +1,23 @@
+---
+- name: Check if ccusage is installed
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.bun/bin/ccusage --version"
+  register: ccusage_check
+  failed_when: false
+  changed_when: false
+
+- name: Install ccusage globally with Bun
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.bun/bin/bun install -g ccusage"
+  when: ccusage_check.rc != 0
+
+- name: Ensure ~/.local/bin exists for ccusage symlink
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Link ccusage into ~/.local/bin
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.bun/bin/ccusage"
+    dest: "{{ ansible_env.HOME }}/.local/bin/ccusage"
+    state: link
+    force: true

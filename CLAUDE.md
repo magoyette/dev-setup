@@ -19,7 +19,7 @@ dev-setup/
 │   ├── core.yml                  # apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide
 │   ├── starship.yml              # starship install + bash init + stow deploy
 │   ├── node.yml                  # node, bun, markdownlint, playwright
-│   ├── ai-assistants.yml         # claude-code, codex, ast-grep, agent-skills
+│   ├── ai-assistants.yml         # claude-code, codex, ccusage, ast-grep, agent-skills
 │   ├── emacs.yml                 # emacs (skippable via playbooks_in_main_playbook)
 │   ├── neovim.yml                # neovim (skippable via playbooks_in_main_playbook)
 │   ├── defaults.yml              # Tool versions, checksums, npm packages (not user-configurable)
@@ -32,6 +32,7 @@ dev-setup/
 │       ├── neovim.yml, emacs.yml, emacs-lsp-booster.yml, emacs-node.yml
 │       ├── claude-code.yml       # Install + stow + settings management (hooks/statusLine/sandbox)
 │       ├── codex.yml             # Install + config.toml management
+│       ├── ccusage.yml           # Install ccusage globally with Bun and link it into ~/.local/bin
 │       ├── global-agent-context.yml, playwright.yml, ast-grep.yml
 │       └── agent-skills.yml      # Submodule update + symlinks for Claude Code and Codex
 ├── requirements.yml              # Ansible Galaxy collections (community.general)
@@ -79,7 +80,7 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in, not us
 | `core.yml` | apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide | always |
 | `starship.yml` | starship | `playbooks_in_main_playbook` |
 | `node.yml` | node, bun, markdownlint, playwright | always |
-| `ai-assistants.yml` | claude-code, codex, ast-grep, agent-skills | always |
+| `ai-assistants.yml` | claude-code, codex, ccusage, ast-grep, agent-skills | always |
 | `emacs.yml` | emacs (includes emacs-node) | `playbooks_in_main_playbook` |
 | `neovim.yml` | neovim | `playbooks_in_main_playbook` |
 
@@ -96,6 +97,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | fnm, zoxide, bun | `creates:` pointing to installed binary/directory |
 | Node LTS via fnm | `fnm list \| grep -q {{ fnm_node_version }}`; install if rc != 0 |
 | npm tools (markdownlint-cli2, Playwright, @playwright/cli, Codex, ast-grep, sandbox-runtime) | `npm list -g` check; install only if missing |
+| ccusage | `--version` check plus `bun install -g ccusage`; symlinked into `~/.local/bin` |
 | Versioned binaries (difftastic, hadolint, tokei, Starship, Neovim) | `--version` check; downloads pinned GitHub release only when missing/version mismatch (versions in `defaults.yml`) |
 | Starship/Neovim config | Stow packages (`changed_when: false`) |
 | Claude Code | `which claude` check before install |

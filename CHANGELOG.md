@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.15.0] - 2026-03-11
+
+### Added
+
+- Add `ccusage` to the `ai-assistants` sub-playbook to track Claude Code usage
+
 ## [3.14.1] - 2026-03-11
 
 ### Changed
@@ -358,7 +364,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.14.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.15.0...HEAD
+[3.15.0]: https://github.com/magoyette/dev-setup/compare/v3.14.1...v3.15.0
 [3.14.1]: https://github.com/magoyette/dev-setup/compare/v3.14.0...v3.14.1
 [3.14.0]: https://github.com/magoyette/dev-setup/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/magoyette/dev-setup/compare/v3.12.0...v3.13.0
