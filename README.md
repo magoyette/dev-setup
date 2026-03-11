@@ -106,6 +106,8 @@ The pre-commit hook runs `ansible-playbook ansible/playbook.yml --syntax-check` 
 
 `ansible-lint ansible/` can also be used, but there's too many pre-existing lint violations to add it to the pre-commit hook.
 
+Markdown linting is manual for now. Run `./run-markdownlint.sh`; it lints repo Markdown files from this repository and ignores irrelevant files.
+
 ## Releasing a new version
 
 Update `CHANGELOG.md` first: move entries from `[Unreleased]` to a new versioned section with today's date and update the comparison links at the bottom, then commit.
@@ -151,6 +153,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 
 - [bun](https://bun.com/) : JavaScript and TypeScript toolkit
 - [fnm](https://github.com/Schniz/fnm) : Node version manager
+- [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2) : Markdown linter CLI installed globally via npm, using the upstream markdownlint rules
 - [Node](https://nodejs.org) : JavaScript and Typescript runtime
 - [playwright-cli](https://github.com/microsoft/playwright-cli) : browser automation for testing front-end changes
 

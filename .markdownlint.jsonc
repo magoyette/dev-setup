@@ -1,0 +1,5 @@
+{
+  // Keep the default rule set and relax line length for prose-heavy docs.
+  "default": true,
+  "MD013": false
+}

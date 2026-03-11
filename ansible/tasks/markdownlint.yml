@@ -1,0 +1,9 @@
+- name: Check if markdownlint-cli2 is installed
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g markdownlint-cli2"
+  register: markdownlint_check
+  failed_when: false
+  changed_when: false
+
+- name: Install markdownlint-cli2
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g markdownlint-cli2"
+  when: markdownlint_check.rc != 0

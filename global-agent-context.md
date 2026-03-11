@@ -14,6 +14,7 @@ Check `--help` for exact flags when needed.
 - `difft`: syntax-aware diff.
 - `fzf`: interactive fuzzy finder.
 - `hadolint`: lint Dockerfiles.
+- `markdownlint-cli2`: lint Markdown files with the upstream markdownlint rules.
 - `pandoc`: convert Markdown and other document formats.
 - `tldr`: simplified command examples and quick references.
 - `tokei`: count files, lines, code, comments, and blanks by language.

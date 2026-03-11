@@ -18,7 +18,7 @@ dev-setup/
 │   ├── playbook.yml              # Main Ansible playbook — imports all sub-playbooks (core, starship, node, ai-assistants, emacs, neovim)
 │   ├── core.yml                  # Core sub-playbook: apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide
 │   ├── starship.yml              # Starship sub-playbook: starship install, bash init, stow deploy
-│   ├── node.yml                  # Node sub-playbook: node, bun, playwright
+│   ├── node.yml                  # Node sub-playbook: node, bun, markdownlint, playwright
 │   ├── ai-assistants.yml         # AI assistants sub-playbook: claude-code, codex, ast-grep, agent-skills
 │   ├── emacs.yml                 # Emacs sub-playbook: emacs (skipped via playbooks_in_main_playbook)
 │   ├── neovim.yml                # Neovim sub-playbook: neovim (skipped via playbooks_in_main_playbook)
@@ -37,6 +37,7 @@ dev-setup/
 │       ├── zoxide.yml            # zoxide install
 │       ├── starship.yml          # Starship install from GitHub release + bash init + stow deploy
 │       ├── bun.yml               # bun install
+│       ├── markdownlint.yml      # markdownlint-cli2 install via npm (check-then-install)
 │       ├── neovim.yml            # Neovim install from GitHub release + stow deploy
 │       ├── claude-code.yml       # Claude Code install + stow deploy + sandbox-runtime npm install + partial settings management (hooks/statusLine/sandbox)
 │       ├── codex.yml             # Codex CLI install via npm (check-then-install) + project doc settings, status line, and sandbox writable roots in ~/.codex/config.toml
@@ -75,6 +76,7 @@ dev-setup/
 │   ├── merge-claude-settings.sh  # Merges managed Claude settings fields (hooks/statusLine/sandbox) without touching other keys
 │   ├── download-playwright-skill.sh  # Downloads Playwright skill from GitHub into skills/playwright/
 │   └── download-ast-grep-skill.sh  # Downloads ast-grep skill from GitHub into skills/ast-grep/
+├── run-markdownlint.sh           # Runs repository Markdown linting with markdownlint-cli2
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
 └── claude-hooks.md               # Documentation for notification system
 ```
@@ -141,7 +143,7 @@ The playbook is split into a main `playbook.yml` and six sub-playbooks, each cov
 |---|---|---|
 | `core.yml` | apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide | always |
 | `starship.yml` | starship | `playbooks_in_main_playbook` |
-| `node.yml` | node, bun, playwright | always |
+| `node.yml` | node, bun, markdownlint, playwright | always |
 | `ai-assistants.yml` | claude-code, codex, ast-grep, agent-skills | always |
 | `emacs.yml` | emacs (includes emacs-node) | `playbooks_in_main_playbook` |
 | `neovim.yml` | neovim | `playbooks_in_main_playbook` |
@@ -163,6 +165,7 @@ Each sub-playbook can also be run independently via `run-ansible.sh <name>` or `
 | git aliases         | `sync-git-aliases.sh` upserts only managed aliases, removes only obsolete managed aliases, preserves user aliases, and exits changed only when content differs; skipped when `install_git_aliases` is `false` |
 | fnm                 | `creates:` pointing to `~/.local/share/fnm`                                                       |
 | Node LTS via fnm    | Checks `fnm list \| grep -q {{ fnm_node_version }}`; installs only if return code != 0 (`fnm_node_version` in `defaults.yml`) |
+| markdownlint-cli2   | `npm list -g markdownlint-cli2` check; install only if missing                                   |
 | zoxide, bun         | `creates:` pointing to the installed binary/directory                                             |
 | difftastic          | `creates:` pointing to `~/.local/bin/difft`                                                       |
 | hadolint            | Checks `~/.local/bin/hadolint --version`; downloads the pinned GitHub release binary only when missing/version mismatch (`hadolint_version` in `defaults.yml`) |
@@ -287,6 +290,12 @@ It is installed via the `pipx` CLI in `ansible/tasks/ansible-lint.yml`, which ke
 Use `ansible-lint ansible/` as advisory tooling for gradual cleanup. Do not treat its current output as a blocking check for unrelated work until the repository is substantially more lint-clean.
 
 For broad mechanical cleanup, start with `ansible-lint --fix ansible/` and then review the resulting changes manually. It can resolve a large share of formatting and FQCN issues quickly, but it should not be trusted as an unattended refactor for behavior-sensitive tasks.
+
+### markdownlint
+
+`markdownlint-cli2` is installed as part of the `node` sub-playbook via npm, using the existing `fnm`-managed Node runtime. This avoids Ubuntu's `markdownlint` package, which is the older Ruby `mdl` implementation rather than the upstream Node toolchain from David Anson's `markdownlint` project.
+
+Repository Markdown rules live in `.markdownlint.jsonc`. The initial config keeps the default rule set and disables `MD013` so the current prose-heavy docs can be linted usefully without a large cleanup pass. Manual repo linting uses `run-markdownlint.sh`, which runs `markdownlint-cli2` from the repository root while excluding `claude/.claude/`, `external-skills/`, and `skills/`.
 
 ### Starship
 
