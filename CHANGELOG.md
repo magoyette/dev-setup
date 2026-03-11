@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.1] - 2026-03-11
+
+### Changed
+
+- Reduce CLAUDE.md size by removing redundancy (42k to 17k characters)
+
 ## [3.14.0] - 2026-03-10
 
 ### Added
@@ -352,7 +358,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.14.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.14.1...HEAD
+[3.14.1]: https://github.com/magoyette/dev-setup/compare/v3.14.0...v3.14.1
 [3.14.0]: https://github.com/magoyette/dev-setup/compare/v3.13.0...v3.14.0
 [3.13.0]: https://github.com/magoyette/dev-setup/compare/v3.12.0...v3.13.0
 [3.12.0]: https://github.com/magoyette/dev-setup/compare/v3.11.0...v3.12.0
