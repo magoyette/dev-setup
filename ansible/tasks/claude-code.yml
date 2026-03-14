@@ -49,3 +49,9 @@
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: 'alias ccstatusline="bunx ccstatusline@latest"'
     state: present
+
+- name: Add claude wrapper function for daily auto-upgrade
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: 'claude() { local stamp="$HOME/.local/share/claude-upgrade-check"; if [[ ! -f "$stamp" ]] || [[ -n $(find "$stamp" -mtime +1 2>/dev/null) ]]; then command claude upgrade; touch "$stamp"; fi; command claude "$@"; }'
+    state: present

@@ -101,6 +101,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Versioned binaries (difftastic, hadolint, tokei, Starship, Neovim) | `--version` check; downloads pinned GitHub release only when missing/version mismatch (versions in `defaults.yml`) |
 | Starship/Neovim config | Stow packages (`changed_when: false`) |
 | Claude Code | `which claude` check before install |
+| Claude upgrade wrapper | `lineinfile` (no-op if line already present) |
 | Claude settings (hooks, statusLine, sandbox) | `merge-claude-settings.sh` merges managed keys via `jq`; `allowWrite` from `ai_assistants_sandbox_writable_roots`; other user keys preserved via recursive merge |
 | Codex config | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots) |
 | Global agent context | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
@@ -128,6 +129,11 @@ Entries in `ansible/tasks/emacs.yml` (applied when `emacs` is in `playbooks_in_m
 
 - `alias emacs="emacs -nw"` (forces terminal Emacs when launched as `emacs`)
 - `alias e='emacsclient -t -a "" --eval "(progn (switch-to-buffer \"*scratch*\") nil)"'` (opens a terminal `emacsclient` frame in `*scratch*` and auto-starts the daemon if needed)
+
+Entries in `ansible/tasks/claude-code.yml` (always applied via `ai-assistants.yml`):
+
+- `alias ccstatusline="bunx ccstatusline@latest"`
+- `claude()` wrapper function — runs `claude upgrade` at most once per day (stamp file: `~/.local/share/claude-upgrade-check`) before launching Claude Code; workaround for fnm multishell paths breaking auto-upgrade detection
 
 Entries in `ansible/tasks/starship.yml` (applied when `starship` is in `playbooks_in_main_playbook`, via `starship.yml`):
 
