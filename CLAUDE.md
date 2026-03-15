@@ -41,8 +41,7 @@ dev-setup/
 ├── claude/.claude/hooks/wsl-notify.sh # Stow: WSL-to-Windows notification hook
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 ├── skills-claude/
-│   ├── codex-review-uncommitted/ # Claude-only skill: delegate review to `codex review --uncommitted`
-│   └── codex-review-branch/     # Claude-only skill: delegate review to `codex review --base <branch>`
+│   └── codex-review/            # Claude-only skill: delegate review to `codex review` (uncommitted or base branch)
 ├── skills-codex/                # Codex-only own skills
 ├── external-skills/humanizer/    # Git submodule (https://github.com/blader/humanizer)
 ├── external-skills-claude/      # Claude-only external skills
@@ -235,7 +234,7 @@ Skills are deployed to `~/.claude/skills/` and `~/.agents/skills/` (both real di
 - **Codex-only external skills** (`external-skills-codex/<name>/`): deploy only to Codex
 - External skills auto-update on playbook run via `git submodule update --init --remote --merge`
 - Current shared own skills: `ast-grep`, `playwright`
-- Current Claude-only own skills: `codex-review-uncommitted`, `codex-review-branch`
+- Current Claude-only own skills: `codex-review`
 - Current external skills: `humanizer` (<https://github.com/blader/humanizer>)
 
 ## Troubleshooting

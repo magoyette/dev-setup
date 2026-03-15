@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-03-15
+
+### Changed
+
+- Consolidate `codex-review-uncommitted` and `codex-review-branch` Claude Code skills into a single `codex-review` skill.
+
 ## [3.16.1] - 2026-03-15
 
 ### Added
@@ -384,7 +390,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.16.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/magoyette/dev-setup/compare/v3.16.1...v4.0.0
 [3.16.1]: https://github.com/magoyette/dev-setup/compare/v3.16.0...v3.16.1
 [3.16.0]: https://github.com/magoyette/dev-setup/compare/v3.15.1...v3.16.0
 [3.15.1]: https://github.com/magoyette/dev-setup/compare/v3.15.0...v3.15.1

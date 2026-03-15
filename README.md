@@ -156,7 +156,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - unzip: to unzip .zip files
 - [Zoxide](https://github.com/ajeetdsouza/zoxide) : alternative to cd
 
-### starship
+### starship sub-playbook
 
 - [Starship](https://starship.rs/) : cross-shell prompt configured for Bash in WSL2
 
@@ -168,7 +168,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [Node](https://nodejs.org) : JavaScript and Typescript runtime
 - [playwright-cli](https://github.com/microsoft/playwright-cli) : browser automation for testing front-end changes
 
-### ai-assistants
+### ai-assistants sub-playbook
 
 - [claude-code](https://github.com/anthropics/claude-code) : coding agent (with [sandboxing](https://code.claude.com/docs/en/sandboxing) enabled by default)
 - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
@@ -176,23 +176,32 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [codex](https://github.com/openai/codex) : coding agent
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
 
-### emacs
+### emacs sub-playbook
 
 - [Emacs](https://www.gnu.org/software/emacs/) : terminal text editor configured with [my personal configuration](https://github.com/magoyette/.emacs.d)
 - [emacs-lsp-booster](https://github.com/blahgeek/emacs-lsp-booster) : better performance in lsp-mode
 
-### neovim
+### neovim sub-playbook
 
 - [Neovim](https://neovim.io/) : terminal text editor
 
-### Agent skills
+## Agent skills
 
-### Claude Code skills
+Skills can be shared between Claude Code and Codex, or specific to one of the AI assistants.
 
-- `codex-review-uncommitted` : Claude Code delegates review of local uncommitted changes to Codex
-- `codex-review-branch` : Claude Code delegates review of the current branch against the base branch to Codex (base branch is an optional parameter)
+### Skills
 
-#### Shared external skills
+Some agent skills are provided by this repository.
+
+#### Claude Code skills
+
+- `codex-review` : Claude Code delegates review to Codex. Reviews uncommitted changes by default. Pass a base branch as the first argument to do a PR-style review.
+
+### External skills
+
+Other skills are external and are provided by third-parties.
+
+### External shared skills
 
 - [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright/src/skill) : browser automation skill (bundled with Playwright npm package)
 - [ast-grep](https://github.com/ast-grep/agent-skill) : AST-based structural code search skill
