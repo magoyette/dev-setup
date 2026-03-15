@@ -58,4 +58,11 @@
     line: "alias e='emacsclient -t -a \"\" --eval \"(progn (switch-to-buffer \\\"*scratch*\\\") nil)\"'"
     state: present
 
+- name: Add emacsclient Magit status alias
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: "^alias eg="
+    line: "alias eg='emacsclient -t -a \"\" --eval \"(progn (magit-status) nil)\"'"
+    state: present
+
 - ansible.builtin.import_tasks: emacs-node.yml

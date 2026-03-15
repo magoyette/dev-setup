@@ -91,8 +91,9 @@ git alias
 
 ## Shell aliases
 
-- `e` : open Emacs with the daemon
-- `emacs` : open Emacs in terminal mode
+- `e` : open Emacs with the daemon, initial buffer is `*scratch*`
+- `eg` : open Emacs with the daemon, initial buffer is Magit status
+- `emacs` : open Emacs without the daemon
 - `ccstatusline` : configure the Claude Code status line
 - `fd` : alias to Ubuntu's `fdfind` binary
 
