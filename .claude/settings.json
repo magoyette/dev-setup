@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ansible-playbook ansible/playbook.yml --syntax-check 2>&1)",
+      "Bash(shellcheck scripts/merge-claude-settings.sh 2>&1)"
+    ]
+  }
+}

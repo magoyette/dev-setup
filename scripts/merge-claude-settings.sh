@@ -23,8 +23,9 @@ fi
 sandbox_enabled="${CLAUDE_SANDBOX_ENABLED:-true}"
 sandbox_allow_write="${CLAUDE_SANDBOX_ALLOW_WRITE:-[]}"
 sandbox_allowed_hosts="${CLAUDE_SANDBOX_ALLOWED_HOSTS:-[]}"
+webfetch_hosts="${CLAUDE_PERMISSIONS_ALLOW_WEBFETCH:-[]}"
 
-jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$sandbox_allow_write" --argjson sandbox_allowed_hosts "$sandbox_allowed_hosts" '
+jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$sandbox_allow_write" --argjson sandbox_allowed_hosts "$sandbox_allowed_hosts" --argjson webfetch_hosts "$webfetch_hosts" '
   .hooks = {
     "Notification": [
       {
@@ -50,6 +51,12 @@ jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$
   | if ($sandbox_allowed_hosts | length) > 0 then
       .sandbox.network = ((.sandbox.network // {}) * {"allowedHosts": $sandbox_allowed_hosts})
     else . end
+  | .permissions = ((.permissions // {}) * {
+      "allow": (
+        ((.permissions.allow // []) | map(select(test("^WebFetch\\(domain:") | not)))
+        + ($webfetch_hosts | map("WebFetch(domain:\(.))"))
+      )
+    })
 ' "$tmp_input" >"$tmp_output"
 
 if [[ -f "$settings_file" ]] && cmp -s "$tmp_output" "$settings_file"; then

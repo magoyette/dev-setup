@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2026-03-15
+
+### Added
+
+- Add `.claude/settings.json` to allow Ansible syntax check and `shellcheck`
+- Auto-approve `WebFetch(domain:<host>)` in Claude Code's `permissions.allow` for each host in `ai_assistants_sandbox_allowed_hosts`
+
 ## [4.0.0] - 2026-03-15
 
 ### Changed
@@ -390,7 +397,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/magoyette/dev-setup/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/magoyette/dev-setup/compare/v3.16.1...v4.0.0
 [3.16.1]: https://github.com/magoyette/dev-setup/compare/v3.16.0...v3.16.1
 [3.16.0]: https://github.com/magoyette/dev-setup/compare/v3.15.1...v3.16.0

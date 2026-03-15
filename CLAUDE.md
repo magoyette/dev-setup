@@ -11,6 +11,8 @@ This is a developer setup repository for WSL2 (Windows Subsystem for Linux v2). 
 ```text
 dev-setup/
 ├── CLAUDE.md
+├── .claude/
+│   └── settings.json            # Repo-local Claude Code permissions allowlist for this workspace
 ├── global-agent-context.md       # Deployed to ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md
 ├── .githooks/
 │   └── pre-commit                # Ansible syntax checks when ansible/*.yml is staged
@@ -81,44 +83,44 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in, not us
 
 ### Playbook structure
 
-| Sub-playbook | Tasks included | Condition |
-| --- | --- | --- |
-| `core.yml` | apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide | always |
-| `starship.yml` | starship | `playbooks_in_main_playbook` |
-| `node.yml` | node, bun, markdownlint, playwright | always |
-| `ai-assistants.yml` | claude-code, codex, ccusage, ast-grep, agent-skills | always |
-| `emacs.yml` | emacs (includes emacs-node) | `playbooks_in_main_playbook` |
-| `neovim.yml` | neovim | `playbooks_in_main_playbook` |
+| Sub-playbook        | Tasks included                                                                           | Condition                    |
+| ------------------- | ---------------------------------------------------------------------------------------- | ---------------------------- |
+| `core.yml`          | apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide | always                       |
+| `starship.yml`      | starship                                                                                 | `playbooks_in_main_playbook` |
+| `node.yml`          | node, bun, markdownlint, playwright                                                      | always                       |
+| `ai-assistants.yml` | claude-code, codex, ccusage, ast-grep, agent-skills                                      | always                       |
+| `emacs.yml`         | emacs (includes emacs-node)                                                              | `playbooks_in_main_playbook` |
+| `neovim.yml`        | neovim                                                                                   | `playbooks_in_main_playbook` |
 
 Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and skips if absent. This check also applies to direct runs (`run-ansible.sh <name>`).
 
 ### Idempotency approach
 
-| Concern | Mechanism |
-| --- | --- |
-| apt packages | `apt_repository` + `apt` modules; adds `ppa:git-core/ppa` for git |
-| ansible-lint, tldr | `pipx install` via `command` with `creates:`; tldr removes distro clients first |
-| `~/.bashrc` entries | `lineinfile` module |
-| git config / aliases | `community.general.git_config`; aliases via `sync-git-aliases.sh` (upserts managed, preserves user aliases); skipped when `install_git_aliases` is `false` |
-| fnm, zoxide, bun | `creates:` pointing to installed binary/directory |
-| Node LTS via fnm | `fnm list \| grep -q {{ fnm_node_version }}`; install if rc != 0 |
-| npm tools (markdownlint-cli2, Playwright, @playwright/cli, Codex, ast-grep, sandbox-runtime) | `npm list -g` check; install only if missing |
-| ccusage | `--version` check plus `bun install -g ccusage`; symlinked into `~/.local/bin` |
-| Versioned binaries (difftastic, hadolint, tokei, Starship, Neovim) | `--version` check; downloads pinned GitHub release only when missing/version mismatch (versions in `defaults.yml`) |
-| Starship/Neovim config | Stow packages (`changed_when: false`) |
-| Claude Code | `which claude` check before install |
-| Claude upgrade wrapper | `lineinfile` (no-op if line already present) |
-| Claude settings (hooks, statusLine, sandbox) | `merge-claude-settings.sh` merges managed keys via `jq`; `allowWrite` from `ai_assistants_sandbox_writable_roots`; `allowedHosts` from `ai_assistants_sandbox_allowed_hosts`; other user keys preserved via recursive merge |
-| Codex config | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots) |
-| Global agent context | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
-| Playwright deps/browsers | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`) |
-| Skills (Playwright, ast-grep) | Downloaded into `skills/` with `creates:` on `SKILL.md`; auto-symlinked by `agent-skills.yml` to both agents |
-| Checked-in own skills | Stored under `skills/`, `skills-claude/`, or `skills-codex/`; auto-symlinked by `agent-skills.yml` to the matching agent targets |
-| Emacs | `meta: end_play` when excluded; deps via `apt`; build via `--version` check; emacs-lsp-booster via SHA-256 checksum; LSP npm via `npm list -g` |
-| External skills | `git submodule update --init --remote --merge` (`changed_when: false`) |
-| Skill symlinks | `file state=link` for shared and target-specific skills; opposite-target links for agent-specific skills are removed with `state=absent` |
-| Repo hooks | `git config --local core.hooksPath` check; runs `install-git-hooks.sh` only when not set |
-| Stow | Idempotent by nature |
+| Concern                                                                                      | Mechanism                                                                                                                                                                                                                   |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| apt packages                                                                                 | `apt_repository` + `apt` modules; adds `ppa:git-core/ppa` for git                                                                                                                                                           |
+| ansible-lint, tldr                                                                           | `pipx install` via `command` with `creates:`; tldr removes distro clients first                                                                                                                                             |
+| `~/.bashrc` entries                                                                          | `lineinfile` module                                                                                                                                                                                                         |
+| git config / aliases                                                                         | `community.general.git_config`; aliases via `sync-git-aliases.sh` (upserts managed, preserves user aliases); skipped when `install_git_aliases` is `false`                                                                  |
+| fnm, zoxide, bun                                                                             | `creates:` pointing to installed binary/directory                                                                                                                                                                           |
+| Node LTS via fnm                                                                             | `fnm list \| grep -q {{ fnm_node_version }}`; install if rc != 0                                                                                                                                                            |
+| npm tools (markdownlint-cli2, Playwright, @playwright/cli, Codex, ast-grep, sandbox-runtime) | `npm list -g` check; install only if missing                                                                                                                                                                                |
+| ccusage                                                                                      | `--version` check plus `bun install -g ccusage`; symlinked into `~/.local/bin`                                                                                                                                              |
+| Versioned binaries (difftastic, hadolint, tokei, Starship, Neovim)                           | `--version` check; downloads pinned GitHub release only when missing/version mismatch (versions in `defaults.yml`)                                                                                                          |
+| Starship/Neovim config                                                                       | Stow packages (`changed_when: false`)                                                                                                                                                                                       |
+| Claude Code                                                                                  | `which claude` check before install                                                                                                                                                                                         |
+| Claude upgrade wrapper                                                                       | `lineinfile` (no-op if line already present)                                                                                                                                                                                |
+| Claude settings (hooks, statusLine, sandbox, permissions)                                    | `merge-claude-settings.sh` merges managed keys via `jq`; `allowWrite` from `ai_assistants_sandbox_writable_roots`; `allowedHosts` from `ai_assistants_sandbox_allowed_hosts`; `permissions.allow` gets `WebFetch(domain:<host>)` entries for each allowed host; other user keys preserved via recursive merge |
+| Codex config                                                                                 | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots)                                                                                                                           |
+| Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`                                                                                                                                             |
+| Playwright deps/browsers                                                                     | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`)                                                                                                                                    |
+| Skills (Playwright, ast-grep)                                                                | Downloaded into `skills/` with `creates:` on `SKILL.md`; auto-symlinked by `agent-skills.yml` to both agents                                                                                                                |
+| Checked-in own skills                                                                        | Stored under `skills/`, `skills-claude/`, or `skills-codex/`; auto-symlinked by `agent-skills.yml` to the matching agent targets                                                                                            |
+| Emacs                                                                                        | `meta: end_play` when excluded; deps via `apt`; build via `--version` check; emacs-lsp-booster via SHA-256 checksum; LSP npm via `npm list -g`                                                                              |
+| External skills                                                                              | `git submodule update --init --remote --merge` (`changed_when: false`)                                                                                                                                                      |
+| Skill symlinks                                                                               | `file state=link` for shared and target-specific skills; opposite-target links for agent-specific skills are removed with `state=absent`                                                                                    |
+| Repo hooks                                                                                   | `git config --local core.hooksPath` check; runs `install-git-hooks.sh` only when not set                                                                                                                                    |
+| Stow                                                                                         | Idempotent by nature                                                                                                                                                                                                        |
 
 ### bashrc entries managed by Ansible
 
@@ -156,12 +158,12 @@ Git is installed from `ppa:git-core/ppa` for newer upstream releases. Aliases ar
 
 Difftastic is a **secondary** diff tool alongside delta (the default pager). Invoked explicitly via `dt`-prefixed git aliases defined in `scripts/sync-git-aliases.sh`:
 
-| Alias | Mirrors | Description |
-| ----- | ------- | ----------- |
-| `git dtd` | `git d` | difftastic diff |
+| Alias      | Mirrors  | Description                    |
+| ---------- | -------- | ------------------------------ |
+| `git dtd`  | `git d`  | difftastic diff                |
 | `git dtdl` | `git dl` | difftastic diff --cached HEAD^ |
-| `git dtds` | `git ds` | difftastic diff --staged |
-| `git dtl` | `git l` | difftastic log with patches |
+| `git dtds` | `git ds` | difftastic diff --staged       |
+| `git dtl`  | `git l`  | difftastic log with patches    |
 
 All aliases use `-c diff.external=difft` so the override is per-command only.
 
@@ -206,9 +208,14 @@ This means editing files under the corresponding repo directory immediately affe
 
 ## Claude Code Configuration
 
-`settings.json` is not tracked in git. Ansible manages only `hooks`, `statusLine`, `sandbox.enabled`, and `sandbox.filesystem.allowWrite` via `scripts/merge-claude-settings.sh`. All other keys are user-managed and preserved.
+Claude Code uses two config locations in this repo:
 
-To change managed fields, edit `merge-claude-settings.sh` and re-run the playbook. For other settings, edit `~/.claude/settings.json` directly.
+- `claude/.claude/` contains Stow-deployed home-directory files such as hooks.
+- `.claude/settings.json` is a repo-local Claude Code settings file tracked in git for workspace-specific permissions.
+
+Ansible manages only `hooks`, `statusLine`, `sandbox.enabled`, and `sandbox.filesystem.allowWrite` in `~/.claude/settings.json` via `scripts/merge-claude-settings.sh`. All other home-directory keys are user-managed and preserved.
+
+To change managed home-directory fields, edit `merge-claude-settings.sh` and re-run the playbook. To change repo-local Claude permissions for this workspace, edit `.claude/settings.json` directly.
 
 ### WSL-to-Windows Notification Hook
 
