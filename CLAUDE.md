@@ -111,6 +111,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Claude Code                                                                                  | `which claude` check before install                                                                                                                                                                                         |
 | Claude upgrade wrapper                                                                       | `lineinfile` (no-op if line already present)                                                                                                                                                                                |
 | Claude settings (hooks, statusLine, sandbox, permissions)                                    | `merge-claude-settings.sh` merges managed keys via `jq`; `allowWrite` from `ai_assistants_sandbox_writable_roots`; `allowedHosts` from `ai_assistants_sandbox_allowed_hosts`; `permissions.allow` gets `WebFetch(domain:<host>)` entries for each allowed host; other user keys preserved via recursive merge |
+| Claude Code plugins                                                                          | `claude plugin list` check; `claude plugin install <name>@<marketplace> --scope user` for each entry in `claude_code_plugins` (`defaults.yml`) not already listed                                                          |
 | Codex config                                                                                 | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots)                                                                                                                           |
 | Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`                                                                                                                                             |
 | Playwright deps/browsers                                                                     | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`)                                                                                                                                    |
@@ -216,6 +217,17 @@ Claude Code uses two config locations in this repo:
 Ansible manages only `hooks`, `statusLine`, `sandbox.enabled`, and `sandbox.filesystem.allowWrite` in `~/.claude/settings.json` via `scripts/merge-claude-settings.sh`. All other home-directory keys are user-managed and preserved.
 
 To change managed home-directory fields, edit `merge-claude-settings.sh` and re-run the playbook. To change repo-local Claude permissions for this workspace, edit `.claude/settings.json` directly.
+
+### Claude Code Plugins
+
+Plugins are installed from the official Anthropic marketplace via `claude plugin install`. The list is declared in `claude_code_plugins` in `ansible/defaults.yml`. Ansible checks `claude plugin list` and installs any missing plugins idempotently. To add or remove a plugin, edit the list in `defaults.yml` and re-run the playbook (note: removing an entry does not uninstall the plugin — uninstall manually with `claude plugin uninstall <name>`).
+
+Current managed plugins:
+
+- `context7` — live, version-specific library documentation retrieval (by Upstash)
+- `skill-creator` — toolkit for developing, evaluating, and benchmarking Claude Code skills (Anthropic Verified)
+- `claude-md-management` — audits CLAUDE.md quality and captures session learnings via `/revise-claude-md` (Anthropic Verified)
+- `claude-code-setup` — analyzes a codebase and recommends MCP servers, skills, hooks, and subagents for it (Anthropic Verified)
 
 ### WSL-to-Windows Notification Hook
 

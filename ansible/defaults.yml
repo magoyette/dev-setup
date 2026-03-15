@@ -19,6 +19,13 @@ codex_status_line:
   - five-hour-limit
   - weekly-limit
 
+# Claude Code plugins installed from the official marketplace
+claude_code_plugins:
+  - context7@claude-plugins-official
+  - skill-creator@claude-plugins-official
+  - claude-md-management@claude-plugins-official
+  - claude-code-setup@claude-plugins-official
+
 # npm global packages required by Emacs LSP mode and formatting tools
 emacs_npm_packages:
   - "@astrojs/language-server"

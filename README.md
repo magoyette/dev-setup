@@ -2,6 +2,8 @@
 
 My personal developer setup for WSL2 (Windows Subsystem for Linux v2).
 
+See the [CHANGELOG](CHANGELOG.md) for the release notes.
+
 ## WSL Installation
 
 Install Ubuntu in WSL: `wsl --install`.
@@ -176,6 +178,8 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [codex](https://github.com/openai/codex) : coding agent
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
 
+Many agent skills and Claude Code plugins are installed by the sub-playbook, see the dedicated sections below.
+
 ### emacs sub-playbook
 
 - [Emacs](https://www.gnu.org/software/emacs/) : terminal text editor configured with [my personal configuration](https://github.com/magoyette/.emacs.d)
@@ -185,24 +189,27 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 
 - [Neovim](https://neovim.io/) : terminal text editor
 
-## Agent skills
+## Agent skills for AI Assistants
 
 Skills can be shared between Claude Code and Codex, or specific to one of the AI assistants.
 
-### Skills
+### magoyette/dev-setup skills
 
-Some agent skills are provided by this repository.
-
-#### Claude Code skills
-
-- `codex-review` : Claude Code delegates review to Codex. Reviews uncommitted changes by default. Pass a base branch as the first argument to do a PR-style review.
+- `codex-review` : Claude Code skill that delegates review to Codex. Reviews uncommitted changes by default. Pass a base branch as the first argument to do a PR-style review.
 
 ### External skills
 
-Other skills are external and are provided by third-parties.
-
-### External shared skills
+External skills are provided by other projects.
 
 - [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright/src/skill) : browser automation skill (bundled with Playwright npm package)
 - [ast-grep](https://github.com/ast-grep/agent-skill) : AST-based structural code search skill
 - [humanizer](https://github.com/blader/humanizer) : remove signs of AI-generated writing from text
+
+## Claude Code Plugins
+
+[Claude Code plugins](https://claude.com/plugins) that are installed with Ansible.
+
+- [context7](https://claude.com/plugins/context7) : MCP server for technical documentation. Add "use context7" to the prompt to leverage it.
+- [skill-creator](https://claude.com/plugins/skill-creator) : toolkit for Claude Code skills development.
+- [claude-md-management](https://claude.com/plugins/claude-md-management) : audits `CLAUDE.md` quality, trigger with `audit my CLAUDE.md files`. `/revise-claude-md` command capture learnings after a session in `CLAUDE.md`
+- [claude-code-setup](https://claude.com/plugins/claude-code-setup) : plugin that recommends improvements for Claude Code. Trigger with "recommend automations for this project", "setup Claude Code", "which MCPs should I use", etc.

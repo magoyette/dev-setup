@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-03-15
+
+### Added
+
+- Add 4 Claude Code plugins from the official marketplace:
+  `context7`, `skill-creator`, `claude-md-management` and `claude-code-setup`.
+
 ## [4.1.0] - 2026-03-15
 
 ### Added
@@ -397,7 +404,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.2.0...HEAD
+[4.2.0]: https://github.com/magoyette/dev-setup/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/magoyette/dev-setup/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/magoyette/dev-setup/compare/v3.16.1...v4.0.0
 [3.16.1]: https://github.com/magoyette/dev-setup/compare/v3.16.0...v3.16.1

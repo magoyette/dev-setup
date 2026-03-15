@@ -46,6 +46,16 @@
   changed_when: claude_settings_merge.rc == 2
   failed_when: claude_settings_merge.rc not in [0, 2]
 
+- name: Get installed Claude Code plugins
+  ansible.builtin.command: claude plugin list
+  register: claude_plugin_list
+  changed_when: false
+
+- name: Install Claude Code plugins
+  ansible.builtin.command: claude plugin install {{ item }} --scope user
+  loop: "{{ claude_code_plugins }}"
+  when: item not in claude_plugin_list.stdout
+
 - name: Add ccstatusline alias
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
