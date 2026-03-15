@@ -40,6 +40,7 @@
   environment:
     CLAUDE_SANDBOX_ENABLED: "{{ claude_sandbox_enabled | lower }}"
     CLAUDE_SANDBOX_ALLOW_WRITE: "{{ ai_assistants_sandbox_writable_roots | to_json }}"
+    CLAUDE_SANDBOX_ALLOWED_HOSTS: "{{ ai_assistants_sandbox_allowed_hosts | default([]) | to_json }}"
   register: claude_settings_merge
   changed_when: claude_settings_merge.rc == 2
   failed_when: claude_settings_merge.rc not in [0, 2]

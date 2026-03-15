@@ -4,6 +4,10 @@ git_user_email: "you@example.com"
 git_core_editor: "" # possible value: nvim
 install_git_aliases: true
 ai_assistants_sandbox_writable_roots: []
+ai_assistants_sandbox_allowed_hosts:
+  # Whitelist ChatGPT for Claude Code Codex skills
+  - chatgpt.com
+  - ab.chatgpt.com
 playbooks_in_main_playbook:
   - core
   - starship

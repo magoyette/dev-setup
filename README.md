@@ -54,6 +54,8 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   Install and manage this repo's Git aliases. Default: `true`. Set to `false` to skip Git alias management.
 - `ai_assistants_sandbox_writable_roots`
   Extra writable roots for the sandboxes of Codex (`writable_roots`) and Claude Code (`sandbox.filesystem.allowWrite`). Default: `[]`.
+- `ai_assistants_sandbox_allowed_hosts`
+  Hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`). Default to hosts needed by the agent skills.
 - `playwright_browsers`
   Browsers to install for Playwright. Default: `["chrome"]`. Accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
 - `playbooks_in_main_playbook`

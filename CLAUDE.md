@@ -72,6 +72,7 @@ The playbook is idempotent — safe to re-run. `ansible/vars.yml` is gitignored.
 - `git_core_editor` — optional `core.editor` override; empty string = no change
 - `install_git_aliases` — manage repo's Git aliases (default `true`); `false` skips alias sync
 - `ai_assistants_sandbox_writable_roots` — extra writable roots shared by Codex (`writable_roots`) and Claude Code (`sandbox.filesystem.allowWrite`); default `[]`
+- `ai_assistants_sandbox_allowed_hosts` — hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`); default `[]`
 - `playwright_browsers` — browsers to install (default `["chromium"]`; options: `chromium`, `firefox`, `webkit`)
 - `playbooks_in_main_playbook` — sub-playbooks to run; omit a name to skip it; when absent all run
 
@@ -108,7 +109,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Starship/Neovim config | Stow packages (`changed_when: false`) |
 | Claude Code | `which claude` check before install |
 | Claude upgrade wrapper | `lineinfile` (no-op if line already present) |
-| Claude settings (hooks, statusLine, sandbox) | `merge-claude-settings.sh` merges managed keys via `jq`; `allowWrite` from `ai_assistants_sandbox_writable_roots`; other user keys preserved via recursive merge |
+| Claude settings (hooks, statusLine, sandbox) | `merge-claude-settings.sh` merges managed keys via `jq`; `allowWrite` from `ai_assistants_sandbox_writable_roots`; `allowedHosts` from `ai_assistants_sandbox_allowed_hosts`; other user keys preserved via recursive merge |
 | Codex config | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots) |
 | Global agent context | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
 | Playwright deps/browsers | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`) |

@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.16.1] - 2026-03-15
+
+### Added
+
+- Add `ai_assistants_sandbox_allowed_hosts` variable to configure `sandbox.network.allowedHosts` in Claude Code settings
+- Allow `chatgpt.com` and `ab.chatgpt.com` in Claude Code sandbox for codex skills
+
 ## [3.16.0] - 2026-03-15
 
 ### Added
@@ -377,7 +384,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.16.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.16.1...HEAD
+[3.16.1]: https://github.com/magoyette/dev-setup/compare/v3.16.0...v3.16.1
 [3.16.0]: https://github.com/magoyette/dev-setup/compare/v3.15.1...v3.16.0
 [3.15.1]: https://github.com/magoyette/dev-setup/compare/v3.15.0...v3.15.1
 [3.15.0]: https://github.com/magoyette/dev-setup/compare/v3.14.1...v3.15.0

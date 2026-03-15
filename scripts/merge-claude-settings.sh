@@ -22,8 +22,9 @@ fi
 
 sandbox_enabled="${CLAUDE_SANDBOX_ENABLED:-true}"
 sandbox_allow_write="${CLAUDE_SANDBOX_ALLOW_WRITE:-[]}"
+sandbox_allowed_hosts="${CLAUDE_SANDBOX_ALLOWED_HOSTS:-[]}"
 
-jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$sandbox_allow_write" '
+jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$sandbox_allow_write" --argjson sandbox_allowed_hosts "$sandbox_allowed_hosts" '
   .hooks = {
     "Notification": [
       {
@@ -42,7 +43,13 @@ jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$
     "command": "bunx -y ccstatusline@latest",
     "padding": 0
   }
-  | .sandbox = ((.sandbox // {}) * {"enabled": $sandbox_enabled, "filesystem": ((.sandbox.filesystem // {}) * {"allowWrite": $sandbox_allow_write})})
+  | .sandbox = ((.sandbox // {}) * {
+      "enabled": $sandbox_enabled,
+      "filesystem": ((.sandbox.filesystem // {}) * {"allowWrite": $sandbox_allow_write})
+    })
+  | if ($sandbox_allowed_hosts | length) > 0 then
+      .sandbox.network = ((.sandbox.network // {}) * {"allowedHosts": $sandbox_allowed_hosts})
+    else . end
 ' "$tmp_input" >"$tmp_output"
 
 if [[ -f "$settings_file" ]] && cmp -s "$tmp_output" "$settings_file"; then
