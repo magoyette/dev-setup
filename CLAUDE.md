@@ -40,7 +40,13 @@ dev-setup/
 ├── starship/.config/starship.toml # Stow: Starship prompt config
 ├── claude/.claude/hooks/wsl-notify.sh # Stow: WSL-to-Windows notification hook
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
+├── skills-claude/
+│   ├── codex-review-uncommitted/ # Claude-only skill: delegate review to `codex review --uncommitted`
+│   └── codex-review-branch/     # Claude-only skill: delegate review to `codex review --base <branch>`
+├── skills-codex/                # Codex-only own skills
 ├── external-skills/humanizer/    # Git submodule (https://github.com/blader/humanizer)
+├── external-skills-claude/      # Claude-only external skills
+├── external-skills-codex/       # Codex-only external skills
 ├── llm-docs/                     # Fix documentation (node-fix, zoxide-fix, emacs-fix, emacs-dependency-integration)
 ├── scripts/
 │   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh
@@ -106,10 +112,11 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Codex config | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots) |
 | Global agent context | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` |
 | Playwright deps/browsers | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`) |
-| Skills (Playwright, ast-grep) | Downloaded via scripts with `creates:` on `SKILL.md`; auto-symlinked by `agent-skills.yml` |
+| Skills (Playwright, ast-grep) | Downloaded into `skills/` with `creates:` on `SKILL.md`; auto-symlinked by `agent-skills.yml` to both agents |
+| Checked-in own skills | Stored under `skills/`, `skills-claude/`, or `skills-codex/`; auto-symlinked by `agent-skills.yml` to the matching agent targets |
 | Emacs | `meta: end_play` when excluded; deps via `apt`; build via `--version` check; emacs-lsp-booster via SHA-256 checksum; LSP npm via `npm list -g` |
 | External skills | `git submodule update --init --remote --merge` (`changed_when: false`) |
-| Skill symlinks | `file state=link` (no-op if correct) |
+| Skill symlinks | `file state=link` for shared and target-specific skills; opposite-target links for agent-specific skills are removed with `state=absent` |
 | Repo hooks | `git config --local core.hooksPath` check; runs `install-git-hooks.sh` only when not set |
 | Stow | Idempotent by nature |
 
@@ -161,7 +168,7 @@ All aliases use `-c diff.external=difft` so the override is per-command only.
 ### Tool notes
 
 - **ansible-lint**: Use `ansible-lint ansible/` as advisory tooling. `ansible-lint --fix ansible/` for broad cleanup, but review results manually.
-- **markdownlint**: Rules in `.markdownlint.jsonc` (MD013 disabled). Lint with `run-markdownlint.sh` (excludes `claude/.claude/`, `external-skills/`, `skills/`).
+- **markdownlint**: Rules in `.markdownlint.jsonc` (MD013 disabled). Lint with `run-markdownlint.sh` (excludes `claude/.claude/`, `external-skills*`, and `skills*`).
 - **fd**: Exposed as `alias fd="fdfind"` in shell-config.
 - **Versioned tools** (difftastic, hadolint, tokei, Starship, Neovim): to upgrade, bump version in `defaults.yml` and re-run the playbook.
 
@@ -219,9 +226,15 @@ Ansible manages `~/.codex/config.toml`: `project_doc_fallback_filenames = ["CLAU
 
 Skills are deployed to `~/.claude/skills/` and `~/.agents/skills/` (both real directories created by Ansible). Both use the SKILL.md format.
 
-- **Own skills** (`skills/<name>/`): Create `SKILL.md`, re-run playbook
-- **External skills** (`external-skills/<name>/`): `git submodule add <url> external-skills/<name>`, re-run playbook
+- **Shared own skills** (`skills/<name>/`): deploy to Claude Code and Codex
+- **Claude-only own skills** (`skills-claude/<name>/`): deploy only to Claude Code
+- **Codex-only own skills** (`skills-codex/<name>/`): deploy only to Codex
+- **Shared external skills** (`external-skills/<name>/`): `git submodule add <url> external-skills/<name>`, re-run playbook
+- **Claude-only external skills** (`external-skills-claude/<name>/`): deploy only to Claude Code
+- **Codex-only external skills** (`external-skills-codex/<name>/`): deploy only to Codex
 - External skills auto-update on playbook run via `git submodule update --init --remote --merge`
+- Current shared own skills: `ast-grep`, `playwright`
+- Current Claude-only own skills: `codex-review-uncommitted`, `codex-review-branch`
 - Current external skills: `humanizer` (<https://github.com/blader/humanizer>)
 
 ## Troubleshooting

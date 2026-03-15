@@ -19,6 +19,59 @@
     recurse: false
   register: own_skill_dirs
 
+- name: Find Claude-only external skills
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/../external-skills-claude"
+    file_type: directory
+    recurse: false
+  register: claude_external_skill_dirs
+
+- name: Find Claude-only own skills
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/../skills-claude"
+    file_type: directory
+    recurse: false
+  register: claude_own_skill_dirs
+
+- name: Find Codex-only external skills
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/../external-skills-codex"
+    file_type: directory
+    recurse: false
+  register: codex_external_skill_dirs
+
+- name: Find Codex-only own skills
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/../skills-codex"
+    file_type: directory
+    recurse: false
+  register: codex_own_skill_dirs
+
+- name: Build skill name lists for collision detection
+  ansible.builtin.set_fact:
+    shared_skill_names: >-
+      {{ (own_skill_dirs.files + external_skill_dirs.files) | map(attribute='path') | map('basename') | list }}
+    claude_only_skill_names: >-
+      {{ (claude_own_skill_dirs.files + claude_external_skill_dirs.files) | map(attribute='path') | map('basename') | list }}
+    codex_only_skill_names: >-
+      {{ (codex_own_skill_dirs.files + codex_external_skill_dirs.files) | map(attribute='path') | map('basename') | list }}
+
+- name: Assert no shared/Claude-only skill name collisions
+  ansible.builtin.assert:
+    that: shared_skill_names | intersect(claude_only_skill_names) | length == 0
+    fail_msg: >-
+      Skill name collision: the following names appear in both shared and Claude-only skill dirs:
+      {{ shared_skill_names | intersect(claude_only_skill_names) | join(', ') }}.
+      Rename the skill in one of the directories to resolve the conflict.
+
+- name: Assert no shared/Codex-only skill name collisions
+  ansible.builtin.assert:
+    that: shared_skill_names | intersect(codex_only_skill_names) | length == 0
+    fail_msg: >-
+      Skill name collision: the following names appear in both shared and Codex-only skill dirs:
+      {{ shared_skill_names | intersect(codex_only_skill_names) | join(', ') }}.
+      Rename the skill in one of the directories to resolve the conflict.
+
 - name: Create Claude Code skills directory
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.claude/skills"
@@ -39,6 +92,20 @@
     state: link
   loop: "{{ own_skill_dirs.files }}"
 
+- name: Link Claude-only external skills to Claude Code skills directory
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.claude/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ claude_external_skill_dirs.files }}"
+
+- name: Link Claude-only own skills to Claude Code skills directory
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.claude/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ claude_own_skill_dirs.files }}"
+
 - name: Create Codex skills directory
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.agents/skills"
@@ -58,3 +125,41 @@
     dest: "{{ ansible_env.HOME }}/.agents/skills/{{ item.path | basename }}"
     state: link
   loop: "{{ own_skill_dirs.files }}"
+
+- name: Link Codex-only external skills to Codex skills directory
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.agents/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ codex_external_skill_dirs.files }}"
+
+- name: Link Codex-only own skills to Codex skills directory
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_env.HOME }}/.agents/skills/{{ item.path | basename }}"
+    state: link
+  loop: "{{ codex_own_skill_dirs.files }}"
+
+- name: Remove Claude-only external skills from Codex skills directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.agents/skills/{{ item.path | basename }}"
+    state: absent
+  loop: "{{ claude_external_skill_dirs.files }}"
+
+- name: Remove Claude-only own skills from Codex skills directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.agents/skills/{{ item.path | basename }}"
+    state: absent
+  loop: "{{ claude_own_skill_dirs.files }}"
+
+- name: Remove Codex-only external skills from Claude Code skills directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.claude/skills/{{ item.path | basename }}"
+    state: absent
+  loop: "{{ codex_external_skill_dirs.files }}"
+
+- name: Remove Codex-only own skills from Claude Code skills directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.claude/skills/{{ item.path | basename }}"
+    state: absent
+  loop: "{{ codex_own_skill_dirs.files }}"

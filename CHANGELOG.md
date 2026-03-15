@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.16.0] - 2026-03-15
+
+### Added
+
+- Add agent-specific skill directories for skills that are specific to Claude Code or Codex
+- Add Claude Code specific skills `codex-review-uncommitted` and `codex-review-branch` that calls `codex review`
+
 ## [3.15.1] - 2026-03-14
 
 ### Added
@@ -370,7 +377,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.15.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v3.16.0...HEAD
+[3.16.0]: https://github.com/magoyette/dev-setup/compare/v3.15.1...v3.16.0
 [3.15.1]: https://github.com/magoyette/dev-setup/compare/v3.15.0...v3.15.1
 [3.15.0]: https://github.com/magoyette/dev-setup/compare/v3.14.1...v3.15.0
 [3.14.1]: https://github.com/magoyette/dev-setup/compare/v3.14.0...v3.14.1

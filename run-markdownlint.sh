@@ -14,4 +14,8 @@ exec markdownlint-cli2 \
   '**/*.md' \
   '#claude/.claude' \
   '#external-skills' \
-  '#skills'
+  '#external-skills-claude' \
+  '#external-skills-codex' \
+  '#skills' \
+  '#skills-claude' \
+  '#skills-codex'

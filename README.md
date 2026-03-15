@@ -100,13 +100,22 @@ Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_byte
 
 For global user-level context, Ansible also deploys [`global-agent-context.md`](global-agent-context.md) to both `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. That file is a concise shared list of the CLI tools installed by this setup that are useful for an AI agent and doesn't have an Agent Skill.
 
+## Agent skills
+
+This repository supports shared agent skills and agent-specific skills.
+
+- Shared skills: `skills/` and `external-skills/`
+- Claude-only skills: `skills-claude/` and `external-skills-claude/`
+- Codex-only skills: `skills-codex/` and `external-skills-codex/`
+
 ## Pre-commit hook
 
 The pre-commit hook runs `ansible-playbook ansible/playbook.yml --syntax-check` when staged files include `ansible/*.yml`.
 
 `ansible-lint ansible/` can also be used, but there's too many pre-existing lint violations to add it to the pre-commit hook.
 
-Markdown linting is manual for now. Run `./run-markdownlint.sh`; it lints repo Markdown files from this repository and ignores irrelevant files.
+Markdown linting is manual for now. Run `./run-markdownlint.sh`; it lints repo Markdown files from this repository and ignores irrelevant files, including
+bundled skills and external skill directories.
 
 ## Releasing a new version
 
@@ -175,6 +184,13 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [Neovim](https://neovim.io/) : terminal text editor
 
 ### Agent skills
+
+### Claude Code skills
+
+- `codex-review-uncommitted` : Claude Code delegates review of local uncommitted changes to Codex
+- `codex-review-branch` : Claude Code delegates review of the current branch against the base branch to Codex (base branch is an optional parameter)
+
+#### Shared external skills
 
 - [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright/src/skill) : browser automation skill (bundled with Playwright npm package)
 - [ast-grep](https://github.com/ast-grep/agent-skill) : AST-based structural code search skill
