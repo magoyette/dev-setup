@@ -2,7 +2,25 @@
   "permissions": {
     "allow": [
       "Bash(ansible-playbook ansible/playbook.yml --syntax-check 2>&1)",
-      "Bash(shellcheck scripts/merge-claude-settings.sh 2>&1)"
+      "Bash(shellcheck scripts/merge-claude-settings.sh 2>&1)",
+      "Bash(shellcheck scripts/*.sh 2>&1)",
+      "Bash(shellcheck *.sh 2>&1)",
+      "Bash(shellcheck claude/.claude/hooks/*.sh 2>&1)",
+      "Bash(./run-markdownlint.sh 2>&1)",
+      "Bash(ansible-lint ansible/ 2>&1)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(cat | jq -r '.tool_input.file_path // empty'); case \"$file\" in *.sh) shellcheck \"$file\";; *.md) case \"$file\" in */.claude/*|*/external-skills*|*/skills*) ;; *) markdownlint-cli2 \"$file\";; esac;; esac"
+          }
+        ]
+      }
     ]
   }
 }

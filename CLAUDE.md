@@ -12,7 +12,9 @@ This is a developer setup repository for WSL2 (Windows Subsystem for Linux v2). 
 dev-setup/
 ├── CLAUDE.md
 ├── .claude/
-│   └── settings.json            # Repo-local Claude Code permissions allowlist for this workspace
+│   ├── settings.json            # Repo-local Claude Code permissions allowlist and PostToolUse hooks
+│   └── agents/
+│       └── completion-checklist.md  # Subagent: verify completion checklist after any change
 ├── global-agent-context.md       # Deployed to ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md
 ├── .githooks/
 │   └── pre-commit                # Ansible syntax checks when ansible/*.yml is staged
@@ -216,11 +218,23 @@ This means editing files under the corresponding repo directory immediately affe
 Claude Code uses two config locations in this repo:
 
 - `claude/.claude/` contains Stow-deployed home-directory files such as hooks.
-- `.claude/settings.json` is a repo-local Claude Code settings file tracked in git for workspace-specific permissions.
+- `.claude/settings.json` is a repo-local Claude Code settings file tracked in git for workspace-specific permissions and hooks.
+- `.claude/agents/` contains project-scoped subagents tracked in git.
 
 Ansible manages only `hooks`, `statusLine`, `sandbox.enabled`, and `sandbox.filesystem.allowWrite` in `~/.claude/settings.json` via `scripts/merge-claude-settings.sh`. All other home-directory keys are user-managed and preserved.
 
 To change managed home-directory fields, edit `merge-claude-settings.sh` and re-run the playbook. To change repo-local Claude permissions for this workspace, edit `.claude/settings.json` directly.
+
+### PostToolUse Hooks
+
+`.claude/settings.json` includes `PostToolUse` hooks that fire after every `Edit` or `Write` tool call:
+
+- **shellcheck** — runs `shellcheck <file>` automatically when a `.sh` file is edited
+- **markdownlint** — runs `markdownlint-cli2 <file>` automatically when a `.md` file is edited; excluded paths (matching `run-markdownlint.sh`): `.claude/`, `external-skills*`, `skills*`
+
+### Completion Checklist Subagent
+
+`.claude/agents/completion-checklist.md` is a project-scoped subagent that verifies every item in the completion checklist after a change: CLAUDE.md/README.md updates, CHANGELOG.md versioned entry, ansible syntax, and shellcheck. Invoke it at the end of any change to confirm nothing was missed.
 
 ### Claude Code Plugins
 

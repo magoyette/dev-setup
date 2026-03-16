@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.3.0] - 2026-03-15
+
+### Added
+
+- Add `PostToolUse` hooks in `.claude/settings.json` to auto-run `shellcheck` on edited `.sh` files and `markdownlint-cli2` on edited `.md` files
+- Add `completion-checklist` subagent in `.claude/agents/` to verify the completion checklist of dev-setup after any change
+- Expand `.claude/settings.json` permissions to allow `shellcheck` on all repo `.sh` files, `./run-markdownlint.sh`, and `ansible-lint ansible/`
+
+### Fixed
+
+- Fix `PostToolUse` markdownlint hook to skip `.claude/`, `external-skills*`, and `skills*` paths (matching `run-markdownlint.sh` exclusions)
+
 ## [4.2.2] - 2026-03-15
 
 ### Fixed
@@ -416,7 +428,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.2.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.3.0...HEAD
+[4.3.0]: https://github.com/magoyette/dev-setup/compare/v4.2.2...v4.3.0
 [4.2.2]: https://github.com/magoyette/dev-setup/compare/v4.2.1...v4.2.2
 [4.2.1]: https://github.com/magoyette/dev-setup/compare/v4.2.0...v4.2.1
 [4.2.0]: https://github.com/magoyette/dev-setup/compare/v4.1.0...v4.2.0
