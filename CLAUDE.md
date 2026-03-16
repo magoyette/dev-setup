@@ -48,13 +48,16 @@ dev-setup/
 ├── external-skills/humanizer/    # Git submodule (https://github.com/blader/humanizer)
 ├── external-skills-claude/      # Claude-only external skills
 ├── external-skills-codex/       # Codex-only external skills
-├── llm-docs/                     # Fix documentation (node-fix, zoxide-fix, emacs-fix, emacs-dependency-integration)
+├── docs/                         # Reference documentation (claude-code-tips, vs-code)
 ├── scripts/
 │   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh
 │   ├── install-emacs-in-ubuntu.sh
 │   └── download-playwright-skill.sh, download-ast-grep-skill.sh
 ├── run-markdownlint.sh
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
+├── run-ansible.sh                # Re-run playbook without reinstalling Ansible
+├── release.sh                    # Tag and push a new semver release
+├── ccstatusline/                 # Stow: ccstatusline config
 └── claude-hooks.md
 ```
 
@@ -259,7 +262,7 @@ Skills are deployed to `~/.claude/skills/` and `~/.agents/skills/` (both real di
 
 ## Troubleshooting
 
-The `llm-docs/` directory contains fix documentation: `node-fix.md` (fnm detection), `zoxide-fix.md` (PATH config), `emacs-fix.md` (build-essential), `emacs-dependency-integration.md` (dependency migration to Ansible). Read these when debugging similar issues.
+The `docs/` directory contains reference documentation. Read these when relevant.
 
 ## Versioning and Changelog
 
