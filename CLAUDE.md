@@ -22,7 +22,7 @@ dev-setup/
 │   ├── playbook.yml              # Main playbook — imports sub-playbooks
 │   ├── core.yml                  # apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide
 │   ├── starship.yml              # starship install + bash init + stow deploy
-│   ├── node.yml                  # node, bun, markdownlint, playwright
+│   ├── node.yml                  # node, bun, markdownlint, agent-browser, playwright
 │   ├── ai-assistants.yml         # claude-code, codex, ccusage, ast-grep, agent-skills
 │   ├── emacs.yml                 # emacs (skippable via playbooks_in_main_playbook)
 │   ├── neovim.yml                # neovim (skippable via playbooks_in_main_playbook)
@@ -37,7 +37,7 @@ dev-setup/
 │       ├── claude-code.yml       # Install + stow + settings management (hooks/statusLine/sandbox)
 │       ├── codex.yml             # Install + config.toml management
 │       ├── ccusage.yml           # Install ccusage globally with Bun and link it into ~/.local/bin
-│       ├── global-agent-context.yml, playwright.yml, ast-grep.yml
+│       ├── global-agent-context.yml, agent-browser.yml, playwright.yml, ast-grep.yml
 │       └── agent-skills.yml      # Submodule update + symlinks for Claude Code and Codex
 ├── requirements.yml              # Ansible Galaxy collections (community.general)
 ├── nvim/.config/nvim/init.lua    # Stow: lazy.nvim + onedark + Neogit (<Space>gg)
@@ -54,7 +54,7 @@ dev-setup/
 ├── scripts/
 │   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh
 │   ├── install-emacs-in-ubuntu.sh
-│   └── download-playwright-skill.sh, download-ast-grep-skill.sh
+│   └── download-agent-browser-skill.sh, download-playwright-skill.sh, download-ast-grep-skill.sh
 ├── run-markdownlint.sh
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
 ├── run-ansible.sh                # Re-run playbook without reinstalling Ansible
@@ -79,7 +79,7 @@ The playbook is idempotent — safe to re-run. `ansible/vars.yml` is gitignored.
 - `install_git_aliases` — manage repo's Git aliases (default `true`); `false` skips alias sync
 - `ai_assistants_sandbox_writable_roots` — extra writable roots shared by Codex (`writable_roots`) and Claude Code (`sandbox.filesystem.allowWrite`); default `[]`
 - `ai_assistants_sandbox_allowed_hosts` — hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`); default `[]`
-- `playwright_browsers` — browsers to install (default `["chromium"]`; options: `chromium`, `firefox`, `webkit`)
+- `playwright_browsers` — browsers to install (default `["chrome"]`; options: `chrome`, `chromium`, `firefox`, `webkit`)
 - `playbooks_in_main_playbook` — sub-playbooks to run; omit a name to skip it; when absent all run
 
 Tool versions and npm packages are in `ansible/defaults.yml` (checked in, not user-configurable).
@@ -92,7 +92,7 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in, not us
 | ------------------- | ---------------------------------------------------------------------------------------- | ---------------------------- |
 | `core.yml`          | apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide | always                       |
 | `starship.yml`      | starship                                                                                 | `playbooks_in_main_playbook` |
-| `node.yml`          | node, bun, markdownlint, playwright                                                      | always                       |
+| `node.yml`          | node, bun, markdownlint, agent-browser, playwright                                       | always                       |
 | `ai-assistants.yml` | claude-code, codex, ccusage, ast-grep, agent-skills                                      | always                       |
 | `emacs.yml`         | emacs (includes emacs-node)                                                              | `playbooks_in_main_playbook` |
 | `neovim.yml`        | neovim                                                                                   | `playbooks_in_main_playbook` |
@@ -109,7 +109,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | git config / aliases                                                                         | `community.general.git_config`; aliases via `sync-git-aliases.sh` (upserts managed, preserves user aliases); skipped when `install_git_aliases` is `false`                                                                  |
 | fnm, zoxide, bun                                                                             | `creates:` pointing to installed binary/directory                                                                                                                                                                           |
 | Node LTS via fnm                                                                             | `fnm list \| grep -q {{ fnm_node_version }}`; install if rc != 0                                                                                                                                                            |
-| npm tools (markdownlint-cli2, Playwright, @playwright/cli, Codex, ast-grep, sandbox-runtime) | `npm list -g` check; install only if missing                                                                                                                                                                                |
+| npm tools                                                                                    | `npm list -g` check; install only if missing                                                                                                                                                                                |
 | ccusage                                                                                      | `--version` check plus `bun install -g ccusage`; symlinked into `~/.local/bin`                                                                                                                                              |
 | Versioned binaries (difftastic, hadolint, tokei, Starship, Neovim)                           | `--version` check; downloads pinned GitHub release only when missing/version mismatch (versions in `defaults.yml`)                                                                                                          |
 | Starship/Neovim config                                                                       | Stow packages (`changed_when: false`)                                                                                                                                                                                       |
@@ -119,8 +119,9 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Claude Code plugins                                                                          | `claude plugin list` check; `claude plugin install <name>@<marketplace> --scope user` for each entry in `claude_code_plugins` (`defaults.yml`) not already listed                                                           |
 | Codex config                                                                                 | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots)                                                                                                                           |
 | Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`                                                                                                                                             |
+| agent-browser browser + Linux deps                                                           | `agent-browser install --with-deps` always runs (`changed_when: false`)                                                                                                                                                     |
 | Playwright deps/browsers                                                                     | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`)                                                                                                                                    |
-| Skills (Playwright, ast-grep)                                                                | Downloaded into `skills/` with `creates:` on `SKILL.md`; auto-symlinked by `agent-skills.yml` to both agents                                                                                                                |
+| Skills (agent-browser, Playwright, ast-grep)                                                 | Downloaded into `skills/` with `creates:` on `SKILL.md`; auto-symlinked by `agent-skills.yml` to both agents                                                                                                                |
 | Checked-in own skills                                                                        | Stored under `skills/`, `skills-claude/`, or `skills-codex/`; auto-symlinked by `agent-skills.yml` to the matching agent targets                                                                                            |
 | Emacs                                                                                        | `meta: end_play` when excluded; deps via `apt`; build via `--version` check; emacs-lsp-booster via SHA-256 checksum; LSP npm via `npm list -g`                                                                              |
 | External skills                                                                              | `git submodule update --init --remote --merge` (`changed_when: false`)                                                                                                                                                      |
@@ -251,9 +252,13 @@ Current managed plugins:
 
 Script: `claude/.claude/hooks/wsl-notify.sh` (Stow-deployed). Focus-aware (`ONLY_WHEN_UNFOCUSED=true`), triggers on `permission_prompt` and `idle_prompt`. Uses PowerShell WinRT APIs for Windows toast notifications. Dependencies: `jq`, `powershell.exe`.
 
+## Agent Browser
+
+Installs `agent-browser` from npm and runs `agent-browser install --with-deps` to provision Chrome for Testing and Linux system dependencies. Its skill is downloaded from GitHub by `download-agent-browser-skill.sh` into `skills/agent-browser/` (gitignored); to update, delete the directory and re-run.
+
 ## Playwright
 
-Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwright install-deps`), and browsers from `playwright_browsers` in `vars.yml`. Skill downloaded from GitHub by `download-playwright-skill.sh` into `skills/playwright/` (gitignored); to update, delete the directory and re-run.
+Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwright install-deps`), and browsers from `playwright_browsers` in `vars.yml`. Skill downloaded from GitHub by `download-playwright-skill.sh` into `skills/playwright/` (gitignored); to update, delete the directory and re-run. Keep `agent-browser` as the default generic browser automation skill; use Playwright when the user explicitly asks for it or needs Playwright-specific capabilities such as cross-browser coverage, request routing/mocking, tracing, or storage-state workflows.
 
 ## Codex Configuration
 
@@ -270,7 +275,7 @@ Skills are deployed to `~/.claude/skills/` and `~/.agents/skills/` (both real di
 - **Claude-only external skills** (`external-skills-claude/<name>/`): deploy only to Claude Code
 - **Codex-only external skills** (`external-skills-codex/<name>/`): deploy only to Codex
 - External skills auto-update on playbook run via `git submodule update --init --remote --merge`
-- Current shared own skills: `ast-grep`, `playwright`
+- Current shared own skills: `agent-browser`, `ast-grep`, `playwright`
 - Current Claude-only own skills: `codex-review`
 - Current external skills: `humanizer` (<https://github.com/blader/humanizer>)
 

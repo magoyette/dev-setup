@@ -1,5 +1,6 @@
 ansible/vars.yml
 skills/ast-grep/
+skills/agent-browser/
 skills/playwright/
 nvim/.config/nvim/lazy-lock.json
 claude/.claude/*

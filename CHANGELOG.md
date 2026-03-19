@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.4.0] - 2026-03-18
+
+### Added
+
+- Add `agent-browser` to the node sub-playbook and download its shared agent skill bundle
+
+### Changed
+
+- Prefer `agent-browser` for generic browser automation while keeping the Playwright skill for explicit Playwright-specific workflows
+
 ## [4.3.0] - 2026-03-15
 
 ### Added
@@ -428,7 +438,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.3.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.4.0...HEAD
+[4.4.0]: https://github.com/magoyette/dev-setup/compare/v4.3.0...v4.4.0
 [4.3.0]: https://github.com/magoyette/dev-setup/compare/v4.2.2...v4.3.0
 [4.2.2]: https://github.com/magoyette/dev-setup/compare/v4.2.1...v4.2.2
 [4.2.1]: https://github.com/magoyette/dev-setup/compare/v4.2.0...v4.2.1

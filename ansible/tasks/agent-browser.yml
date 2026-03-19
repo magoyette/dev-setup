@@ -1,0 +1,23 @@
+---
+- name: Check if agent-browser is installed
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g agent-browser"
+  register: agent_browser_check
+  failed_when: false
+  changed_when: false
+
+- name: Install agent-browser
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g agent-browser"
+  when: agent_browser_check.rc != 0
+
+- name: Install agent-browser browser and Linux dependencies
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- agent-browser install --with-deps"
+  become: true
+  changed_when: false
+  environment:
+    FNM_DIR: "{{ ansible_env.HOME }}/.local/share/fnm"
+    HOME: "{{ ansible_env.HOME }}"
+
+- name: Download agent-browser skill from GitHub
+  ansible.builtin.command:
+    cmd: "{{ playbook_dir }}/../scripts/download-agent-browser-skill.sh"
+    creates: "{{ playbook_dir }}/../skills/agent-browser/SKILL.md"
