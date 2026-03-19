@@ -247,6 +247,7 @@ Current managed plugins:
 - `skill-creator` — toolkit for developing, evaluating, and benchmarking Claude Code skills (Anthropic Verified)
 - `claude-md-management` — audits CLAUDE.md quality and captures session learnings via `/revise-claude-md` (Anthropic Verified)
 - `claude-code-setup` — analyzes a codebase and recommends MCP servers, skills, hooks, and subagents for it (Anthropic Verified)
+- `frontend-design` — generates production-grade frontend interfaces with distinctive design aesthetics (Anthropic Verified)
 
 ### WSL-to-Windows Notification Hook
 
