@@ -2,10 +2,11 @@
 set -euo pipefail
 
 # Downloads the ast-grep skill from the ast-grep/agent-skill GitHub repository
-# into skills/ast-grep/ (own skill, auto-symlinked by agent-skills.yml).
+# into external-skills/ast-grep/ (shared external skill, auto-symlinked by
+# agent-skills.yml).
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SKILL_DIR="$REPO_ROOT/skills/ast-grep"
+SKILL_DIR="$REPO_ROOT/external-skills/ast-grep"
 REFS_DIR="$SKILL_DIR/references"
 BASE_URL="https://raw.githubusercontent.com/ast-grep/agent-skill/main/ast-grep/skills/ast-grep"
 

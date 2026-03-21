@@ -47,7 +47,7 @@ dev-setup/
 ├── skills-claude/
 │   └── codex-review/            # Claude-only skill: delegate review to `codex review` (uncommitted or base branch)
 ├── skills-codex/                # Codex-only own skills
-├── external-skills/humanizer/    # Git submodule (https://github.com/blader/humanizer)
+├── external-skills/             # Shared third-party skills (downloaded bundles + submodules)
 ├── external-skills-claude/      # Claude-only external skills
 ├── external-skills-codex/       # Codex-only external skills
 ├── docs/                         # Reference documentation (claude-code-tips, vs-code)
@@ -121,7 +121,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`                                                                                                                                             |
 | agent-browser browser + Linux deps                                                           | `agent-browser install --with-deps` always runs (`changed_when: false`)                                                                                                                                                     |
 | Playwright deps/browsers                                                                     | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`)                                                                                                                                    |
-| Skills (agent-browser, Playwright, ast-grep)                                                 | Downloaded into `skills/` with `creates:` on `SKILL.md`; auto-symlinked by `agent-skills.yml` to both agents                                                                                                                |
+| Skills (agent-browser, Playwright, ast-grep)                                                 | Downloaded into `external-skills/` with `creates:` on `SKILL.md`; legacy copies under `skills/` are removed before symlink discovery                                                                                        |
 | Checked-in own skills                                                                        | Stored under `skills/`, `skills-claude/`, or `skills-codex/`; auto-symlinked by `agent-skills.yml` to the matching agent targets                                                                                            |
 | Emacs                                                                                        | `meta: end_play` when excluded; deps via `apt`; build via `--version` check; emacs-lsp-booster via SHA-256 checksum; LSP npm via `npm list -g`                                                                              |
 | External skills                                                                              | `git submodule update --init --remote --merge` (`changed_when: false`)                                                                                                                                                      |
@@ -255,11 +255,11 @@ Script: `claude/.claude/hooks/wsl-notify.sh` (Stow-deployed). Focus-aware (`ONLY
 
 ## Agent Browser
 
-Installs `agent-browser` from npm and runs `agent-browser install --with-deps` to provision Chrome for Testing and Linux system dependencies. Its skill is downloaded from GitHub by `download-agent-browser-skill.sh` into `skills/agent-browser/` (gitignored); to update, delete the directory and re-run.
+Installs `agent-browser` from npm and runs `agent-browser install --with-deps` to provision Chrome for Testing and Linux system dependencies. Its skill is downloaded from GitHub by `download-agent-browser-skill.sh` into `external-skills/agent-browser/` (gitignored); to update, delete the directory and re-run.
 
 ## Playwright
 
-Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwright install-deps`), and browsers from `playwright_browsers` in `vars.yml`. Skill downloaded from GitHub by `download-playwright-skill.sh` into `skills/playwright/` (gitignored); the downloader mirrors the current upstream `cli-client/skill` bundle and derives its reference files from `SKILL.md` so newly added docs are picked up automatically. To update, delete the directory and re-run. Keep `agent-browser` as the default generic browser automation skill; use Playwright when the user explicitly asks for it or needs Playwright-specific capabilities such as cross-browser coverage, request routing/mocking, tracing, or storage-state workflows.
+Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwright install-deps`), and browsers from `playwright_browsers` in `vars.yml`. Skill downloaded from GitHub by `download-playwright-skill.sh` into `external-skills/playwright/` (gitignored); the downloader mirrors the current upstream `cli-client/skill` bundle and derives its reference files from `SKILL.md` so newly added docs are picked up automatically. To update, delete the directory and re-run. Keep `agent-browser` as the default generic browser automation skill; use Playwright when the user explicitly asks for it or needs Playwright-specific capabilities such as cross-browser coverage, request routing/mocking, tracing, or storage-state workflows.
 
 ## Codex Configuration
 
@@ -272,13 +272,13 @@ Skills are deployed to `~/.claude/skills/` and `~/.agents/skills/` (both real di
 - **Shared own skills** (`skills/<name>/`): deploy to Claude Code and Codex
 - **Claude-only own skills** (`skills-claude/<name>/`): deploy only to Claude Code
 - **Codex-only own skills** (`skills-codex/<name>/`): deploy only to Codex
-- **Shared external skills** (`external-skills/<name>/`): `git submodule add <url> external-skills/<name>`, re-run playbook
+- **Shared external skills** (`external-skills/<name>/`): deploy to Claude Code and Codex; may be checked out as submodules or downloaded by install scripts
 - **Claude-only external skills** (`external-skills-claude/<name>/`): deploy only to Claude Code
 - **Codex-only external skills** (`external-skills-codex/<name>/`): deploy only to Codex
 - External skills auto-update on playbook run via `git submodule update --init --remote --merge`
-- Current shared own skills: `agent-browser`, `ast-grep`, `playwright`
+- Current shared own skills: none
 - Current Claude-only own skills: `codex-review`
-- Current external skills: `humanizer` (<https://github.com/blader/humanizer>)
+- Current external skills: `agent-browser`, `ast-grep`, `playwright`, `humanizer` (<https://github.com/blader/humanizer>)
 
 ## Troubleshooting
 

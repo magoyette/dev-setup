@@ -12,4 +12,4 @@
 - name: Download ast-grep skill from GitHub
   ansible.builtin.command:
     cmd: "{{ playbook_dir }}/../scripts/download-ast-grep-skill.sh"
-    creates: "{{ playbook_dir }}/../skills/ast-grep/SKILL.md"
+    creates: "{{ playbook_dir }}/../external-skills/ast-grep/SKILL.md"

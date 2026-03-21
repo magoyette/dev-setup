@@ -2,10 +2,11 @@
 set -euo pipefail
 
 # Downloads the Playwright skill from the Microsoft Playwright GitHub repository
-# into skills/playwright/ (own skill, auto-symlinked by agent-skills.yml).
+# into external-skills/playwright/ (shared external skill, auto-symlinked by
+# agent-skills.yml).
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SKILL_DIR="$REPO_ROOT/skills/playwright"
+SKILL_DIR="$REPO_ROOT/external-skills/playwright"
 REFS_DIR="$SKILL_DIR/references"
 BASE_URL="https://raw.githubusercontent.com/microsoft/playwright/main/packages/playwright-core/src/tools/cli-client/skill"
 

@@ -5,6 +5,15 @@
     chdir: "{{ playbook_dir }}/.."
   changed_when: false
 
+- name: Remove legacy downloaded skills from own skills directory
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/../skills/{{ item }}"
+    state: absent
+  loop:
+    - agent-browser
+    - ast-grep
+    - playwright
+
 - name: Find external skills
   ansible.builtin.find:
     paths: "{{ playbook_dir }}/../external-skills"

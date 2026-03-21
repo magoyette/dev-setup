@@ -20,4 +20,4 @@
 - name: Download agent-browser skill from GitHub
   ansible.builtin.command:
     cmd: "{{ playbook_dir }}/../scripts/download-agent-browser-skill.sh"
-    creates: "{{ playbook_dir }}/../skills/agent-browser/SKILL.md"
+    creates: "{{ playbook_dir }}/../external-skills/agent-browser/SKILL.md"

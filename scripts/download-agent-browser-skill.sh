@@ -2,10 +2,11 @@
 set -euo pipefail
 
 # Downloads the agent-browser skill from the upstream GitHub repository
-# into skills/agent-browser/ (shared skill, auto-symlinked by agent-skills.yml).
+# into external-skills/agent-browser/ (shared external skill, auto-symlinked by
+# agent-skills.yml).
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SKILL_DIR="$REPO_ROOT/skills/agent-browser"
+SKILL_DIR="$REPO_ROOT/external-skills/agent-browser"
 REFS_DIR="$SKILL_DIR/references"
 TEMPLATES_DIR="$SKILL_DIR/templates"
 BASE_URL="https://raw.githubusercontent.com/vercel-labs/agent-browser/main/skills/agent-browser"

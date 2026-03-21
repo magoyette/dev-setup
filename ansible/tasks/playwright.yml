@@ -35,4 +35,4 @@
 - name: Download Playwright skill from GitHub
   ansible.builtin.command:
     cmd: "{{ playbook_dir }}/../scripts/download-playwright-skill.sh"
-    creates: "{{ playbook_dir }}/../skills/playwright/SKILL.md"
+    creates: "{{ playbook_dir }}/../external-skills/playwright/SKILL.md"
