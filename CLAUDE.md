@@ -259,7 +259,7 @@ Installs `agent-browser` from npm and runs `agent-browser install --with-deps` t
 
 ## Playwright
 
-Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwright install-deps`), and browsers from `playwright_browsers` in `vars.yml`. Skill downloaded from GitHub by `download-playwright-skill.sh` into `skills/playwright/` (gitignored); to update, delete the directory and re-run. Keep `agent-browser` as the default generic browser automation skill; use Playwright when the user explicitly asks for it or needs Playwright-specific capabilities such as cross-browser coverage, request routing/mocking, tracing, or storage-state workflows.
+Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwright install-deps`), and browsers from `playwright_browsers` in `vars.yml`. Skill downloaded from GitHub by `download-playwright-skill.sh` into `skills/playwright/` (gitignored); the downloader mirrors the current upstream `cli-client/skill` bundle and derives its reference files from `SKILL.md` so newly added docs are picked up automatically. To update, delete the directory and re-run. Keep `agent-browser` as the default generic browser automation skill; use Playwright when the user explicitly asks for it or needs Playwright-specific capabilities such as cross-browser coverage, request routing/mocking, tracing, or storage-state workflows.
 
 ## Codex Configuration
 

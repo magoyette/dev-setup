@@ -170,7 +170,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2) : Markdown linter CLI installed globally via npm, using the upstream markdownlint rules
 - [Node](https://nodejs.org) : JavaScript and Typescript runtime
 - [agent-browser](https://github.com/vercel-labs/agent-browser) : browser automation CLI for AI agents with Chrome for Testing provisioning
-- [playwright-cli](https://github.com/microsoft/playwright-cli) : browser automation for testing front-end changes
+- [playwright-cli](https://github.com/microsoft/playwright/tree/main/packages/playwright-core/src/tools/cli-client) : browser automation for testing front-end changes
 
 ### ai-assistants sub-playbook
 
@@ -204,7 +204,7 @@ Skills can be shared between Claude Code and Codex, or specific to one of the AI
 External skills are provided by other projects.
 
 - [agent-browser](https://github.com/vercel-labs/agent-browser/tree/main/skills/agent-browser) : default browser automation skill for generic website interaction, form filling, screenshots, scraping, and login flows
-- [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright/src/skill) : browser automation skill (bundled with Playwright npm package)
+- [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright-core/src/tools/cli-client/skill) : browser automation skill (bundled with Playwright npm package)
 - [ast-grep](https://github.com/ast-grep/agent-skill) : AST-based structural code search skill
 - [humanizer](https://github.com/blader/humanizer) : remove signs of AI-generated writing from text
 

@@ -7,17 +7,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SKILL_DIR="$REPO_ROOT/skills/playwright"
 REFS_DIR="$SKILL_DIR/references"
-BASE_URL="https://raw.githubusercontent.com/microsoft/playwright/main/packages/playwright/src/skill"
-
-REFERENCE_FILES=(
-  request-mocking.md
-  running-code.md
-  session-management.md
-  storage-state.md
-  test-generation.md
-  tracing.md
-  video-recording.md
-)
+BASE_URL="https://raw.githubusercontent.com/microsoft/playwright/main/packages/playwright-core/src/tools/cli-client/skill"
 
 mkdir -p "$REFS_DIR"
 
@@ -34,7 +24,22 @@ if ! grep -qF "$CUSTOM_DESCRIPTION" "$SKILL_DIR/SKILL.md"; then
   exit 1
 fi
 
-for ref in "${REFERENCE_FILES[@]}"; do
+# Mirror whatever reference docs the upstream skill currently links to so new
+# docs are included automatically when Playwright expands the skill bundle.
+mapfile -t reference_files < <(
+  grep -oE 'references/[[:alnum:]._-]+\.md' "$SKILL_DIR/SKILL.md" \
+    | sed 's#references/##' \
+    | sort -u
+)
+
+if [ "${#reference_files[@]}" -eq 0 ]; then
+  echo "Failed to discover Playwright skill reference files" >&2
+  exit 1
+fi
+
+rm -f "$REFS_DIR"/*.md
+
+for ref in "${reference_files[@]}"; do
   echo "Downloading references/$ref..."
   curl -fsSL "$BASE_URL/references/$ref" -o "$REFS_DIR/$ref"
 done
