@@ -198,6 +198,7 @@ Skills can be shared between Claude Code and Codex, or specific to one of the AI
 ### magoyette/dev-setup skills
 
 - `codex-review` : Claude Code skill that delegates review to Codex. Reviews uncommitted changes by default. Pass a base branch as the first argument to do a PR-style review.
+- `claude-review` : Codex skill that delegates review to Claude Code. Reviews uncommitted changes by default. Pass a base branch as the first argument to do a PR-style review.
 
 ### External skills
 

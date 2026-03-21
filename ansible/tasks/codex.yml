@@ -61,3 +61,11 @@
     regexp: "^\\s*writable_roots\\s*="
     insertafter: "^\\[sandbox_workspace_write\\]\\s*$"
     line: "writable_roots = {{ ai_assistants_sandbox_writable_roots | to_json }}"
+
+- name: Deploy claude-review script with stow
+  ansible.builtin.command: >
+    stow
+    --dir="{{ playbook_dir }}/.."
+    --target="{{ ansible_env.HOME }}"
+    claude-review
+  changed_when: false

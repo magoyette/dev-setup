@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.6.0] - 2026-03-21
+
+### Added
+
+- Add `claude-review` skill specific to Codex that delegates code review to Claude Code.
+  It works in a similar way than `codex-review` skill that leverages `codex review`.
+
+## Changed
+
+- Improve the `codex-review` skill to instruct Claude to avoid doing its own code reviews.
+
 ## [4.5.2] - 2026-03-21
 
 ### Changed
@@ -456,7 +467,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.5.2...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.6.0...HEAD
+[4.6.0]: https://github.com/magoyette/dev-setup/compare/v4.5.2...v4.6.0
 [4.5.2]: https://github.com/magoyette/dev-setup/compare/v4.5.1...v4.5.2
 [4.5.1]: https://github.com/magoyette/dev-setup/compare/v4.5.0...v4.5.1
 [4.5.0]: https://github.com/magoyette/dev-setup/compare/v4.4.0...v4.5.0

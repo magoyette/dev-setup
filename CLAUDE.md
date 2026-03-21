@@ -35,7 +35,7 @@ dev-setup/
 │       ├── node.yml, bun.yml, markdownlint.yml, starship.yml
 │       ├── neovim.yml, emacs.yml, emacs-lsp-booster.yml, emacs-node.yml
 │       ├── claude-code.yml       # Install + stow + settings management (hooks/statusLine/sandbox)
-│       ├── codex.yml             # Install + config.toml management
+│       ├── codex.yml             # Install + config.toml management + claude-review stow deploy
 │       ├── ccusage.yml           # Install ccusage globally with Bun and link it into ~/.local/bin
 │       ├── global-agent-context.yml, agent-browser.yml, playwright.yml, ast-grep.yml
 │       └── agent-skills.yml      # Submodule update + symlinks for Claude Code and Codex
@@ -43,10 +43,12 @@ dev-setup/
 ├── nvim/.config/nvim/init.lua    # Stow: lazy.nvim + onedark + Neogit (<Space>gg)
 ├── starship/.config/starship.toml # Stow: Starship prompt config
 ├── claude/.claude/hooks/wsl-notify.sh # Stow: WSL-to-Windows notification hook
+├── claude-review/.local/bin/claude-review.sh # Stow: claude-review helper for Codex skill
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 ├── skills-claude/
 │   └── codex-review/            # Claude-only skill: delegate review to `codex review` (uncommitted or base branch)
-├── skills-codex/                # Codex-only own skills
+├── skills-codex/
+│   └── claude-review/           # Codex-only skill: delegate review to Claude Code via `claude-review.sh`
 ├── external-skills/             # Shared third-party skills (downloaded bundles + submodules)
 ├── external-skills-claude/      # Claude-only external skills
 ├── external-skills-codex/       # Codex-only external skills
@@ -117,7 +119,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Claude upgrade wrapper                                                                       | `lineinfile` (no-op if line already present)                                                                                                                                                                                |
 | Claude settings (hooks, statusLine, sandbox, permissions)                                    | `merge-claude-settings.sh` merges managed keys via `jq`; derives `allowWrite`, `allowedHosts`, and `permissions.allow`; preserves other user keys via recursive merge                                                       |
 | Claude Code plugins                                                                          | `claude plugin list` check; `claude plugin install <name>@<marketplace> --scope user` for each entry in `claude_code_plugins` (`defaults.yml`) not already listed                                                           |
-| Codex config                                                                                 | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots)                                                                                                                           |
+| Codex config                                                                                 | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots); `claude-review` stow package deploys helper script to `~/.local/bin`                                                     |
 | Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`                                                                                                                                             |
 | agent-browser browser + Linux deps                                                           | `agent-browser install --with-deps` always runs (`changed_when: false`)                                                                                                                                                     |
 | Playwright deps/browsers                                                                     | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`)                                                                                                                                    |
@@ -201,7 +203,8 @@ Four phases: (1) Dependencies — deb-src, `build-dep emacs`, libmagick, tree-si
 Stow is invoked per-package from each tool's task file. It creates symlinks from `~/` into the repo:
 
 ```text
-~/.claude/      -> dev-setup/claude/.claude/
+~/.claude/              -> dev-setup/claude/.claude/
+~/.local/bin/claude-review.sh -> dev-setup/claude-review/.local/bin/claude-review.sh
 ```
 
 This means editing files under the corresponding repo directory immediately affects the live config.
@@ -263,7 +266,7 @@ Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwr
 
 ## Codex Configuration
 
-Ansible manages `~/.codex/config.toml`: `project_doc_fallback_filenames = ["CLAUDE.md"]`, `project_doc_max_bytes` (from `defaults.yml`), `status_line` (from `defaults.yml`), and `writable_roots` (from `ai_assistants_sandbox_writable_roots` in `vars.yml`). Global context: `~/.codex/AGENTS.md` symlinked to `global-agent-context.md`.
+Ansible manages `~/.codex/config.toml`: `project_doc_fallback_filenames = ["CLAUDE.md"]`, `project_doc_max_bytes` (from `defaults.yml`), `status_line` (from `defaults.yml`), and `writable_roots` (from `ai_assistants_sandbox_writable_roots` in `vars.yml`). Global context: `~/.codex/AGENTS.md` symlinked to `global-agent-context.md`. The `claude-review` stow package deploys `claude-review.sh` to `~/.local/bin/` so the Codex `claude-review` skill works from any repository.
 
 ## Skills Management
 
@@ -278,6 +281,7 @@ Skills are deployed to `~/.claude/skills/` and `~/.agents/skills/` (both real di
 - External skills auto-update on playbook run via `git submodule update --init --remote --merge`
 - Current shared own skills: none
 - Current Claude-only own skills: `codex-review`
+- Current Codex-only own skills: `claude-review`
 - Current external skills: `agent-browser`, `ast-grep`, `playwright`, `humanizer` (<https://github.com/blader/humanizer>)
 
 ## Troubleshooting
