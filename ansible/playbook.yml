@@ -5,3 +5,4 @@
 - import_playbook: ai-assistants.yml
 - import_playbook: emacs.yml
 - import_playbook: neovim.yml
+- import_playbook: tmux.yml

@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.7.0] - 2026-03-22
+
+### Added
+
+- Add a `tmux` sub-playbook that installs tmux, bootstraps TPM, and deploys a managed tmux configuration
+- Add managed `tmux-which-key`, `tmux-yank`, `tmux-onedark-theme`, and `tmux-nerd-font-window-name` tmux plugins
+
+### Changed
+
+- Configure tmux truecolor support for terminal apps and move the managed `tmux-which-key` YAML into the plugin's XDG config path
+
+### Fixed
+
+- Override the OneDark tmux theme's pane styling so terminal apps like Emacs and Claude Code keep their own colors inside tmux
+- Propagate `COLORTERM=truecolor` and explicit RGB terminal features inside tmux for terminal apps that detect color support from the environment
+- Export `COLORTERM=truecolor` and `FORCE_COLOR=3` from the managed `claude()` shell wrapper so Claude Code keeps its rich-color rendering inside tmux
+- Backup and replace a conflicting pre-existing `tmux-which-key` config file before deploying tmux dotfiles with Stow
+
 ## [4.6.1] - 2026-03-22
 
 ### Added
@@ -478,7 +496,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.6.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.7.0...HEAD
+[4.7.0]: https://github.com/magoyette/dev-setup/compare/v4.6.1...v4.7.0
 [4.6.1]: https://github.com/magoyette/dev-setup/compare/v4.6.0...v4.6.1
 [4.6.0]: https://github.com/magoyette/dev-setup/compare/v4.5.2...v4.6.0
 [4.5.2]: https://github.com/magoyette/dev-setup/compare/v4.5.1...v4.5.2

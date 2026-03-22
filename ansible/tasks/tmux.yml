@@ -1,0 +1,53 @@
+---
+- name: Install tmux
+  become: true
+  ansible.builtin.apt:
+    name: tmux
+    state: present
+
+- name: Ensure ~/.tmux/plugins directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.tmux/plugins"
+    state: directory
+    mode: "0755"
+
+- name: Install TPM
+  ansible.builtin.git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
+
+- name: Check for pre-existing tmux-which-key config at managed path
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.config/tmux/plugins/tmux-which-key/config.yaml"
+    follow: false
+  register: tmux_which_key_config_stat
+
+- name: Backup pre-existing tmux-which-key config before Stow takes ownership
+  ansible.builtin.copy:
+    src: "{{ ansible_env.HOME }}/.config/tmux/plugins/tmux-which-key/config.yaml"
+    dest: "{{ ansible_env.HOME }}/.config/tmux/plugins/tmux-which-key/config.yaml.pre-dev-setup-backup"
+    remote_src: true
+    force: false
+  when:
+    - tmux_which_key_config_stat.stat.exists
+    - not tmux_which_key_config_stat.stat.islnk | default(false)
+
+- name: Remove conflicting tmux-which-key config before Stow
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/tmux/plugins/tmux-which-key/config.yaml"
+    state: absent
+  when:
+    - tmux_which_key_config_stat.stat.exists
+    - not tmux_which_key_config_stat.stat.islnk | default(false)
+
+- name: Deploy tmux dotfiles with stow
+  ansible.builtin.command: >
+    stow
+    --dir="{{ playbook_dir }}/.."
+    --target="{{ ansible_env.HOME }}"
+    tmux
+  changed_when: false
+
+- name: Install tmux plugins with TPM
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.tmux/plugins/tpm/bin/install_plugins"
+  changed_when: false

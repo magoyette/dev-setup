@@ -15,5 +15,6 @@ playbooks_in_main_playbook:
   - ai-assistants
   - emacs
   - neovim
+  - tmux
 playwright_browsers:
   - chrome

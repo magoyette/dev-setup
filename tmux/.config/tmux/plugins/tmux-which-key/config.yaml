@@ -1,0 +1,98 @@
+command_alias_start_index: 250
+
+keybindings:
+  prefix_table: Space
+
+title:
+  prefix: tmux
+  prefix_style: fg=green,align=centre,bold
+  style: align=centre,bold
+
+items:
+  - name: Windows
+    key: w
+    menu:
+      - name: New window
+        key: c
+        command: new-window -c "#{pane_current_path}"
+      - name: Rename window
+        key: ","
+        command: command-prompt -I "#W" "rename-window -- '%%'"
+      - name: Next window
+        key: n
+        command: next-window
+      - name: Previous window
+        key: p
+        command: previous-window
+      - name: Choose window
+        key: w
+        command: choose-window
+  - name: Panes
+    key: p
+    menu:
+      - name: Split horizontal
+        key: "%"
+        command: split-window -h -c "#{pane_current_path}"
+      - name: Split vertical
+        key: "\""
+        command: split-window -v -c "#{pane_current_path}"
+      - separator: true
+      - name: Move left
+        key: h
+        command: select-pane -L
+      - name: Move down
+        key: j
+        command: select-pane -D
+      - name: Move up
+        key: k
+        command: select-pane -U
+      - name: Move right
+        key: l
+        command: select-pane -R
+      - separator: true
+      - name: Cycle panes
+        key: o
+        command: select-pane -t :.+
+      - name: Show pane numbers
+        key: q
+        command: display-panes
+      - name: Zoom pane
+        key: z
+        command: resize-pane -Z
+      - name: Kill pane
+        key: x
+        command: kill-pane
+  - name: Resize
+    key: r
+    menu:
+      - name: Resize left
+        key: H
+        command: resize-pane -L 5
+        transient: true
+      - name: Resize down
+        key: J
+        command: resize-pane -D 5
+        transient: true
+      - name: Resize up
+        key: K
+        command: resize-pane -U 5
+        transient: true
+      - name: Resize right
+        key: L
+        command: resize-pane -R 5
+        transient: true
+  - name: Session
+    key: s
+    menu:
+      - name: Detach client
+        key: d
+        command: detach-client
+      - name: Choose tree
+        key: s
+        command: choose-tree -Zs
+  - name: Config
+    key: c
+    menu:
+      - name: Reload tmux.conf
+        key: r
+        command: source-file ~/.tmux.conf \; display-message "tmux.conf reloaded"

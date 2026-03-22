@@ -61,7 +61,7 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 - `playwright_browsers`
   Browsers to install for Playwright. Default: `["chrome"]`. Accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
 - `playbooks_in_main_playbook`
-  Sub-playbooks to run when invoking the main playbook. Default: `[core, starship, node, ai-assistants, emacs, neovim]`.
+  Sub-playbooks to run when invoking the main playbook. Default: `[core, starship, node, ai-assistants, emacs, neovim, tmux]`.
 
 Some sub-playbooks depend on others:
 
@@ -73,6 +73,7 @@ Some sub-playbooks depend on others:
 | `ai-assistants` | `core`, `node`                     |
 | `emacs`         | `core`, `node`                     |
 | `neovim`        | `core`                             |
+| `tmux`          | `core`                             |
 
 Run the bootstrap script:
 
@@ -182,6 +183,8 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 
 Many agent skills and Claude Code plugins are installed by the sub-playbook, see the dedicated sections below.
 
+The managed `claude()` shell wrapper also exports `COLORTERM=truecolor` and `FORCE_COLOR=3` before launching Claude Code so its TUI keeps the rich-color path inside tmux as well as direct WSL shells.
+
 ### emacs sub-playbook
 
 - [Emacs](https://www.gnu.org/software/emacs/) : terminal text editor configured with [my personal configuration](https://github.com/magoyette/.emacs.d)
@@ -190,6 +193,17 @@ Many agent skills and Claude Code plugins are installed by the sub-playbook, see
 ### neovim sub-playbook
 
 - [Neovim](https://neovim.io/) : terminal text editor
+
+### tmux sub-playbook
+
+- [tmux](https://github.com/tmux/tmux/wiki) : terminal multiplexer with a Stow-managed config
+- [TPM](https://github.com/tmux-plugins/tpm) : tmux plugin manager, bootstrapped by Ansible
+- [tmux-which-key](https://github.com/alexwforsythe/tmux-which-key) : popup keybinding guide for the managed tmux shortcuts
+- [tmux-yank](https://github.com/tmux-plugins/tmux-yank) : copy text from tmux into the system clipboard
+- [tmux-onedark-theme](https://github.com/odedlaz/tmux-onedark-theme) : One Dark theme for tmux status line and UI
+- [tmux-nerd-font-window-name](https://github.com/joshmedeski/tmux-nerd-font-window-name) : Nerd Font icons for tmux window names
+
+The tmux config enables truecolor, propagates `COLORTERM=truecolor` inside tmux panes, installs the `tmux-which-key` YAML configuration in the plugin's XDG path so `prefix` + `Space` opens the managed keybinding menu, and overrides the OneDark theme's pane styling so terminal apps like Emacs and Claude Code keep their own colors.
 
 ## Agent skills for AI Assistants
 

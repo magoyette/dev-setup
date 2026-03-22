@@ -26,13 +26,14 @@ dev-setup/
 │   ├── ai-assistants.yml         # claude-code, codex, ccusage, ast-grep, agent-skills
 │   ├── emacs.yml                 # emacs (skippable via playbooks_in_main_playbook)
 │   ├── neovim.yml                # neovim (skippable via playbooks_in_main_playbook)
+│   ├── tmux.yml                  # tmux install + TPM bootstrap + stow deploy
 │   ├── defaults.yml              # Tool versions, checksums, npm packages (not user-configurable)
 │   ├── vars.yml                  # User-specific variables — gitignored, copied from example
 │   └── tasks/                    # Individual task files (one per tool/concern)
 │       ├── apt-packages.yml      # build-essential, bubblewrap, eza, fd-find, fzf, socat, pipx
 │       ├── ansible-lint.yml, tldr.yml, shell-config.yml, git.yml
 │       ├── difftastic.yml, hadolint.yml, tokei.yml, zoxide.yml
-│       ├── node.yml, bun.yml, markdownlint.yml, starship.yml
+│       ├── node.yml, bun.yml, markdownlint.yml, starship.yml, tmux.yml
 │       ├── neovim.yml, emacs.yml, emacs-lsp-booster.yml, emacs-node.yml
 │       ├── claude-code.yml       # Install + stow + settings management (hooks/statusLine/sandbox)
 │       ├── codex.yml             # Install + config.toml management + claude-review stow deploy
@@ -41,6 +42,8 @@ dev-setup/
 │       └── agent-skills.yml      # Submodule update + symlinks for Claude Code and Codex
 ├── requirements.yml              # Ansible Galaxy collections (community.general)
 ├── nvim/.config/nvim/init.lua    # Stow: lazy.nvim + onedark + Neogit (<Space>gg)
+├── tmux/.tmux.conf               # Stow: tmux config with TPM plugins and keybindings
+├── tmux/.config/tmux/plugins/tmux-which-key/config.yaml # Stow: tmux-which-key popup menu config
 ├── starship/.config/starship.toml # Stow: Starship prompt config
 ├── claude/.claude/hooks/wsl-notify.sh # Stow: WSL-to-Windows notification hook
 ├── claude-review/.local/bin/claude-review.sh # Stow: claude-review helper for Codex skill
@@ -68,7 +71,7 @@ dev-setup/
 
 - **First-time:** `./install.sh` (installs Ansible, Galaxy collections, runs playbook)
 - **Re-run:** `./run-ansible.sh` (skips Ansible install, avoids double sudo prompt)
-- **Single sub-playbook:** `./run-ansible.sh core` (or `starship`, `node`, `ai-assistants`, `emacs`, `neovim`)
+- **Single sub-playbook:** `./run-ansible.sh core` (or `starship`, `node`, `ai-assistants`, `emacs`, `neovim`, `tmux`)
 - **Setup:** copy `ansible/vars.yml.example` to `ansible/vars.yml` and edit; `install.sh` auto-creates on first run
 
 The playbook is idempotent — safe to re-run. `ansible/vars.yml` is gitignored. Add `--ask-become-pass` to `install.sh` if no passwordless sudo.
@@ -97,6 +100,7 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in, not us
 | `ai-assistants.yml` | claude-code, codex, ccusage, ast-grep, agent-skills                                      | always                       |
 | `emacs.yml`         | emacs (includes emacs-node)                                                              | `playbooks_in_main_playbook` |
 | `neovim.yml`        | neovim                                                                                   | `playbooks_in_main_playbook` |
+| `tmux.yml`          | tmux, TPM, Stow-deployed tmux config, tmux plugins                                       | `playbooks_in_main_playbook` |
 
 Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and skips if absent. This check also applies to direct runs (`run-ansible.sh <name>`).
 
@@ -125,6 +129,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Skills (agent-browser, Playwright, ast-grep)                                                 | Downloaded into `external-skills/` with `creates:` on `SKILL.md`; legacy copies under `skills/` are removed before symlink discovery                                                                                        |
 | Checked-in own skills                                                                        | Stored under `skills/`, `skills-claude/`, or `skills-codex/`; auto-symlinked by `agent-skills.yml` to the matching agent targets                                                                                            |
 | Emacs                                                                                        | `meta: end_play` when excluded; deps via `apt`; build via `--version` check; emacs-lsp-booster via SHA-256 checksum; LSP npm via `npm list -g`                                                                              |
+| tmux                                                                                         | `meta: end_play` when excluded; `apt` install for tmux; TPM cloned with `git`; backs up a conflicting `tmux-which-key` config before Stow; dotfiles via Stow; TPM CLI install after config deploy (`changed_when: false`)   |
 | External skills                                                                              | `git submodule update --init --remote --merge` (`changed_when: false`)                                                                                                                                                      |
 | Skill symlinks                                                                               | `file state=link` for shared and target-specific skills; opposite-target links for agent-specific skills are removed with `state=absent`                                                                                    |
 | Repo hooks                                                                                   | `git config --local core.hooksPath` check; runs `install-git-hooks.sh` only when not set                                                                                                                                    |
@@ -151,7 +156,7 @@ Entries in `ansible/tasks/emacs.yml` (applied when `emacs` is in `playbooks_in_m
 Entries in `ansible/tasks/claude-code.yml` (always applied via `ai-assistants.yml`):
 
 - `alias ccstatusline="bunx ccstatusline@latest"`
-- `claude()` wrapper function — runs `claude upgrade` at most once per day (stamp file: `~/.local/share/claude-upgrade-check`) before launching Claude Code; workaround for fnm multishell paths breaking auto-upgrade detection
+- `claude()` wrapper function — exports `COLORTERM=truecolor` and `FORCE_COLOR=3`, then runs `claude upgrade` at most once per day (stamp file: `~/.local/share/claude-upgrade-check`) before launching Claude Code; workaround for fnm multishell paths breaking auto-upgrade detection and to keep Claude Code on its rich-color path inside tmux
 
 Entries in `ansible/tasks/starship.yml` (applied when `starship` is in `playbooks_in_main_playbook`, via `starship.yml`):
 
@@ -190,6 +195,10 @@ Config: `starship/.config/starship.toml` (Stow-deployed). Uses Nerd Font glyphs 
 ### Neovim
 
 Config: `nvim/.config/nvim/init.lua` (Stow-deployed). Bootstraps `lazy.nvim`, onedark theme, Neogit with Telescope (`<leader>gg`). `lazy-lock.json` is gitignored.
+
+### tmux
+
+Config: `tmux/.tmux.conf` (Stow-deployed). Sets `default-terminal` to `tmux-256color`, enables RGB color overrides, and forces `COLORTERM=truecolor` into tmux's environment so terminal apps like Emacs and Claude Code can detect truecolor inside tmux. Uses TPM to install `tmux-onedark-theme`, `tmux-yank`, `tmux-which-key`, and `tmux-nerd-font-window-name`. After TPM loads, local overrides reset `window-style` and `window-active-style` to `default` so the OneDark theme affects tmux UI elements without recoloring full-screen terminal apps. The `tmux-which-key` menu is configured via `tmux/.config/tmux/plugins/tmux-which-key/config.yaml` using the plugin's XDG mode.
 
 ### Emacs
 
