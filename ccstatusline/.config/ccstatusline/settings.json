@@ -9,15 +9,15 @@
         "rawValue": true
       },
       {
-        "id": "3",
-        "type": "context-percentage-usable",
-        "color": "brightBlack",
+        "id": "163ce210-1459-44c6-9db6-ae0c36e25f54",
+        "type": "thinking-effort",
+        "backgroundColor": "bgBrightWhite",
         "rawValue": true
       },
       {
-        "id": "5",
-        "type": "block-timer",
-        "color": "magenta",
+        "id": "3",
+        "type": "context-percentage-usable",
+        "color": "brightBlack",
         "rawValue": true
       },
       {
@@ -26,9 +26,33 @@
         "color": "yellow"
       },
       {
-        "id": "ed12f3b1-31dc-4732-93f2-db31a6c34a89",
-        "type": "git-changes",
-        "backgroundColor": "bgBrightYellow"
+        "id": "67d1504b-4f48-41d2-83ac-8347a7c8580f",
+        "type": "session-usage",
+        "backgroundColor": "bgWhite",
+        "rawValue": false
+      },
+      {
+        "id": "a5e2f0a1-5381-48d3-aad0-6d97032e039e",
+        "type": "reset-timer",
+        "backgroundColor": "bgBrightBlack",
+        "rawValue": true,
+        "metadata": {
+          "compact": "false"
+        }
+      },
+      {
+        "id": "760b0199-9d6c-4268-983a-8a69115c2294",
+        "type": "weekly-usage",
+        "backgroundColor": "bgBrightBlue"
+      },
+      {
+        "id": "ec6cea48-9b20-4d76-9343-74c02dbe7fd7",
+        "type": "weekly-reset-timer",
+        "backgroundColor": "bgBrightBlack",
+        "rawValue": true,
+        "metadata": {
+          "display": "time"
+        }
       }
     ],
     [],
@@ -37,6 +61,7 @@
   "flexMode": "full-until-compact",
   "compactThreshold": 60,
   "colorLevel": 3,
+  "defaultPadding": " ",
   "inheritSeparatorColors": false,
   "globalBold": false,
   "powerline": {
@@ -53,8 +78,7 @@
     "endCaps": [
       ""
     ],
-    "autoAlign": true,
-    "theme": "onedark"
-  },
-  "defaultPadding": " "
+    "theme": "onedark",
+    "autoAlign": true
+  }
 }
