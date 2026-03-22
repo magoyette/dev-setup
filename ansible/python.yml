@@ -1,0 +1,15 @@
+---
+- name: Python setup for WSL2
+  hosts: localhost
+  connection: local
+  vars_files:
+    - defaults.yml
+    - vars.yml
+  tasks:
+    - name: Skip if not in playbooks_in_main_playbook
+      ansible.builtin.meta: end_play
+      when: playbooks_in_main_playbook is defined and 'python' not in playbooks_in_main_playbook
+
+    - ansible.builtin.import_tasks: tasks/python.yml
+    - ansible.builtin.import_tasks: tasks/ansible-lint.yml
+    - ansible.builtin.import_tasks: tasks/tldr.yml

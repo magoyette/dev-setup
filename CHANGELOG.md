@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.7.0] - 2026-03-22
+
+### Added
+
+- Add a `python` sub-playbook that installs pyenv, a managed Python runtime, `uv`, and pyenv-backed `pipx`
+- Add `python_version`, `pyenv_version` and `uv_version` in `vars.yml.example`
+- Provide Python env infos in the global context file for AI agents
+
+### Changed
+
+- Move `ansible-lint` and `tldr` from the core sub-playbook to the new Python sub-playbook
+
 ## [4.6.1] - 2026-03-22
 
 ### Added
@@ -478,7 +490,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.6.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.7.0...HEAD
+[4.7.0]: https://github.com/magoyette/dev-setup/compare/v4.6.1...v4.7.0
 [4.6.1]: https://github.com/magoyette/dev-setup/compare/v4.6.0...v4.6.1
 [4.6.0]: https://github.com/magoyette/dev-setup/compare/v4.5.2...v4.6.0
 [4.5.2]: https://github.com/magoyette/dev-setup/compare/v4.5.1...v4.5.2

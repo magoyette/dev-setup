@@ -1,0 +1,230 @@
+---
+- name: Install Python build dependencies for pyenv
+  become: true
+  ansible.builtin.apt:
+    name:
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - libncursesw5-dev
+      - xz-utils
+      - tk-dev
+      - libxml2-dev
+      - libxmlsec1-dev
+      - libffi-dev
+      - liblzma-dev
+    state: present
+
+- name: Remove distro pipx
+  become: true
+  ansible.builtin.apt:
+    name: pipx
+    state: absent
+
+- name: Ensure ~/.local/bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Install pyenv {{ pyenv_version }}
+  ansible.builtin.git:
+    repo: https://github.com/pyenv/pyenv.git
+    dest: "{{ ansible_env.HOME }}/.pyenv"
+    version: "{{ pyenv_version }}"
+
+- name: Set PYENV_ROOT in bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: '^export PYENV_ROOT="\$HOME/\.pyenv"$'
+    line: 'export PYENV_ROOT="$HOME/.pyenv"'
+    state: present
+
+- name: Add pyenv bin to PATH in bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: '^\[\[ -d \$PYENV_ROOT/bin \]\] && export PATH="\$PYENV_ROOT/bin:\$PATH"$'
+    line: '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
+    state: present
+
+- name: Add pyenv init to bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: '^eval "\$\(pyenv init - bash\)"$'
+    line: 'eval "$(pyenv init - bash)"'
+    insertafter: EOF
+    state: present
+
+- name: Set PYENV_ROOT in profile
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.profile"
+    create: true
+    regexp: '^export PYENV_ROOT="\$HOME/\.pyenv"$'
+    line: 'export PYENV_ROOT="$HOME/.pyenv"'
+    insertafter: EOF
+    state: present
+
+- name: Add pyenv bin to PATH in profile
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.profile"
+    create: true
+    regexp: '^\[\[ -d \$PYENV_ROOT/bin \]\] && export PATH="\$PYENV_ROOT/bin:\$PATH"$'
+    line: '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
+    insertafter: EOF
+    state: present
+
+- name: Add pyenv shim init to profile
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.profile"
+    create: true
+    regexp: '^eval "\$\(pyenv init --path\)"$'
+    line: 'eval "$(pyenv init --path)"'
+    insertafter: EOF
+    state: present
+
+- name: Resolve pyenv Python selector and install target
+  ansible.builtin.shell: |
+    set -euo pipefail
+
+    requested="{{ python_version }}"
+    selector="${requested}"
+
+    if target="$("{{ ansible_env.HOME }}/.pyenv/bin/pyenv" latest -k "${requested}" 2>/dev/null)"; then
+      :
+    elif [[ "${requested}" =~ ^([0-9]+\.[0-9]+)\.[0-9]+$ ]]; then
+      selector="${BASH_REMATCH[1]}"
+      target="$("{{ ansible_env.HOME }}/.pyenv/bin/pyenv" latest -k "${selector}")"
+    else
+      echo "Unable to resolve a pyenv install target for ${requested}" >&2
+      exit 1
+    fi
+
+    printf 'selector=%s\n' "${selector}"
+    printf 'target=%s\n' "${target}"
+  args:
+    executable: /bin/bash
+  register: pyenv_python_resolution
+  changed_when: false
+  environment:
+    PYENV_ROOT: "{{ ansible_env.HOME }}/.pyenv"
+    PATH: "{{ ansible_env.HOME }}/.pyenv/bin:{{ ansible_env.HOME }}/.pyenv/shims:{{ ansible_env.PATH }}"
+
+- name: Set pyenv Python selector and install target facts
+  ansible.builtin.set_fact:
+    pyenv_python_selector: "{{ pyenv_python_resolution.stdout_lines[0] | regex_replace('^selector=', '') }}"
+    pyenv_python_install_target: "{{ pyenv_python_resolution.stdout_lines[1] | regex_replace('^target=', '') }}"
+
+- name: Check if Python {{ pyenv_python_install_target }} is installed via pyenv
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+      - prefix
+      - "{{ pyenv_python_install_target }}"
+  register: pyenv_python_check
+  failed_when: false
+  changed_when: false
+  environment:
+    PYENV_ROOT: "{{ ansible_env.HOME }}/.pyenv"
+    PATH: "{{ ansible_env.HOME }}/.pyenv/bin:{{ ansible_env.HOME }}/.pyenv/shims:{{ ansible_env.PATH }}"
+
+- name: Install Python {{ pyenv_python_install_target }} via pyenv
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+      - install
+      - "{{ pyenv_python_install_target }}"
+  when: pyenv_python_check.rc != 0
+  environment:
+    PYENV_ROOT: "{{ ansible_env.HOME }}/.pyenv"
+    PATH: "{{ ansible_env.HOME }}/.pyenv/bin:{{ ansible_env.HOME }}/.pyenv/shims:{{ ansible_env.PATH }}"
+
+- name: Check current pyenv global Python version
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+      - global
+  register: pyenv_global_version
+  changed_when: false
+  environment:
+    PYENV_ROOT: "{{ ansible_env.HOME }}/.pyenv"
+    PATH: "{{ ansible_env.HOME }}/.pyenv/bin:{{ ansible_env.HOME }}/.pyenv/shims:{{ ansible_env.PATH }}"
+
+- name: Set pyenv global Python version
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+      - global
+      - "{{ pyenv_python_selector }}"
+  when: pyenv_global_version.stdout != pyenv_python_selector
+  environment:
+    PYENV_ROOT: "{{ ansible_env.HOME }}/.pyenv"
+    PATH: "{{ ansible_env.HOME }}/.pyenv/bin:{{ ansible_env.HOME }}/.pyenv/shims:{{ ansible_env.PATH }}"
+
+- name: Check if pipx is installed in pyenv Python
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+      - exec
+      - python
+      - -m
+      - pip
+      - show
+      - pipx
+  register: pyenv_pipx_check
+  failed_when: false
+  changed_when: false
+  environment:
+    PYENV_ROOT: "{{ ansible_env.HOME }}/.pyenv"
+    PATH: "{{ ansible_env.HOME }}/.pyenv/bin:{{ ansible_env.HOME }}/.pyenv/shims:{{ ansible_env.PATH }}"
+
+- name: Install pipx in pyenv Python
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+      - exec
+      - python
+      - -m
+      - pip
+      - install
+      - --upgrade
+      - pip
+      - pipx
+  when: pyenv_pipx_check.rc != 0
+  environment:
+    PYENV_ROOT: "{{ ansible_env.HOME }}/.pyenv"
+    PATH: "{{ ansible_env.HOME }}/.pyenv/bin:{{ ansible_env.HOME }}/.pyenv/shims:{{ ansible_env.PATH }}"
+
+- name: Rehash pyenv shims
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+      - rehash
+  changed_when: false
+  environment:
+    PYENV_ROOT: "{{ ansible_env.HOME }}/.pyenv"
+    PATH: "{{ ansible_env.HOME }}/.pyenv/bin:{{ ansible_env.HOME }}/.pyenv/shims:{{ ansible_env.PATH }}"
+
+- name: Check installed uv version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/uv --version"
+  register: uv_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Download and install uv {{ uv_version }}
+  ansible.builtin.shell: |
+    set -euo pipefail
+
+    tmp_dir="$(mktemp -d)"
+    trap 'rm -rf "${tmp_dir}"' EXIT
+
+    curl -sSfL "https://github.com/astral-sh/uv/releases/download/{{ uv_version }}/uv-x86_64-unknown-linux-gnu.tar.gz" \
+      -o "${tmp_dir}/uv.tar.gz"
+
+    tar -xzf "${tmp_dir}/uv.tar.gz" -C "${tmp_dir}"
+    install -m 0755 "${tmp_dir}/uv-x86_64-unknown-linux-gnu/uv" "{{ ansible_env.HOME }}/.local/bin/uv"
+    install -m 0755 "${tmp_dir}/uv-x86_64-unknown-linux-gnu/uvx" "{{ ansible_env.HOME }}/.local/bin/uvx"
+  args:
+    executable: /bin/bash
+  when: uv_version_output.rc != 0 or ("uv " ~ uv_version) not in uv_version_output.stdout

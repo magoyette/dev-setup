@@ -23,6 +23,7 @@
       - bat
       - bubblewrap
       - build-essential
+      - curl
       - eza
       - fd-find
       - fzf
@@ -30,7 +31,6 @@
       - git-delta
       - jq
       - pandoc
-      - pipx
       - ripgrep
       - shellcheck
       - socat

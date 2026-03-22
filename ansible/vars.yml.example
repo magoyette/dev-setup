@@ -8,8 +8,12 @@ ai_assistants_sandbox_allowed_hosts:
   # Whitelist ChatGPT for Claude Code Codex skills
   - chatgpt.com
   - ab.chatgpt.com
+pyenv_version: "v2.5.3"
+uv_version: "0.9.21"
+python_version: "3.13.12"
 playbooks_in_main_playbook:
   - core
+  - python
   - starship
   - node
   - ai-assistants

@@ -58,16 +58,23 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   Extra writable roots for the sandboxes of Codex (`writable_roots`) and Claude Code (`sandbox.filesystem.allowWrite`). Default: `[]`.
 - `ai_assistants_sandbox_allowed_hosts`
   Hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`). Default to hosts needed by the agent skills.
+- `pyenv_version`
+  pyenv version installed for the Python sub-playbook. Default: `"v2.5.3"`.
+- `uv_version`
+  uv version installed for the Python sub-playbook. Default: `"0.9.21"`.
+- `python_version`
+  Python version installed and selected globally with pyenv. Default: `"3.13.12"`.
 - `playwright_browsers`
   Browsers to install for Playwright. Default: `["chrome"]`. Accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
 - `playbooks_in_main_playbook`
-  Sub-playbooks to run when invoking the main playbook. Default: `[core, starship, node, ai-assistants, emacs, neovim]`.
+  Sub-playbooks to run when invoking the main playbook. Default: `[core, python, starship, node, ai-assistants, emacs, neovim]`.
 
 Some sub-playbooks depend on others:
 
 | Sub-playbook    | Dependency on another sub-playbook |
 | --------------- | ---------------------------------- |
 | `core`          | None                               |
+| `python`        | `core`                             |
 | `starship`      | `core`                             |
 | `node`          | `core`                             |
 | `ai-assistants` | `core`, `node`                     |
@@ -103,7 +110,7 @@ git alias
 
 Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code.
 
-For global user-level context, Ansible also deploys [`global-agent-context.md`](global-agent-context.md) to both `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. That file is a concise shared list of the CLI tools installed by this setup that are useful for an AI agent and doesn't have an Agent Skill.
+For global user-level context, Ansible also deploys [`global-agent-context.md`](global-agent-context.md) to both `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. That file is a concise shared list of the CLI tools installed by this setup that are useful for an AI agent and doesn't have an Agent Skill. It also carries runtime guidance for the pyenv-managed `python3` and `uv` workflow used by this setup.
 
 ## Agent skills
 
@@ -146,7 +153,6 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [eza](https://github.com/eza-community/eza) : modern alternative to `ls`
 - [git](https://git-scm.com/) : installed from `ppa:git-core/ppa`
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
-- [ansible-lint](https://docs.ansible.com/projects/lint/) : linter for Ansible playbooks and task files
 - [fd](https://github.com/sharkdp/fd) : fast alternative to `find`
 - [fzf](https://github.com/junegunn/fzf) : interactive fuzzy finder for shell workflows
 - [hadolint](https://github.com/hadolint/hadolint) : Dockerfile linter installed from the upstream Linux release binary
@@ -154,10 +160,18 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [pandoc](https://pandoc.org/) : for Markdown support
 - [ripgrep](https://github.com/BurntSushi/ripgrep) : for file search
 - [shellcheck](https://github.com/koalaman/shellcheck) : linter for Bash
-- [tldr](https://tldr.sh/) : simplified examples for common command-line tools, installed via `pipx` with the official Python client
 - [tokei](https://github.com/XAMPPRocky/tokei) : count files, lines, code, comments, and blanks by language
 - unzip: to unzip .zip files
 - [Zoxide](https://github.com/ajeetdsouza/zoxide) : alternative to cd
+
+### python sub-playbook
+
+- [Python](https://www.python.org/) : CPython runtime installed and selected globally via pyenv
+- [pyenv](https://github.com/pyenv/pyenv) : Python version manager
+- [uv](https://github.com/astral-sh/uv) : Python project, package, tool, and script runner
+- [pipx](https://pipx.pypa.io/) : Python CLI app installer backed by the pyenv-managed Python
+- [ansible-lint](https://docs.ansible.com/projects/lint/) : linter for Ansible playbooks and task files, installed via `pipx`
+- [tldr](https://tldr.sh/) : simplified examples for common command-line tools, installed via `pipx` with the official Python client
 
 ### starship sub-playbook
 

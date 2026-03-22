@@ -2,11 +2,15 @@
 - name: Install ansible-lint with pipx
   ansible.builtin.command:
     argv:
+      - "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+      - exec
       - pipx
       - install
       - ansible-lint
     creates: "{{ ansible_env.HOME }}/.local/bin/ansible-lint"
   environment:
+    PYENV_ROOT: "{{ ansible_env.HOME }}/.pyenv"
+    PATH: "{{ ansible_env.HOME }}/.pyenv/bin:{{ ansible_env.HOME }}/.pyenv/shims:{{ ansible_env.PATH }}"
     PIPX_HOME: "{{ ansible_env.HOME }}/.local/share/pipx"
     PIPX_BIN_DIR: "{{ ansible_env.HOME }}/.local/bin"
     PIPX_MAN_DIR: "{{ ansible_env.HOME }}/.local/share/man"

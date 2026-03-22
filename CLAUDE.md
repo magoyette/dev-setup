@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a developer setup repository for WSL2 (Windows Subsystem for Linux v2). It uses Ansible for idempotent provisioning of the full development environment and GNU Stow for managing dotfiles.
 
+Global user-level agent guidance lives in `global-agent-context.md`, including shared command conventions for the pyenv-managed `python3` and `uv` workflow installed by this setup.
+
+**Tools intentionally excluded from `global-agent-context.md`** — installed by this setup but not useful for AI agents:
+
+- `bat` (`batcat`) — syntax-highlighted pager; agents read raw output, highlighting adds no value
+- `batrg` — shell function piping `rg` through `bat`; agents just need plain `rg` output
+- `zoxide` — frecency-based `cd` alternative; depends on user visit history, making it unpredictable for agents
+- `fzf` — interactive fuzzy finder; agents filter programmatically, not interactively
+
 ## Repository Structure
 
 ```text
@@ -20,7 +29,8 @@ dev-setup/
 │   └── pre-commit                # Ansible syntax checks when ansible/*.yml is staged
 ├── ansible/
 │   ├── playbook.yml              # Main playbook — imports sub-playbooks
-│   ├── core.yml                  # apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide
+│   ├── core.yml                  # apt-packages, shell-config, git, difftastic, hadolint, tokei, zoxide
+│   ├── python.yml                # pyenv, managed CPython, pipx, uv, ansible-lint, tldr
 │   ├── starship.yml              # starship install + bash init + stow deploy
 │   ├── node.yml                  # node, bun, markdownlint, agent-browser, playwright
 │   ├── ai-assistants.yml         # claude-code, codex, ccusage, ast-grep, agent-skills
@@ -29,8 +39,8 @@ dev-setup/
 │   ├── defaults.yml              # Tool versions, checksums, npm packages (not user-configurable)
 │   ├── vars.yml                  # User-specific variables — gitignored, copied from example
 │   └── tasks/                    # Individual task files (one per tool/concern)
-│       ├── apt-packages.yml      # build-essential, bubblewrap, eza, fd-find, fzf, socat, pipx
-│       ├── ansible-lint.yml, tldr.yml, shell-config.yml, git.yml
+│       ├── apt-packages.yml      # build-essential, bubblewrap, curl, eza, fd-find, fzf, socat
+│       ├── ansible-lint.yml, tldr.yml, python.yml, shell-config.yml, git.yml
 │       ├── difftastic.yml, hadolint.yml, tokei.yml, zoxide.yml
 │       ├── node.yml, bun.yml, markdownlint.yml, starship.yml
 │       ├── neovim.yml, emacs.yml, emacs-lsp-booster.yml, emacs-node.yml
@@ -68,7 +78,7 @@ dev-setup/
 
 - **First-time:** `./install.sh` (installs Ansible, Galaxy collections, runs playbook)
 - **Re-run:** `./run-ansible.sh` (skips Ansible install, avoids double sudo prompt)
-- **Single sub-playbook:** `./run-ansible.sh core` (or `starship`, `node`, `ai-assistants`, `emacs`, `neovim`)
+- **Single sub-playbook:** `./run-ansible.sh core` (or `python`, `starship`, `node`, `ai-assistants`, `emacs`, `neovim`)
 - **Setup:** copy `ansible/vars.yml.example` to `ansible/vars.yml` and edit; `install.sh` auto-creates on first run
 
 The playbook is idempotent — safe to re-run. `ansible/vars.yml` is gitignored. Add `--ask-become-pass` to `install.sh` if no passwordless sudo.
@@ -80,10 +90,13 @@ The playbook is idempotent — safe to re-run. `ansible/vars.yml` is gitignored.
 - `install_git_aliases` — manage repo's Git aliases (default `true`); `false` skips alias sync
 - `ai_assistants_sandbox_writable_roots` — extra writable roots shared by Codex (`writable_roots`) and Claude Code (`sandbox.filesystem.allowWrite`); default `[]`
 - `ai_assistants_sandbox_allowed_hosts` — hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`); default `[]`
+- `pyenv_version` — pyenv version installed for the Python sub-playbook; default `"v2.5.3"`
+- `uv_version` — uv version installed for the Python sub-playbook; default `"0.9.21"`
+- `python_version` — Python version installed and selected globally with pyenv; accepts an exact version or a major/minor line, and falls back to the latest known release in the same major/minor line when an exact patch is unavailable; default `"3.13.12"`
 - `playwright_browsers` — browsers to install (default `["chrome"]`; options: `chrome`, `chromium`, `firefox`, `webkit`)
 - `playbooks_in_main_playbook` — sub-playbooks to run; omit a name to skip it; when absent all run
 
-Tool versions and npm packages are in `ansible/defaults.yml` (checked in, not user-configurable).
+Other pinned tool versions and npm packages are in `ansible/defaults.yml` (checked in, not user-configurable).
 
 ## Ansible Playbook Details
 
@@ -91,7 +104,8 @@ Tool versions and npm packages are in `ansible/defaults.yml` (checked in, not us
 
 | Sub-playbook        | Tasks included                                                                           | Condition                    |
 | ------------------- | ---------------------------------------------------------------------------------------- | ---------------------------- |
-| `core.yml`          | apt-packages, ansible-lint, tldr, shell-config, git, difftastic, hadolint, tokei, zoxide | always                       |
+| `core.yml`          | apt-packages, shell-config, git, difftastic, hadolint, tokei, zoxide                     | always                       |
+| `python.yml`        | python, ansible-lint, tldr                                                               | `playbooks_in_main_playbook` |
 | `starship.yml`      | starship                                                                                 | `playbooks_in_main_playbook` |
 | `node.yml`          | node, bun, markdownlint, agent-browser, playwright                                       | always                       |
 | `ai-assistants.yml` | claude-code, codex, ccusage, ast-grep, agent-skills                                      | always                       |
@@ -105,7 +119,10 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Concern                                                                                      | Mechanism                                                                                                                                                                                                                   |
 | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | apt packages                                                                                 | `apt_repository` + `apt` modules; adds `ppa:git-core/ppa` for git                                                                                                                                                           |
-| ansible-lint, tldr                                                                           | `pipx install` via `command` with `creates:`; tldr removes distro clients first                                                                                                                                             |
+| pyenv / managed CPython                                                                      | `git` checkout of a pinned `pyenv` release, `pyenv prefix` / `pyenv global` checks, and `pyenv install` only when the configured Python version is missing                                                                  |
+| pipx                                                                                         | distro package removed, then `python -m pip install --upgrade pip pipx` inside the pyenv-managed Python only when `pipx` is missing                                                                                         |
+| ansible-lint, tldr                                                                           | `pyenv exec pipx install` via `command` with `creates:`; tldr removes distro clients first                                                                                                                                  |
+| uv                                                                                           | `--version` check; downloads the pinned GitHub release tarball only when missing/version mismatch                                                                                                                           |
 | `~/.bashrc` entries                                                                          | `lineinfile` module                                                                                                                                                                                                         |
 | git config / aliases                                                                         | `community.general.git_config`; aliases via `sync-git-aliases.sh` (upserts managed, preserves user aliases); skipped when `install_git_aliases` is `false`                                                                  |
 | fnm, zoxide, bun                                                                             | `creates:` pointing to installed binary/directory                                                                                                                                                                           |
@@ -130,7 +147,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Repo hooks                                                                                   | `git config --local core.hooksPath` check; runs `install-git-hooks.sh` only when not set                                                                                                                                    |
 | Stow                                                                                         | Idempotent by nature                                                                                                                                                                                                        |
 
-### bashrc entries managed by Ansible
+### Shell init entries managed by Ansible
 
 Entries in `ansible/tasks/shell-config.yml` (always applied via `core.yml`):
 
@@ -141,6 +158,13 @@ Entries in `ansible/tasks/shell-config.yml` (always applied via `core.yml`):
 - `batrg() { rg --pretty "$@" | bat --plain; }` (shell function for ripgrep output with bat syntax highlighting)
 - `export BAT_THEME=OneHalfDark`
 - `eval "$(zoxide init bash)"`
+
+Entries in `ansible/tasks/python.yml` (applied when `python` is in `playbooks_in_main_playbook`, via `python.yml`):
+
+- `export PYENV_ROOT="$HOME/.pyenv"` in both `~/.bashrc` and `~/.profile`
+- `[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"` in both `~/.bashrc` and `~/.profile`
+- `eval "$(pyenv init - bash)"` in `~/.bashrc` for interactive shells
+- `eval "$(pyenv init --path)"` in `~/.profile` for login shells such as `bash -lc`
 
 Entries in `ansible/tasks/emacs.yml` (applied when `emacs` is in `playbooks_in_main_playbook`, via `emacs.yml`):
 
@@ -181,6 +205,7 @@ All aliases use `-c diff.external=difft` so the override is per-command only.
 - **ansible-lint**: Use `ansible-lint ansible/` as advisory tooling. `ansible-lint --fix ansible/` for broad cleanup, but review results manually.
 - **markdownlint**: Rules in `.markdownlint.jsonc` (MD013 disabled). Lint with `run-markdownlint.sh` (excludes `claude/.claude/`, `external-skills*`, and `skills*`).
 - **fd**: Exposed as `alias fd="fdfind"` in shell-config.
+- **Python**: Installed through `pyenv` in the `python` sub-playbook. The runtime and tool versions come from `python_version`, `pyenv_version`, and `uv_version`; exact patch requests fall back to the latest known release in the same major/minor line when needed; `uv` is installed as a standalone binary, and `pipx` is recreated from the pyenv-managed Python instead of the distro package.
 - **Versioned tools** (difftastic, hadolint, tokei, Starship, Neovim): to upgrade, bump version in `defaults.yml` and re-run the playbook.
 
 ### Starship
@@ -196,6 +221,12 @@ Config: `nvim/.config/nvim/init.lua` (Stow-deployed). Bootstraps `lazy.nvim`, on
 When skipped via `playbooks_in_main_playbook`, all Emacs tasks (including emacs-lsp-booster and LSP npm packages) are skipped.
 
 Four phases: (1) Dependencies — deb-src, `build-dep emacs`, libmagick, tree-sitter via Ansible; (2) Build — `scripts/install-emacs-in-ubuntu.sh` with native compilation (AOT), tree-sitter, imagemagick, lucid toolkit, `make -j12`; (3) emacs-lsp-booster — pinned binary with SHA-256 verification; (4) LSP npm packages — from `emacs_npm_packages` in `defaults.yml`.
+
+### Python
+
+When skipped via `playbooks_in_main_playbook`, the pyenv-managed Python runtime, `uv`, `pipx`, `ansible-lint`, and `tldr` are all skipped.
+
+The Python sub-playbook installs the configured `pyenv_version`, `uv_version`, and `python_version`, resolves `python_version` to the selected exact install target with pyenv prefix auto-resolution, removes the distro `pipx` package, recreates `pipx` from the pyenv-managed Python, and configures both `~/.bashrc` and `~/.profile` so the runtime is visible in manual shells and in non-interactive login shells used by AI assistants.
 
 ## GNU Stow & Dotfiles
 
