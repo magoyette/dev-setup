@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.6.1] - 2026-03-22
+
+### Added
+
+- Add documentation for the WSL terminal tab title limitation and its current workarounds
+- Document the notification click-to-focus limitation (Windows Terminal AUMID opens a new tab instead of focusing the existing one)
+
+### Changed
+
+- Move the Claude Code WSL notification hook documentation from the repository root into `docs/`
+
 ## [4.6.0] - 2026-03-21
 
 ### Added
@@ -467,7 +478,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.6.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.6.1...HEAD
+[4.6.1]: https://github.com/magoyette/dev-setup/compare/v4.6.0...v4.6.1
 [4.6.0]: https://github.com/magoyette/dev-setup/compare/v4.5.2...v4.6.0
 [4.5.2]: https://github.com/magoyette/dev-setup/compare/v4.5.1...v4.5.2
 [4.5.1]: https://github.com/magoyette/dev-setup/compare/v4.5.0...v4.5.1

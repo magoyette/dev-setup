@@ -52,7 +52,7 @@ dev-setup/
 ├── external-skills/             # Shared third-party skills (downloaded bundles + submodules)
 ├── external-skills-claude/      # Claude-only external skills
 ├── external-skills-codex/       # Codex-only external skills
-├── docs/                         # Reference documentation (claude-code-tips, vs-code)
+├── docs/                         # Reference documentation
 ├── scripts/
 │   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh
 │   ├── install-emacs-in-ubuntu.sh
@@ -61,8 +61,7 @@ dev-setup/
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
 ├── run-ansible.sh                # Re-run playbook without reinstalling Ansible
 ├── release.sh                    # Tag and push a new semver release
-├── ccstatusline/                 # Stow: ccstatusline config
-└── claude-hooks.md
+└── ccstatusline/                 # Stow: ccstatusline config
 ```
 
 ## Installation & Deployment
