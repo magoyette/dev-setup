@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.9.0] - 2026-03-28
+
+### Added
+
+- Add hallucination reduction guidelines to the global agent context file
+
 ## [4.8.0] - 2026-03-22
 
 ### Changed
@@ -498,7 +504,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.8.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.9.0...HEAD
+[4.9.0]: https://github.com/magoyette/dev-setup/compare/v4.8.0...v4.9.0
 [4.8.0]: https://github.com/magoyette/dev-setup/compare/v4.7.0...v4.8.0
 [4.7.0]: https://github.com/magoyette/dev-setup/compare/v4.6.1...v4.7.0
 [4.6.1]: https://github.com/magoyette/dev-setup/compare/v4.6.0...v4.6.1

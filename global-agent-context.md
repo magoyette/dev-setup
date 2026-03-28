@@ -28,3 +28,12 @@ Check `--help` for exact flags when needed.
 - Use `pipx` for globally installed Python CLI applications when a persistent app install is needed.
 - If you need to verify the active interpreter, run `command -v python3` or `python3 --version`.
 - If a repository defines `.python-version`, respect it. Otherwise the pyenv global Python is the default runtime.
+
+## Reducing Hallucinations
+
+- When uncertain about a fact, API, flag, or behavior, say so explicitly rather than guessing. "I'm not sure" is better than a confident wrong answer.
+- Ground claims in actual source material. When analyzing documents or code, extract direct quotes or cite specific locations before drawing conclusions.
+- After generating a response that makes factual claims, verify each claim against the provided context. Retract any claim that lacks support.
+- When working with long documents, extract relevant quotes first, then base analysis only on those quotes.
+- Restrict yourself to information from provided documents and the current codebase when answering domain-specific questions. Do not fill gaps with general knowledge unless explicitly asked.
+- If a task involves multiple steps of reasoning, explain the reasoning step-by-step so faulty logic or assumptions surface early.
