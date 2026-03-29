@@ -1,0 +1,10 @@
+---
+- name: Check if yaml is installed
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g --depth=0 yaml"
+  register: yaml_npm_check
+  failed_when: false
+  changed_when: false
+
+- name: Install yaml
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g yaml"
+  when: yaml_npm_check.rc != 0

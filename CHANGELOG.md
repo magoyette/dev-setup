@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.10.0] - 2026-03-29
+
+### Added
+
+- Add JSON and YAML syntax validation PostToolUse hooks for Claude Code
+- Install `yaml` npm package globally for YAML validation via `yaml valid`
+
 ## [4.9.0] - 2026-03-28
 
 ### Added
@@ -504,7 +511,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.9.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.10.0...HEAD
+[4.10.0]: https://github.com/magoyette/dev-setup/compare/v4.9.0...v4.10.0
 [4.9.0]: https://github.com/magoyette/dev-setup/compare/v4.8.0...v4.9.0
 [4.8.0]: https://github.com/magoyette/dev-setup/compare/v4.7.0...v4.8.0
 [4.7.0]: https://github.com/magoyette/dev-setup/compare/v4.6.1...v4.7.0

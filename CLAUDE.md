@@ -32,7 +32,7 @@ dev-setup/
 │   ├── core.yml                  # apt-packages, shell-config, git, difftastic, hadolint, tokei, zoxide
 │   ├── python.yml                # pyenv, managed CPython, pipx, uv, ansible-lint, tldr
 │   ├── starship.yml              # starship install + bash init + stow deploy
-│   ├── node.yml                  # node, bun, markdownlint, agent-browser, playwright
+│   ├── node.yml                  # node, bun, markdownlint, yaml, agent-browser, playwright
 │   ├── ai-assistants.yml         # claude-code, codex, ccusage, ast-grep, agent-skills
 │   ├── emacs.yml                 # emacs (skippable via playbooks_in_main_playbook)
 │   ├── neovim.yml                # neovim (skippable via playbooks_in_main_playbook)
@@ -42,7 +42,7 @@ dev-setup/
 │       ├── apt-packages.yml      # build-essential, bubblewrap, curl, eza, fd-find, fzf, socat
 │       ├── ansible-lint.yml, tldr.yml, python.yml, shell-config.yml, git.yml
 │       ├── difftastic.yml, hadolint.yml, tokei.yml, zoxide.yml
-│       ├── node.yml, bun.yml, markdownlint.yml, starship.yml
+│       ├── node.yml, bun.yml, markdownlint.yml, yaml-npm.yml, starship.yml
 │       ├── neovim.yml, emacs.yml, emacs-lsp-booster.yml, emacs-node.yml
 │       ├── claude-code.yml       # Install + stow + settings management (hooks/statusLine/sandbox)
 │       ├── codex.yml             # Install + config.toml management + claude-review stow deploy
@@ -107,7 +107,7 @@ Other pinned tool versions and npm packages are in `ansible/defaults.yml` (check
 | `core.yml`          | apt-packages, shell-config, git, difftastic, hadolint, tokei, zoxide                     | always                       |
 | `python.yml`        | python, ansible-lint, tldr                                                               | `playbooks_in_main_playbook` |
 | `starship.yml`      | starship                                                                                 | `playbooks_in_main_playbook` |
-| `node.yml`          | node, bun, markdownlint, agent-browser, playwright                                       | always                       |
+| `node.yml`          | node, bun, markdownlint, yaml, agent-browser, playwright                                 | always                       |
 | `ai-assistants.yml` | claude-code, codex, ccusage, ast-grep, agent-skills                                      | always                       |
 | `emacs.yml`         | emacs (includes emacs-node)                                                              | `playbooks_in_main_playbook` |
 | `neovim.yml`        | neovim                                                                                   | `playbooks_in_main_playbook` |
@@ -265,6 +265,8 @@ To change managed home-directory fields, edit `merge-claude-settings.sh` and re-
 
 - **shellcheck** — runs `shellcheck <file>` automatically when a `.sh` file is edited
 - **markdownlint** — runs `markdownlint-cli2 <file>` automatically when a `.md` file is edited; excluded paths (matching `run-markdownlint.sh`): `.claude/`, `external-skills*`, `skills*`
+- **json** — runs `node -e "JSON.parse(...)"` automatically when a `.json` file is edited
+- **yaml** — runs `yaml valid <file>` automatically when a `.yaml` or `.yml` file is edited
 
 ### Completion Checklist Subagent
 
