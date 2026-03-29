@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.10.1] - 2026-03-29
+
+### Added
+
+- Change README.md to use `Read and write` permission on `Contents` during `gh auth login`
+
 ## [4.10.0] - 2026-03-29
 
 ### Added

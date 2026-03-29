@@ -95,17 +95,16 @@ The `core` playbook installs `gh` but authentication must be done manually after
 
 ### Creating a personal access token
 
-I create a fine-grained personal access token to grant read-only access to GitHub, mostly to let them retrieve resources from public repositories.
+I create a fine-grained personal access token to GitHub, mostly to let them retrieve resources from public repositories.
 
 1. Go to `GitHub > Settings > Developer settings > Personal access tokens > Fine-grained tokens`
 2. Click `Generate new token`
 3. Set a `Token name` and an `Expiration`
 4. Under `Repository access`, select `All repositories` (or restrict to specific repos)
-5. Under `Permissions > Repository permissions`, grant `Read-only` access to:
-   - Contents
-   - Issues
-   - Metadata (automatically set to read-only)
-   - Pull requests
+5. Under `Permissions > Repository permissions`, grant access to:
+   - `Contents` : `Read and write`
+   - `Issues` : `Read-only`
+   - `Pull requests` :`Read-only`
 6. Click `Generate token`
 
 ### Authenticating gh with the token
