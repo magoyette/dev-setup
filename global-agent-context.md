@@ -8,6 +8,7 @@ Check `--help` for exact flags when needed.
 
 - `eza`: use instead of `ls` for directory listings.
 - `fd`: use instead of `find` for file searches. Aliased from `fdfind` on Ubuntu, so `fd` works directly.
+- `gh`: use for GitHub operations (issues, PRs, repos, searches) from the command line.
 - `rg`: use instead of `grep` for recursive file and content search.
 - `jq`: use to parse and transform JSON.
 - `shellcheck`: run after creating or modifying any `.sh` file.

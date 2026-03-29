@@ -26,6 +26,7 @@
     - ansible.builtin.import_tasks: tasks/apt-packages.yml
     - ansible.builtin.import_tasks: tasks/shell-config.yml
     - ansible.builtin.import_tasks: tasks/git.yml
+    - ansible.builtin.import_tasks: tasks/gh.yml
     - ansible.builtin.import_tasks: tasks/difftastic.yml
     - ansible.builtin.import_tasks: tasks/hadolint.yml
     - ansible.builtin.import_tasks: tasks/tokei.yml

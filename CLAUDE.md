@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a developer setup repository for WSL2 (Windows Subsystem for Linux v2). It uses Ansible for idempotent provisioning of the full development environment and GNU Stow for managing dotfiles.
 
-Global user-level agent guidance lives in `global-agent-context.md`, including shared command conventions for the pyenv-managed `python3` and `uv` workflow installed by this setup.
+Global user-level agent guidance lives in `global-agent-context.md`, including shared command conventions for the pyenv-managed `python3` and `uv` workflow installed by this setup and hallucination reduction guidelines.
 
 **Tools intentionally excluded from `global-agent-context.md`** — installed by this setup but not useful for AI agents:
 
@@ -40,7 +40,7 @@ dev-setup/
 │   ├── vars.yml                  # User-specific variables — gitignored, copied from example
 │   └── tasks/                    # Individual task files (one per tool/concern)
 │       ├── apt-packages.yml      # build-essential, bubblewrap, curl, eza, fd-find, fzf, socat
-│       ├── ansible-lint.yml, tldr.yml, python.yml, shell-config.yml, git.yml
+│       ├── ansible-lint.yml, tldr.yml, python.yml, shell-config.yml, git.yml, gh.yml
 │       ├── difftastic.yml, hadolint.yml, tokei.yml, zoxide.yml
 │       ├── node.yml, bun.yml, markdownlint.yml, starship.yml
 │       ├── neovim.yml, emacs.yml, emacs-lsp-booster.yml, emacs-node.yml
@@ -104,7 +104,7 @@ Other pinned tool versions and npm packages are in `ansible/defaults.yml` (check
 
 | Sub-playbook        | Tasks included                                                                           | Condition                    |
 | ------------------- | ---------------------------------------------------------------------------------------- | ---------------------------- |
-| `core.yml`          | apt-packages, shell-config, git, difftastic, hadolint, tokei, zoxide                     | always                       |
+| `core.yml`          | apt-packages, shell-config, git, gh, difftastic, hadolint, tokei, zoxide                 | always                       |
 | `python.yml`        | python, ansible-lint, tldr                                                               | `playbooks_in_main_playbook` |
 | `starship.yml`      | starship                                                                                 | `playbooks_in_main_playbook` |
 | `node.yml`          | node, bun, markdownlint, agent-browser, playwright                                       | always                       |
@@ -124,6 +124,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | ansible-lint, tldr                                                                           | `pyenv exec pipx install` via `command` with `creates:`; tldr removes distro clients first                                                                                                                                  |
 | uv                                                                                           | `--version` check; downloads the pinned GitHub release tarball only when missing/version mismatch                                                                                                                           |
 | `~/.bashrc` entries                                                                          | `lineinfile` module                                                                                                                                                                                                         |
+| gh (GitHub CLI)                                                                              | `apt_repository` + `apt` with signed keyring from `cli.github.com`                                                                                                                                                          |
 | git config / aliases                                                                         | `community.general.git_config`; aliases via `sync-git-aliases.sh` (upserts managed, preserves user aliases); skipped when `install_git_aliases` is `false`                                                                  |
 | fnm, zoxide, bun                                                                             | `creates:` pointing to installed binary/directory                                                                                                                                                                           |
 | Node LTS via fnm                                                                             | `fnm list \| grep -q {{ fnm_node_version }}`; install if rc != 0                                                                                                                                                            |

@@ -89,6 +89,40 @@ Run the bootstrap script:
 
 This installs Ansible via apt, then runs the Ansible playbook. The playbook is idempotent (safe to re-run after changes). Re-running it should normally report no changes unless a managed setting or pinned version/checksum actually differs.
 
+## GitHub CLI
+
+The `core` playbook installs `gh` but authentication must be done manually after install.
+
+### Creating a personal access token
+
+I create a fine-grained personal access token to grant read-only access to GitHub, mostly to let them retrieve resources from public repositories.
+
+1. Go to `GitHub > Settings > Developer settings > Personal access tokens > Fine-grained tokens`
+2. Click `Generate new token`
+3. Set a `Token name` and an `Expiration`
+4. Under `Repository access`, select `All repositories` (or restrict to specific repos)
+5. Under `Permissions > Repository permissions`, grant `Read-only` access to:
+   - Contents
+   - Issues
+   - Metadata (automatically set to read-only)
+   - Pull requests
+6. Click `Generate token`
+
+### Authenticating gh with the token
+
+```sh
+gh auth login
+```
+
+When prompted:
+
+- `Where do you use GitHub?` : `GitHub.com`
+- `Preferred protocol?` : `HTTPS`
+- `How would you like to authenticate?` : `Paste an authentication token`
+- Paste the fine-grained token
+
+Verify that the login was successful with `gh auth status`.
+
 ## Useful commands
 
 ```sh
@@ -151,6 +185,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - build-essential: C & C++ compilers, make and other tools to build from source
 - [delta](https://github.com/dandavison/delta) : diff tool (primary pager for git commands)
 - [eza](https://github.com/eza-community/eza) : modern alternative to `ls`
+- [gh](https://cli.github.com/) : GitHub CLI for issues, PRs, repos and more
 - [git](https://git-scm.com/) : installed from `ppa:git-core/ppa`
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
 - [fd](https://github.com/sharkdp/fd) : fast alternative to `find`
