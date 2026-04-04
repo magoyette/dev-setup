@@ -29,6 +29,7 @@ claude_code_plugins:
   - claude-md-management@claude-plugins-official
   - claude-code-setup@claude-plugins-official
   - frontend-design@claude-plugins-official
+  - feature-dev@claude-plugins-official
 
 # npm global packages required by Emacs LSP mode and formatting tools
 emacs_npm_packages:

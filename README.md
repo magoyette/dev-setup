@@ -235,3 +235,4 @@ When both browser skills are installed, prefer `agent-browser` for general brows
 - [claude-md-management](https://claude.com/plugins/claude-md-management) : audits `CLAUDE.md` quality, trigger with `audit my CLAUDE.md files`. `/revise-claude-md` command capture learnings after a session in `CLAUDE.md`
 - [claude-code-setup](https://claude.com/plugins/claude-code-setup) : plugin that recommends improvements for Claude Code. Trigger with "recommend automations for this project", "setup Claude Code", "which MCPs should I use", etc.
 - [frontend-design](https://claude.com/plugins/frontend-design) : generates production-grade frontend interfaces with distinctive design direction (typography, motion, spatial composition, visual effects)
+- [feature-dev](https://claude.com/plugins/feature-dev) : systematic 7-phase feature development workflow (discovery → exploration → clarifying questions → architecture → implementation → review → summary) via `/feature-dev`

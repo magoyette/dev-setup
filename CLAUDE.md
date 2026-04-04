@@ -283,6 +283,7 @@ Current managed plugins:
 - `claude-md-management` — audits CLAUDE.md quality and captures session learnings via `/revise-claude-md` (Anthropic Verified)
 - `claude-code-setup` — analyzes a codebase and recommends MCP servers, skills, hooks, and subagents for it (Anthropic Verified)
 - `frontend-design` — generates production-grade frontend interfaces with distinctive design aesthetics (Anthropic Verified)
+- `feature-dev` — systematic 7-phase feature development workflow (discovery → exploration → clarifying questions → architecture → implementation → review → summary) via `/feature-dev` (Anthropic Verified)
 
 ### WSL-to-Windows Notification Hook
 
