@@ -23,7 +23,8 @@ dev-setup/
 ├── .claude/
 │   ├── settings.json            # Repo-local Claude Code permissions allowlist and PostToolUse hooks
 │   └── agents/
-│       └── completion-checklist.md  # Subagent: verify completion checklist after any change
+│       ├── completion-checklist.md  # Subagent: verify completion checklist after any change
+│       └── ansible-reviewer.md      # Subagent: review Ansible tasks for idempotency and conventions
 ├── global-agent-context.md       # Deployed to ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md
 ├── .githooks/
 │   └── pre-commit                # Ansible syntax checks when ansible/*.yml is staged
