@@ -1,4 +1,10 @@
 ---
+- name: Ensure ~/.local/bin exists for user shims
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
 - name: Add ~/.local/bin to PATH
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
@@ -17,11 +23,18 @@
     line: 'alias bat="batcat"'
     state: present
 
-- name: Add fd alias
+- name: Remove legacy fd alias
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: 'alias fd="fdfind"'
-    state: present
+    state: absent
+
+- name: Link fd into ~/.local/bin
+  ansible.builtin.file:
+    src: /usr/bin/fdfind
+    dest: "{{ ansible_env.HOME }}/.local/bin/fd"
+    state: link
+    force: true
 
 - name: Add batrg function
   ansible.builtin.lineinfile:

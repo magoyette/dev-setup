@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.12.1] - 2026-04-06
+
+### Fixed
+
+- Expose Ubuntu's `fdfind` package as `fd` in non-interactive shells for coding assistants
+
 ## [4.12.0] - 2026-04-04
 
 ### Added
@@ -523,7 +529,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.12.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.12.1...HEAD
+[4.12.1]: https://github.com/magoyette/dev-setup/compare/v4.12.0...v4.12.1
 [4.12.0]: https://github.com/magoyette/dev-setup/compare/v4.11.0...v4.12.0
 [4.11.0]: https://github.com/magoyette/dev-setup/compare/v4.10.0...v4.11.0
 [4.10.0]: https://github.com/magoyette/dev-setup/compare/v4.9.0...v4.10.0

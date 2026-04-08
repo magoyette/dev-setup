@@ -124,6 +124,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | pipx                                                                                         | distro package removed, then `python -m pip install --upgrade pip pipx` inside the pyenv-managed Python only when `pipx` is missing                                                                                         |
 | ansible-lint, tldr                                                                           | `pyenv exec pipx install` via `command` with `creates:`; tldr removes distro clients first                                                                                                                                  |
 | uv                                                                                           | `--version` check; downloads the pinned GitHub release tarball only when missing/version mismatch                                                                                                                           |
+| fd command shim                                                                              | `file state=link force=true` creates `~/.local/bin/fd` -> `/usr/bin/fdfind`, exposing `fd-find` as `fd` in non-interactive shells                                                                                           |
 | `~/.bashrc` entries                                                                          | `lineinfile` module                                                                                                                                                                                                         |
 | git config / aliases                                                                         | `community.general.git_config`; aliases via `sync-git-aliases.sh` (upserts managed, preserves user aliases); skipped when `install_git_aliases` is `false`                                                                  |
 | fnm, zoxide, bun                                                                             | `creates:` pointing to installed binary/directory                                                                                                                                                                           |
@@ -155,10 +156,11 @@ Entries in `ansible/tasks/shell-config.yml` (always applied via `core.yml`):
 - `export PATH="$HOME/.local/bin:$PATH"` (for zoxide and other user binaries)
 - `export COLORTERM=truecolor`
 - `alias bat="batcat"`
-- `alias fd="fdfind"` (exposes the standard `fd` command name on Ubuntu)
 - `batrg() { rg --pretty "$@" | bat --plain; }` (shell function for ripgrep output with bat syntax highlighting)
 - `export BAT_THEME=OneHalfDark`
 - `eval "$(zoxide init bash)"`
+
+The same task file also links `~/.local/bin/fd` to `/usr/bin/fdfind` so `fd` is available in non-interactive shells such as `bash -lc`.
 
 Entries in `ansible/tasks/python.yml` (applied when `python` is in `playbooks_in_main_playbook`, via `python.yml`):
 
@@ -205,7 +207,7 @@ All aliases use `-c diff.external=difft` so the override is per-command only.
 
 - **ansible-lint**: Use `ansible-lint ansible/` as advisory tooling. `ansible-lint --fix ansible/` for broad cleanup, but review results manually.
 - **markdownlint**: Rules in `.markdownlint.jsonc` (MD013 disabled). Lint with `run-markdownlint.sh` (excludes `claude/.claude/`, `external-skills*`, and `skills*`).
-- **fd**: Exposed as `alias fd="fdfind"` in shell-config.
+- **fd**: Exposed as `~/.local/bin/fd` linked to Ubuntu's `/usr/bin/fdfind`, so it works in non-interactive shells used by AI agents.
 - **Python**: Installed through `pyenv` in the `python` sub-playbook. The runtime and tool versions come from `python_version`, `pyenv_version`, and `uv_version`; exact patch requests fall back to the latest known release in the same major/minor line when needed; `uv` is installed as a standalone binary, and `pipx` is recreated from the pyenv-managed Python instead of the distro package.
 - **Versioned tools** (difftastic, hadolint, tokei, Starship, Neovim): to upgrade, bump version in `defaults.yml` and re-run the playbook.
 
