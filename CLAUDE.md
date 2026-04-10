@@ -140,7 +140,8 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Claude Code                                                                                  | `which claude` check before install                                                                                                                                                                                         |
 | Claude upgrade wrapper                                                                       | `lineinfile` (no-op if line already present)                                                                                                                                                                                |
 | Claude settings (hooks, statusLine, sandbox, permissions)                                    | `merge-claude-settings.sh` merges managed keys via `jq`; derives `allowWrite`, `allowedHosts`, and `permissions.allow`; preserves other user keys via recursive merge                                                       |
-| Claude Code plugins                                                                          | `claude plugin list` check; `claude plugin install <name>@<marketplace> --scope user` for each entry in `claude_code_plugins` (`defaults.yml`) not already listed                                                           |
+| Claude Code marketplaces                                                                     | `claude plugin marketplace list` check; `claude plugin marketplace add <source>` for each entry in `claude_code_marketplaces` (`defaults.yml`) not already listed                                                            |
+| Claude Code plugins                                                                          | `claude plugin list` output filtered to user-scoped entries via awk; `claude plugin install <name>@<marketplace> --scope user` for each entry in `claude_code_plugins` (`defaults.yml`) not already listed at user scope     |
 | Codex config                                                                                 | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots); `claude-review` stow package deploys helper script to `~/.local/bin`                                                     |
 | Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`                                                                                                                                             |
 | agent-browser browser + Linux deps                                                           | `agent-browser install --with-deps` always runs (`changed_when: false`)                                                                                                                                                     |
@@ -283,7 +284,7 @@ To change managed home-directory fields, edit `merge-claude-settings.sh` and re-
 
 ### Claude Code Plugins
 
-Plugins are installed from the official Anthropic marketplace via `claude plugin install`. The list is declared in `claude_code_plugins` in `ansible/defaults.yml`. Ansible checks `claude plugin list` and installs any missing plugins idempotently. To add or remove a plugin, edit the list in `defaults.yml` and re-run the playbook (note: removing an entry does not uninstall the plugin — uninstall manually with `claude plugin uninstall <name>`).
+Plugins are installed from configured marketplaces via `claude plugin install`. The list is declared in `claude_code_plugins` in `ansible/defaults.yml`. Ansible checks `claude plugin list` and installs any missing plugins idempotently. Third-party marketplaces are declared in `claude_code_marketplaces` and added via `claude plugin marketplace add`. To add or remove a plugin, edit the list in `defaults.yml` and re-run the playbook (note: removing an entry does not uninstall the plugin — uninstall manually with `claude plugin uninstall <name>`).
 
 Current managed plugins:
 
@@ -293,6 +294,7 @@ Current managed plugins:
 - `claude-code-setup` — analyzes a codebase and recommends MCP servers, skills, hooks, and subagents for it (Anthropic Verified)
 - `frontend-design` — generates production-grade frontend interfaces with distinctive design aesthetics (Anthropic Verified)
 - `feature-dev` — systematic 7-phase feature development workflow (discovery → exploration → clarifying questions → architecture → implementation → review → summary) via `/feature-dev` (Anthropic Verified)
+- `codex` — integrates the Codex CLI into Claude Code (from `openai-codex` marketplace via `openai/codex-plugin-cc`); run `/codex:setup` after first install to verify and authenticate
 
 ### WSL-to-Windows Notification Hook
 

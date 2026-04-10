@@ -237,3 +237,4 @@ When both browser skills are installed, prefer `agent-browser` for general brows
 - [claude-code-setup](https://claude.com/plugins/claude-code-setup) : plugin that recommends improvements for Claude Code. Trigger with "recommend automations for this project", "setup Claude Code", "which MCPs should I use", etc.
 - [frontend-design](https://claude.com/plugins/frontend-design) : generates production-grade frontend interfaces with distinctive design direction (typography, motion, spatial composition, visual effects)
 - [feature-dev](https://claude.com/plugins/feature-dev) : systematic 7-phase feature development workflow (discovery → exploration → clarifying questions → architecture → implementation → review → summary) via `/feature-dev`
+- [codex](https://github.com/openai/codex-plugin-cc) (from `openai-codex` marketplace) : integrates the Codex CLI into Claude Code; run `/codex:setup` after install to verify and authenticate

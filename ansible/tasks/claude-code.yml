@@ -46,10 +46,27 @@
   changed_when: claude_settings_merge.rc == 2
   failed_when: claude_settings_merge.rc not in [0, 2]
 
-- name: Get installed Claude Code plugins
-  ansible.builtin.command: claude plugin list
+- name: Get configured Claude Code marketplaces
+  ansible.builtin.command: claude plugin marketplace list
+  register: claude_marketplace_list
+  changed_when: false
+  failed_when: false
+
+- name: Add Claude Code marketplaces
+  ansible.builtin.command: claude plugin marketplace add {{ item }}
+  loop: "{{ claude_code_marketplaces }}"
+  when: item not in claude_marketplace_list.stdout
+
+- name: Get installed Claude Code plugins at user scope
+  # Filters to user-scoped plugins only, matching the name@marketplace format used in
+  # claude_code_plugins (e.g. codex@openai-codex). Each block in `claude plugin list`
+  # starts with "  ❯ name@marketplace" and includes a "    Scope: user" line.
+  # If the output format changes and awk produces no output, all plugins will reinstall
+  # on every run — check claude_plugin_list.stdout if idempotency breaks.
+  ansible.builtin.shell: "claude plugin list | awk '/❯/{p=$NF} /Scope: user/{print p}'"
   register: claude_plugin_list
   changed_when: false
+  failed_when: false
 
 - name: Install Claude Code plugins
   ansible.builtin.command: claude plugin install {{ item }} --scope user

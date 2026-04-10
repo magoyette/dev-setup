@@ -22,6 +22,10 @@ codex_status_line:
   - five-hour-limit
   - weekly-limit
 
+# Claude Code third-party marketplaces (GitHub repo paths)
+claude_code_marketplaces:
+  - openai/codex-plugin-cc
+
 # Claude Code plugins installed from the official marketplace
 claude_code_plugins:
   - context7@claude-plugins-official
@@ -30,6 +34,7 @@ claude_code_plugins:
   - claude-code-setup@claude-plugins-official
   - frontend-design@claude-plugins-official
   - feature-dev@claude-plugins-official
+  - codex@openai-codex
 
 # npm global packages required by Emacs LSP mode and formatting tools
 emacs_npm_packages:
