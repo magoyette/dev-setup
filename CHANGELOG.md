@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.13.0] - 2026-04-09
+
+### Added
+
+- Add project-scoped Codex agents in `.codex/agents/` for completion checklist verification and Ansible review
+
+### Changed
+
+- Document when Claude Code and Codex should invoke the completion checklist and Ansible review agents after a completed change
+
 ## [4.12.1] - 2026-04-06
 
 ### Fixed
@@ -529,7 +539,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.12.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.13.0...HEAD
+[4.13.0]: https://github.com/magoyette/dev-setup/compare/v4.12.1...v4.13.0
 [4.12.1]: https://github.com/magoyette/dev-setup/compare/v4.12.0...v4.12.1
 [4.12.0]: https://github.com/magoyette/dev-setup/compare/v4.11.0...v4.12.0
 [4.11.0]: https://github.com/magoyette/dev-setup/compare/v4.10.0...v4.11.0

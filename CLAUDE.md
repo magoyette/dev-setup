@@ -25,6 +25,10 @@ dev-setup/
 │   └── agents/
 │       ├── completion-checklist.md  # Subagent: verify completion checklist after any change
 │       └── ansible-reviewer.md      # Subagent: review Ansible tasks for idempotency and conventions
+├── .codex/
+│   └── agents/
+│       ├── completion-checklist.toml # Project-scoped Codex agent: verify completion checklist after any change
+│       └── ansible-reviewer.toml     # Project-scoped Codex agent: review Ansible tasks for idempotency and conventions
 ├── global-agent-context.md       # Deployed to ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md
 ├── .githooks/
 │   └── pre-commit                # Ansible syntax checks when ansible/*.yml is staged
@@ -275,6 +279,8 @@ To change managed home-directory fields, edit `merge-claude-settings.sh` and re-
 
 `.claude/agents/completion-checklist.md` is a project-scoped subagent that verifies every item in the completion checklist after a change: CLAUDE.md/README.md updates, CHANGELOG.md versioned entry, ansible syntax, and shellcheck. Invoke it at the end of any change to confirm nothing was missed.
 
+`.claude/agents/ansible-reviewer.md` is a project-scoped subagent for Ansible-focused review. Use it when the completed change touches `ansible/`, provisioning behavior, or idempotency-sensitive setup logic. Skip it when it would add no value, such as a small README-only edit.
+
 ### Claude Code Plugins
 
 Plugins are installed from the official Anthropic marketplace via `claude plugin install`. The list is declared in `claude_code_plugins` in `ansible/defaults.yml`. Ansible checks `claude plugin list` and installs any missing plugins idempotently. To add or remove a plugin, edit the list in `defaults.yml` and re-run the playbook (note: removing an entry does not uninstall the plugin — uninstall manually with `claude plugin uninstall <name>`).
@@ -303,6 +309,21 @@ Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwr
 ## Codex Configuration
 
 Ansible manages `~/.codex/config.toml`: `project_doc_fallback_filenames = ["CLAUDE.md"]`, `project_doc_max_bytes` (from `defaults.yml`), `status_line` (from `defaults.yml`), and `writable_roots` (from `ai_assistants_sandbox_writable_roots` in `vars.yml`). Global context: `~/.codex/AGENTS.md` symlinked to `global-agent-context.md`. The `claude-review` stow package deploys `claude-review.sh` to `~/.local/bin/` so the Codex `claude-review` skill works from any repository.
+
+This repository also tracks project-scoped Codex custom agents under `.codex/agents/`.
+Unlike user-scoped skills, these agents are available only in this repository when
+explicitly spawned.
+
+When a change is complete, Codex should evaluate whether to invoke these project-scoped
+agents:
+
+- `.codex/agents/completion-checklist.toml` (`completion_checklist`) at the end of any
+  completed feature, fix, or config change to verify the repository completion checklist
+- `.codex/agents/ansible-reviewer.toml` (`ansible_reviewer`) when the completed change
+  touches `ansible/`, provisioning behavior, or idempotency-sensitive setup logic
+
+Codex should skip an agent when it is clearly not useful for the current diff. Example:
+a small `README.md` wording change does not need `ansible_reviewer`.
 
 ## Skills Management
 
@@ -373,3 +394,19 @@ Every change to this repository **must** pass through this checklist before bein
 - [ ] **shellcheck** — run `shellcheck <script>` if any `.sh` file was created or modified
 
 **Any agent adding or changing behavior must complete this checklist without waiting to be asked.**
+
+### Review agent workflow
+
+When a feature, fix, or config change is complete, the assistant working in this
+repository should evaluate whether the project-scoped review agents are useful for the
+current diff instead of invoking them blindly.
+
+- **Claude Code** — use `.claude/agents/completion-checklist.md` at the end of completed
+  changes, and use `.claude/agents/ansible-reviewer.md` when the diff touches `ansible/`
+  or provisioning behavior
+- **Codex** — use `.codex/agents/completion-checklist.toml` (`completion_checklist`) at
+  the end of completed changes, and use `.codex/agents/ansible-reviewer.toml`
+  (`ansible_reviewer`) when the diff touches `ansible/` or provisioning behavior
+
+Skip `ansible-reviewer` / `ansible_reviewer` when the change is clearly outside its
+scope, such as a small documentation-only update.
