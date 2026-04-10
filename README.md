@@ -32,6 +32,7 @@ wsl --shutdown
 - Configure the Windows Terminal for Ubuntu
   - I set Windows Terminal to `DejaVuSansM Nerd Font Mono` at `13 pt`
   - I set the Theme to `One Half Dark`. Neovim uses One Dark, while Bat uses One Half Dark.
+- Add an Action for `Rename tab` associated to `Ctrl+Alt+Shift+R`
 
 ## Dev Setup
 
