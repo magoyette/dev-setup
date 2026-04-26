@@ -172,8 +172,8 @@ Entries in `ansible/tasks/python.yml` (applied when `python` is in `playbooks_in
 
 - `export PYENV_ROOT="$HOME/.pyenv"` in both `~/.bashrc` and `~/.profile`
 - `[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"` in both `~/.bashrc` and `~/.profile`
-- `eval "$(pyenv init - bash)"` in `~/.bashrc` for interactive shells
-- `eval "$(pyenv init --path)"` in `~/.profile` for login shells such as `bash -lc`
+- `eval "$(pyenv init - bash --no-rehash)"` in `~/.bashrc` for interactive shells
+- `eval "$(pyenv init --path --no-rehash)"` in `~/.profile` for login shells such as `bash -lc`
 
 Entries in `ansible/tasks/emacs.yml` (applied when `emacs` is in `playbooks_in_main_playbook`, via `emacs.yml`):
 
@@ -235,7 +235,7 @@ Four phases: (1) Dependencies — deb-src, `build-dep emacs`, libmagick, tree-si
 
 When skipped via `playbooks_in_main_playbook`, the pyenv-managed Python runtime, `uv`, `pipx`, `ansible-lint`, and `tldr` are all skipped.
 
-The Python sub-playbook installs the configured `pyenv_version`, `uv_version`, and `python_version`, resolves `python_version` to the selected exact install target with pyenv prefix auto-resolution, removes the distro `pipx` package, recreates `pipx` from the pyenv-managed Python, and configures both `~/.bashrc` and `~/.profile` so the runtime is visible in manual shells and in non-interactive login shells used by AI assistants.
+The Python sub-playbook installs the configured `pyenv_version`, `uv_version`, and `python_version`, resolves `python_version` to the selected exact install target with pyenv prefix auto-resolution, removes the distro `pipx` package, recreates `pipx` from the pyenv-managed Python, rehashes pyenv shims during provisioning, and configures both `~/.bashrc` and `~/.profile` with startup rehashing disabled so the runtime is visible in manual shells and in non-interactive login shells used by AI assistants.
 
 ## GNU Stow & Dotfiles
 

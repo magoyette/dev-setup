@@ -52,8 +52,8 @@
 - name: Add pyenv init to bashrc
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
-    regexp: '^eval "\$\(pyenv init - bash\)"$'
-    line: 'eval "$(pyenv init - bash)"'
+    regexp: '^eval "\$\(pyenv init - bash( --no-rehash)?\)"$'
+    line: 'eval "$(pyenv init - bash --no-rehash)"'
     insertafter: EOF
     state: present
 
@@ -79,8 +79,8 @@
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.profile"
     create: true
-    regexp: '^eval "\$\(pyenv init --path\)"$'
-    line: 'eval "$(pyenv init --path)"'
+    regexp: '^eval "\$\(pyenv init --path( --no-rehash)?\)"$'
+    line: 'eval "$(pyenv init --path --no-rehash)"'
     insertafter: EOF
     state: present
 
