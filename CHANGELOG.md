@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.15.0] - 2026-04-26
+
+### Added
+
+- Add global Codex hooks for WSL-to-Windows notifications and post-edit syntax validation
+
+### Fixed
+
+- Exclude repo-local Claude Code agent files from Markdown linting
+- Validate YAML hook inputs from file contents
+
 ## [4.14.0] - 2026-04-09
 
 ### Added
@@ -549,7 +560,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.14.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.15.0...HEAD
+[4.15.0]: https://github.com/magoyette/dev-setup/compare/v4.14.0...v4.15.0
 [4.14.0]: https://github.com/magoyette/dev-setup/compare/v4.13.0...v4.14.0
 [4.13.0]: https://github.com/magoyette/dev-setup/compare/v4.12.1...v4.13.0
 [4.12.1]: https://github.com/magoyette/dev-setup/compare/v4.12.0...v4.12.1

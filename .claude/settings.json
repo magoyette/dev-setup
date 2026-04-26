@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "file=$(cat | jq -r '.tool_input.file_path // empty'); case \"$file\" in *.sh) shellcheck \"$file\";; *.md) case \"$file\" in */.claude/*|*/external-skills*|*/skills*) ;; *) markdownlint-cli2 \"$file\";; esac;; *.json) node -e \"JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))\" -- \"$file\";; *.yaml|*.yml) yaml valid \"$file\";; esac"
+            "command": "file=$(cat | jq -r '.tool_input.file_path // empty'); case \"$file\" in *.sh) shellcheck \"$file\";; *.md) case \"$file\" in */.claude/*|*/external-skills*|*/skills*) ;; *) markdownlint-cli2 \"$file\";; esac;; *.json) node -e \"JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))\" -- \"$file\";; *.yaml|*.yml) yaml valid < \"$file\";; esac"
           }
         ]
       }

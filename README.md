@@ -109,7 +109,7 @@ git alias
 
 `CLAUDE.md` is the context file for coding agents in this repository.
 
-Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code.
+Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code. Ansible also deploys global Codex hooks for WSL-to-Windows notifications and post-edit validation.
 
 For global user-level context, Ansible also deploys [`global-agent-context.md`](global-agent-context.md) to both `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. That file is a concise shared list of the CLI tools installed by this setup that are useful for an AI agent and doesn't have an Agent Skill. It also carries runtime guidance for the pyenv-managed `python3` and `uv` workflow used by this setup and hallucination reduction guidelines.
 
@@ -183,7 +183,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [bun](https://bun.com/) : JavaScript and TypeScript toolkit
 - [fnm](https://github.com/Schniz/fnm) : Node version manager
 - [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2) : Markdown linter CLI installed globally via npm, using the upstream markdownlint rules
-- [yaml](https://github.com/eemeli/yaml) : YAML parser and validator installed globally via npm, used by Claude Code hooks for YAML syntax validation
+- [yaml](https://github.com/eemeli/yaml) : YAML parser and validator installed globally via npm, used by Claude Code and Codex hooks for YAML syntax validation
 - [Node](https://nodejs.org) : JavaScript and Typescript runtime
 - [agent-browser](https://github.com/vercel-labs/agent-browser) : browser automation CLI for AI agents with Chrome for Testing provisioning
 - [playwright-cli](https://github.com/microsoft/playwright/tree/main/packages/playwright-core/src/tools/cli-client) : browser automation for testing front-end changes

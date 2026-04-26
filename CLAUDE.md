@@ -58,6 +58,7 @@ dev-setup/
 ├── nvim/.config/nvim/init.lua    # Stow: lazy.nvim + onedark + Neogit (<Space>gg)
 ├── starship/.config/starship.toml # Stow: Starship prompt config
 ├── claude/.claude/hooks/wsl-notify.sh # Stow: WSL-to-Windows notification hook
+├── codex/.codex/                # Stow: Codex global hooks and hook scripts
 ├── claude-review/.local/bin/claude-review.sh # Stow: claude-review helper for Codex skill
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 ├── skills-claude/
@@ -140,9 +141,9 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Claude Code                                                                                  | `which claude` check before install                                                                                                                                                                                         |
 | Claude upgrade wrapper                                                                       | `lineinfile` (no-op if line already present)                                                                                                                                                                                |
 | Claude settings (hooks, statusLine, sandbox, permissions)                                    | `merge-claude-settings.sh` merges managed keys via `jq`; derives `allowWrite`, `allowedHosts`, and `permissions.allow`; preserves other user keys via recursive merge                                                       |
-| Claude Code marketplaces                                                                     | `claude plugin marketplace list` check; `claude plugin marketplace add <source>` for each entry in `claude_code_marketplaces` (`defaults.yml`) not already listed                                                            |
-| Claude Code plugins                                                                          | `claude plugin list` output filtered to user-scoped entries via awk; `claude plugin install <name>@<marketplace> --scope user` for each entry in `claude_code_plugins` (`defaults.yml`) not already listed at user scope     |
-| Codex config                                                                                 | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots); `claude-review` stow package deploys helper script to `~/.local/bin`                                                     |
+| Claude Code marketplaces                                                                     | `claude plugin marketplace list` check; `claude plugin marketplace add <source>` for each entry in `claude_code_marketplaces` (`defaults.yml`) not listed                                                                   |
+| Claude Code plugins                                                                          | `claude plugin list` output filtered to user-scoped entries via awk; `claude plugin install <name>@<marketplace> --scope user` for each entry in `claude_code_plugins` (`defaults.yml`) not listed                          |
+| Codex config/hooks                                                                           | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots); `codex` stow deploys `hooks.json`; `claude-review` stow deploys helper script to `~/.local/bin`                          |
 | Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`                                                                                                                                             |
 | agent-browser browser + Linux deps                                                           | `agent-browser install --with-deps` always runs (`changed_when: false`)                                                                                                                                                     |
 | Playwright deps/browsers                                                                     | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`)                                                                                                                                    |
@@ -211,7 +212,7 @@ All aliases use `-c diff.external=difft` so the override is per-command only.
 ### Tool notes
 
 - **ansible-lint**: Use `ansible-lint ansible/` as advisory tooling. `ansible-lint --fix ansible/` for broad cleanup, but review results manually.
-- **markdownlint**: Rules in `.markdownlint.jsonc` (MD013 disabled). Lint with `run-markdownlint.sh` (excludes `claude/.claude/`, `external-skills*`, and `skills*`).
+- **markdownlint**: Rules in `.markdownlint.jsonc` (MD013 disabled). Lint with `run-markdownlint.sh` (excludes `.claude/`, `claude/.claude/`, `external-skills*`, and `skills*`).
 - **fd**: Exposed as `~/.local/bin/fd` linked to Ubuntu's `/usr/bin/fdfind`, so it works in non-interactive shells used by AI agents.
 - **Python**: Installed through `pyenv` in the `python` sub-playbook. The runtime and tool versions come from `python_version`, `pyenv_version`, and `uv_version`; exact patch requests fall back to the latest known release in the same major/minor line when needed; `uv` is installed as a standalone binary, and `pipx` is recreated from the pyenv-managed Python instead of the distro package.
 - **Versioned tools** (difftastic, hadolint, tokei, Starship, Neovim): to upgrade, bump version in `defaults.yml` and re-run the playbook.
@@ -274,7 +275,7 @@ To change managed home-directory fields, edit `merge-claude-settings.sh` and re-
 - **shellcheck** — runs `shellcheck <file>` automatically when a `.sh` file is edited
 - **markdownlint** — runs `markdownlint-cli2 <file>` automatically when a `.md` file is edited; excluded paths (matching `run-markdownlint.sh`): `.claude/`, `external-skills*`, `skills*`
 - **json** — runs `node -e "JSON.parse(...)"` automatically when a `.json` file is edited
-- **yaml** — runs `yaml valid <file>` automatically when a `.yaml` or `.yml` file is edited
+- **yaml** — runs `yaml valid` against the file contents automatically when a `.yaml` or `.yml` file is edited
 
 ### Completion Checklist Subagent
 
@@ -300,6 +301,8 @@ Current managed plugins:
 
 Script: `claude/.claude/hooks/wsl-notify.sh` (Stow-deployed). Focus-aware (`ONLY_WHEN_UNFOCUSED=true`), triggers on `permission_prompt` and `idle_prompt`. Uses PowerShell WinRT APIs for Windows toast notifications. Dependencies: `jq`, `powershell.exe`.
 
+Codex uses `codex/.codex/hooks/wsl-notify.sh` from global `~/.codex/hooks.json` for equivalent WSL-to-Windows toast notifications on `PermissionRequest` and `Stop`.
+
 ## Agent Browser
 
 Installs `agent-browser` from npm and runs `agent-browser install --with-deps` to provision Chrome for Testing and Linux system dependencies. Its skill is downloaded from GitHub by `download-agent-browser-skill.sh` into `external-skills/agent-browser/` (gitignored); to update, delete the directory and re-run.
@@ -310,7 +313,15 @@ Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwr
 
 ## Codex Configuration
 
-Ansible manages `~/.codex/config.toml`: `project_doc_fallback_filenames = ["CLAUDE.md"]`, `project_doc_max_bytes` (from `defaults.yml`), `status_line` (from `defaults.yml`), and `writable_roots` (from `ai_assistants_sandbox_writable_roots` in `vars.yml`). Global context: `~/.codex/AGENTS.md` symlinked to `global-agent-context.md`. The `claude-review` stow package deploys `claude-review.sh` to `~/.local/bin/` so the Codex `claude-review` skill works from any repository.
+Ansible manages `~/.codex/config.toml`: `project_doc_fallback_filenames = ["CLAUDE.md"]`, `project_doc_max_bytes` (from `defaults.yml`), `status_line` (from `defaults.yml`), and `writable_roots` (from `ai_assistants_sandbox_writable_roots` in `vars.yml`). Global context: `~/.codex/AGENTS.md` symlinked to `global-agent-context.md`. The `codex` stow package deploys `~/.codex/hooks.json` and hook scripts. The `claude-review` stow package deploys `claude-review.sh` to `~/.local/bin/` so the Codex `claude-review` skill works from any repository.
+
+`codex/.codex/hooks.json` registers global Codex hooks:
+
+- **PermissionRequest** — sends a Windows toast that approval is required, without returning an allow/deny decision
+- **Stop** — sends a Windows toast that input is waiting and returns valid JSON so Codex stops normally
+- **PostToolUse** — for `Edit|Write` (`apply_patch`) edits, `validate-edited-files.sh` extracts changed paths and runs `shellcheck`, `markdownlint-cli2`, JSON parsing, or `yaml valid` as appropriate; Markdown excludes `.claude/`, `external-skills*`, and `skills*`
+
+Codex hooks are stable in Codex `0.124.0+`, so this setup does not set `[features].codex_hooks = true`.
 
 This repository also tracks project-scoped Codex custom agents under `.codex/agents/`.
 Unlike user-scoped skills, these agents are available only in this repository when
