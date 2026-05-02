@@ -1,0 +1,17 @@
+---
+- name: Create Socket data directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/share/socket"
+    state: directory
+    mode: "0755"
+
+- name: Check if socket is installed
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- socket --version"
+  register: socket_check
+  failed_when: false
+  changed_when: false
+
+- name: Install socket
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g socket"
+  when: socket_check.rc != 0
+  changed_when: true

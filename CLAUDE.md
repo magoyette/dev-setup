@@ -37,7 +37,7 @@ dev-setup/
 │   ├── core.yml                  # apt-packages, shell-config, git, difftastic, hadolint, tokei, zoxide
 │   ├── python.yml                # pyenv, managed CPython, pipx, uv, ansible-lint, tldr
 │   ├── starship.yml              # starship install + bash init + stow deploy
-│   ├── node.yml                  # node, bun, markdownlint, yaml, agent-browser, playwright
+│   ├── node.yml                  # node, bun, markdownlint, yaml, socket, agent-browser, playwright
 │   ├── ai-assistants.yml         # claude-code, codex, ccusage, ast-grep, agent-skills
 │   ├── emacs.yml                 # emacs (skippable via playbooks_in_main_playbook)
 │   ├── neovim.yml                # neovim (skippable via playbooks_in_main_playbook)
@@ -47,7 +47,7 @@ dev-setup/
 │       ├── apt-packages.yml      # build-essential, bubblewrap, curl, eza, fd-find, fzf, socat
 │       ├── ansible-lint.yml, tldr.yml, python.yml, shell-config.yml, git.yml
 │       ├── difftastic.yml, hadolint.yml, tokei.yml, zoxide.yml
-│       ├── node.yml, bun.yml, markdownlint.yml, yaml-npm.yml, starship.yml
+│       ├── node.yml, bun.yml, markdownlint.yml, yaml-npm.yml, socket.yml, starship.yml
 │       ├── neovim.yml, emacs.yml, emacs-lsp-booster.yml, emacs-node.yml
 │       ├── claude-code.yml       # Install + stow + settings management (hooks/statusLine/sandbox)
 │       ├── codex.yml             # Install + config.toml management + claude-review stow deploy
@@ -113,7 +113,7 @@ Other pinned tool versions and npm packages are in `ansible/defaults.yml` (check
 | `core.yml`          | apt-packages, shell-config, git, difftastic, hadolint, tokei, zoxide                     | always                       |
 | `python.yml`        | python, ansible-lint, tldr                                                               | `playbooks_in_main_playbook` |
 | `starship.yml`      | starship                                                                                 | `playbooks_in_main_playbook` |
-| `node.yml`          | node, bun, markdownlint, yaml, agent-browser, playwright                                 | always                       |
+| `node.yml`          | node, bun, markdownlint, yaml, socket, agent-browser, playwright                         | always                       |
 | `ai-assistants.yml` | claude-code, codex, ccusage, ast-grep, agent-skills                                      | always                       |
 | `emacs.yml`         | emacs (includes emacs-node)                                                              | `playbooks_in_main_playbook` |
 | `neovim.yml`        | neovim                                                                                   | `playbooks_in_main_playbook` |
@@ -135,6 +135,7 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | fnm, zoxide, bun                                                                             | `creates:` pointing to installed binary/directory                                                                                                                                                                           |
 | Node LTS via fnm                                                                             | `fnm list \| grep -q {{ fnm_node_version }}`; install if rc != 0                                                                                                                                                            |
 | npm tools                                                                                    | `npm list -g` check; install only if missing                                                                                                                                                                                |
+| Socket data directory                                                                        | `file state=directory` creates `~/.local/share/socket` so the CLI can write its settings                                                                                                                                    |
 | ccusage                                                                                      | `--version` check plus `bun install -g ccusage`; symlinked into `~/.local/bin`                                                                                                                                              |
 | Versioned binaries (difftastic, hadolint, tokei, Starship, Neovim)                           | `--version` check; downloads pinned GitHub release only when missing/version mismatch (versions in `defaults.yml`)                                                                                                          |
 | Starship/Neovim config                                                                       | Stow packages (`changed_when: false`)                                                                                                                                                                                       |
@@ -214,6 +215,7 @@ All aliases use `-c diff.external=difft` so the override is per-command only.
 - **ansible-lint**: Use `ansible-lint ansible/` as advisory tooling. `ansible-lint --fix ansible/` for broad cleanup, but review results manually.
 - **markdownlint**: Rules in `.markdownlint.jsonc` (MD013 disabled). Lint with `run-markdownlint.sh` (excludes `.claude/`, `claude/.claude/`, `external-skills*`, and `skills*`).
 - **fd**: Exposed as `~/.local/bin/fd` linked to Ubuntu's `/usr/bin/fdfind`, so it works in non-interactive shells used by AI agents.
+- **Socket**: Installed globally as the `socket` npm package for supply-chain scans; `socket login` and `socket wrapper on` remain manual.
 - **Python**: Installed through `pyenv` in the `python` sub-playbook. The runtime and tool versions come from `python_version`, `pyenv_version`, and `uv_version`; exact patch requests fall back to the latest known release in the same major/minor line when needed; `uv` is installed as a standalone binary, and `pipx` is recreated from the pyenv-managed Python instead of the distro package.
 - **Versioned tools** (difftastic, hadolint, tokei, Starship, Neovim): to upgrade, bump version in `defaults.yml` and re-run the playbook.
 

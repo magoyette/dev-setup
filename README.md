@@ -184,6 +184,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [fnm](https://github.com/Schniz/fnm) : Node version manager
 - [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2) : Markdown linter CLI installed globally via npm, using the upstream markdownlint rules
 - [yaml](https://github.com/eemeli/yaml) : YAML parser and validator installed globally via npm, used by Claude Code and Codex hooks for YAML syntax validation
+- [Socket](https://socket.dev/) : security CLI installed globally via npm; `socket login` and `socket wrapper on` remain manual. See [Socket CLI usage](docs/socket.md)
 - [Node](https://nodejs.org) : JavaScript and Typescript runtime
 - [agent-browser](https://github.com/vercel-labs/agent-browser) : browser automation CLI for AI agents with Chrome for Testing provisioning
 - [playwright-cli](https://github.com/microsoft/playwright/tree/main/packages/playwright-core/src/tools/cli-client) : browser automation for testing front-end changes

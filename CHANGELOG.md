@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.16.0] - 2026-04-26
+
+### Added
+
+- Install the Socket CLI globally in the node sub-playbook
+
 ## [4.15.1] - 2026-04-26
 
 ### Fixed
@@ -566,7 +572,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.15.1...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.16.0...HEAD
+[4.16.0]: https://github.com/magoyette/dev-setup/compare/v4.15.1...v4.16.0
 [4.15.1]: https://github.com/magoyette/dev-setup/compare/v4.15.0...v4.15.1
 [4.15.0]: https://github.com/magoyette/dev-setup/compare/v4.14.0...v4.15.0
 [4.14.0]: https://github.com/magoyette/dev-setup/compare/v4.13.0...v4.14.0
