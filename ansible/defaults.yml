@@ -17,8 +17,10 @@ codex_project_doc_max_bytes: 1073741824
 claude_sandbox_enabled: true
 codex_status_line:
   - model-with-reasoning
-  - git-branch
+  - fast-mode
   - context-used
+  - current-dir
+  - git-branch
   - five-hour-limit
   - weekly-limit
 

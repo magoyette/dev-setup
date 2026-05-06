@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.18.0] - 2026-05-05
+
+### Added
+
+- Add `fast-mode` and `current-dir` to the Codex status line
+
 ## [4.17.0] - 2026-05-05
 
 ### Added
@@ -584,7 +590,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.17.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.18.0...HEAD
+[4.18.0]: https://github.com/magoyette/dev-setup/compare/v4.17.0...v4.18.0
 [4.17.0]: https://github.com/magoyette/dev-setup/compare/v4.16.0...v4.17.0
 [4.16.0]: https://github.com/magoyette/dev-setup/compare/v4.15.1...v4.16.0
 [4.15.1]: https://github.com/magoyette/dev-setup/compare/v4.15.0...v4.15.1
