@@ -2,6 +2,7 @@
 git_user_name: "Your Name"
 git_user_email: "you@example.com"
 git_core_editor: "" # possible value: nvim
+shell_editor: "" # sets $EDITOR; possible value: nvim
 install_git_aliases: true
 ai_assistants_sandbox_writable_roots: []
 ai_assistants_sandbox_allowed_hosts:

@@ -38,7 +38,7 @@ dev-setup/
 │   ├── python.yml                # pyenv, managed CPython, pipx, uv, ansible-lint, tldr
 │   ├── starship.yml              # starship install + bash init + stow deploy
 │   ├── node.yml                  # node, bun, markdownlint, yaml, socket, agent-browser, playwright
-│   ├── ai-assistants.yml         # claude-code, codex, ccusage, ast-grep, agent-skills
+│   ├── ai-assistants.yml         # claude-code, codex, opencode, ccusage, ast-grep, agent-skills
 │   ├── emacs.yml                 # emacs (skippable via playbooks_in_main_playbook)
 │   ├── neovim.yml                # neovim (skippable via playbooks_in_main_playbook)
 │   ├── defaults.yml              # Tool versions, checksums, npm packages (not user-configurable)
@@ -51,6 +51,7 @@ dev-setup/
 │       ├── neovim.yml, emacs.yml, emacs-lsp-booster.yml, emacs-node.yml
 │       ├── claude-code.yml       # Install + stow + settings management (hooks/statusLine/sandbox)
 │       ├── codex.yml             # Install + config.toml management + claude-review stow deploy
+│       ├── opencode.yml          # Install via curl script + manage opencode.json
 │       ├── ccusage.yml           # Install ccusage globally with Bun and link it into ~/.local/bin
 │       ├── global-agent-context.yml, agent-browser.yml, playwright.yml, ast-grep.yml
 │       └── agent-skills.yml      # Submodule update + symlinks for Claude Code and Codex
@@ -70,7 +71,7 @@ dev-setup/
 ├── external-skills-codex/       # Codex-only external skills
 ├── docs/                         # Reference documentation
 ├── scripts/
-│   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh
+│   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh, merge-opencode-config.sh
 │   ├── install-emacs-in-ubuntu.sh
 │   └── download-agent-browser-skill.sh, download-playwright-skill.sh, download-ast-grep-skill.sh
 ├── run-markdownlint.sh
@@ -93,6 +94,7 @@ The playbook is idempotent — safe to re-run. `ansible/vars.yml` is gitignored.
 
 - `git_user_name` / `git_user_email` — git identity
 - `git_core_editor` — optional `core.editor` override; empty string = no change
+- `shell_editor` — optional `$EDITOR` export added to `~/.bashrc`; empty string = no change (used by OpenCode and other tools that read `$EDITOR`)
 - `install_git_aliases` — manage repo's Git aliases (default `true`); `false` skips alias sync
 - `ai_assistants_sandbox_writable_roots` — extra writable roots shared by Codex (`writable_roots`) and Claude Code (`sandbox.filesystem.allowWrite`); default `[]`
 - `ai_assistants_sandbox_allowed_hosts` — hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`); default `[]`
@@ -114,7 +116,7 @@ Other pinned tool versions and npm packages are in `ansible/defaults.yml` (check
 | `python.yml`        | python, ansible-lint, tldr                                                               | `playbooks_in_main_playbook` |
 | `starship.yml`      | starship                                                                                 | `playbooks_in_main_playbook` |
 | `node.yml`          | node, bun, markdownlint, yaml, socket, agent-browser, playwright                         | always                       |
-| `ai-assistants.yml` | claude-code, codex, ccusage, ast-grep, agent-skills                                      | always                       |
+| `ai-assistants.yml` | claude-code, codex, opencode, ccusage, ast-grep, agent-skills                            | always                       |
 | `emacs.yml`         | emacs (includes emacs-node)                                                              | `playbooks_in_main_playbook` |
 | `neovim.yml`        | neovim                                                                                   | `playbooks_in_main_playbook` |
 
@@ -140,12 +142,14 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Versioned binaries (difftastic, hadolint, tokei, Starship, Neovim)                           | `--version` check; downloads pinned GitHub release only when missing/version mismatch (versions in `defaults.yml`)                                                                                                          |
 | Starship/Neovim config                                                                       | Stow packages (`changed_when: false`)                                                                                                                                                                                       |
 | Claude Code                                                                                  | `which claude` check before install                                                                                                                                                                                         |
+| OpenCode                                                                                     | `which opencode` check before install via curl script                                                                                                                                                                       |
+| OpenCode config                                                                              | `merge-opencode-config.sh` jq merge; manages schema, share, snapshot, formatter, LSP, and permission keys; rc 0 = no change, 2 = rewritten; preserves other user keys                                                       |
 | Claude upgrade wrapper                                                                       | `lineinfile` (no-op if line already present)                                                                                                                                                                                |
 | Claude settings (hooks, statusLine, sandbox, permissions)                                    | `merge-claude-settings.sh` merges managed keys via `jq`; derives `allowWrite`, `allowedHosts`, and `permissions.allow`; preserves other user keys via recursive merge                                                       |
 | Claude Code marketplaces                                                                     | `claude plugin marketplace list` check; `claude plugin marketplace add <source>` for each entry in `claude_code_marketplaces` (`defaults.yml`) not listed                                                                   |
 | Claude Code plugins                                                                          | `claude plugin list` output filtered to user-scoped entries via awk; `claude plugin install <name>@<marketplace> --scope user` for each entry in `claude_code_plugins` (`defaults.yml`) not listed                          |
 | Codex config/hooks                                                                           | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots); `codex` stow deploys `hooks.json`; `claude-review` stow deploys helper script to `~/.local/bin`                          |
-| Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`                                                                                                                                             |
+| Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.config/opencode/AGENTS.md`; parent dir created via `file state=directory` for the OpenCode path                                       |
 | agent-browser browser + Linux deps                                                           | `agent-browser install --with-deps` always runs (`changed_when: false`)                                                                                                                                                     |
 | Playwright deps/browsers                                                                     | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`)                                                                                                                                    |
 | Skills (agent-browser, Playwright, ast-grep)                                                 | Downloaded into `external-skills/` with `creates:` on `SKILL.md`; legacy copies under `skills/` are removed before symlink discovery                                                                                        |
@@ -165,6 +169,7 @@ Entries in `ansible/tasks/shell-config.yml` (always applied via `core.yml`):
 - `alias bat="batcat"`
 - `batrg() { rg --pretty "$@" | bat --plain; }` (shell function for ripgrep output with bat syntax highlighting)
 - `export BAT_THEME=OneHalfDark`
+- `export EDITOR=<value>` (only when `shell_editor` is set in `vars.yml`; skipped otherwise)
 - `eval "$(zoxide init bash)"`
 
 The same task file also links `~/.local/bin/fd` to `/usr/bin/fdfind` so `fd` is available in non-interactive shells such as `bash -lc`.
@@ -339,6 +344,25 @@ agents:
 
 Codex should skip an agent when it is clearly not useful for the current diff. Example:
 a small `README.md` wording change does not need `ansible_reviewer`.
+
+## OpenCode Configuration
+
+OpenCode is installed via the official curl script (`curl -fsSL https://opencode.ai/install | bash`) gated on `which opencode`. The install is not re-run on subsequent playbook runs.
+
+**Authentication** is a one-time interactive step (not Ansible-managed):
+
+1. Launch `opencode`
+2. Run `/connect`, select **OpenAI**, then **ChatGPT Plus/Pro** (no API key required)
+3. Complete the browser OAuth flow with your ChatGPT Plus account
+4. Run `/models` inside OpenCode to confirm GPT models are available
+
+**Global context**: `ansible/tasks/global-agent-context.yml` symlinks `~/.config/opencode/AGENTS.md` → `global-agent-context.md`. This is the primary path OpenCode consults for global rules (per OpenCode docs); it does not rely on the `~/.claude/CLAUDE.md` Claude-Code compatibility fallback.
+
+**Skills**: OpenCode reads `~/.claude/skills/` and `~/.agents/skills/` automatically — both already created and populated by `agent-skills.yml`. No additional skill wiring is needed.
+
+**Config**: Ansible manages `~/.config/opencode/opencode.json` via `scripts/merge-opencode-config.sh`, setting the OpenCode schema, disabling session sharing and snapshots, enabling built-in formatters and LSP servers, and applying global permission rules for reads, edits, bash, web fetches, and web searches. Other user-managed keys in that file are preserved.
+
+**Updates**: The Ansible task is gated on `which opencode` and will not re-run once installed. To upgrade, use OpenCode's built-in upgrade mechanism (if available), or delete the binary and re-run `./run-ansible.sh ai-assistants`.
 
 ## Skills Management
 

@@ -1,0 +1,22 @@
+---
+- name: Check if OpenCode is installed
+  ansible.builtin.command: which opencode
+  register: opencode_check
+  failed_when: false
+  changed_when: false
+
+- name: Install OpenCode
+  ansible.builtin.shell: curl -fsSL https://opencode.ai/install | bash
+  when: opencode_check.rc != 0
+
+- name: Ensure ~/.config/opencode directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/opencode"
+    state: directory
+    mode: "0755"
+
+- name: Merge OpenCode global config
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/merge-opencode-config.sh {{ ansible_env.HOME }}/.config/opencode/opencode.json"
+  register: opencode_config_merge
+  changed_when: opencode_config_merge.rc == 2
+  failed_when: opencode_config_merge.rc not in [0, 2]

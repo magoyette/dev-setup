@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.17.0] - 2026-05-05
+
+### Added
+
+- Add OpenCode as a third AI coding assistant in the `ai-assistants` sub-playbook
+- Symlink `~/.config/opencode/AGENTS.md` to the shared global agent context so OpenCode loads it via its primary documented path
+- Disable OpenCode session sharing globally by managing `~/.config/opencode/opencode.json`
+- Enable OpenCode formatters and manage global OpenCode permission defaults
+- Enable all built-in OpenCode LSP servers globally
+- Disable OpenCode snapshots globally
+- Add `shell_editor` user variable to export `$EDITOR` in `~/.bashrc`
+
 ## [4.16.0] - 2026-04-26
 
 ### Added
@@ -572,7 +584,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.16.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.17.0...HEAD
+[4.17.0]: https://github.com/magoyette/dev-setup/compare/v4.16.0...v4.17.0
 [4.16.0]: https://github.com/magoyette/dev-setup/compare/v4.15.1...v4.16.0
 [4.15.1]: https://github.com/magoyette/dev-setup/compare/v4.15.0...v4.15.1
 [4.15.0]: https://github.com/magoyette/dev-setup/compare/v4.14.0...v4.15.0

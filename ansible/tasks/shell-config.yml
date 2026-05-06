@@ -48,6 +48,14 @@
     line: "export BAT_THEME=OneHalfDark"
     state: present
 
+- name: Set EDITOR environment variable
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: "^export EDITOR="
+    line: "export EDITOR={{ shell_editor | quote }}"
+    state: present
+  when: (shell_editor | default('') | trim | length) > 0
+
 - name: Add zoxide init to bashrc
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"

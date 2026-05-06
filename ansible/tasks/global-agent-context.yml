@@ -12,3 +12,16 @@
     dest: "{{ ansible_env.HOME }}/.codex/AGENTS.md"
     state: link
     force: true
+
+- name: Ensure OpenCode global config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/opencode"
+    state: directory
+    mode: "0755"
+
+- name: Deploy shared global agent context for OpenCode
+  ansible.builtin.file:
+    src: "{{ playbook_dir }}/../global-agent-context.md"
+    dest: "{{ ansible_env.HOME }}/.config/opencode/AGENTS.md"
+    state: link
+    force: true

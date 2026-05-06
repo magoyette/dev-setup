@@ -195,6 +195,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
 - [ccusage](https://ccusage.com/) : usage and cost reporting for Claude Code
 - [codex](https://github.com/openai/codex) : coding agent
+- [opencode](https://opencode.ai/) : coding agent; authenticate once with `/connect`
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
 
 Many agent skills and Claude Code plugins are installed by the sub-playbook, see the dedicated sections below.
