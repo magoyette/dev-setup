@@ -9,7 +9,7 @@ My personal VS Code setup.
 ## Extensions
 
 - [Astro](https://marketplace.visualstudio.com/items?itemName=astro-build.astro-vscode)
-- [Claude Code for VS Code](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code)
+- [Better Todo Tree](https://marketplace.visualstudio.com/items?itemName=FanaticPythoner.better-todo-tree)
 - [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
   - [French - Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker-french)
 - [Container Tools](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-containers)
@@ -19,13 +19,12 @@ My personal VS Code setup.
 - [Docker DX](https://marketplace.visualstudio.com/items?itemName=docker.docker)
 - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 - [Even Better TOML](https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml)
-- [Git Blame](https://marketplace.visualstudio.com/items?itemName=waderyan.gitblame)
-- [GitHub Theme](https://marketplace.visualstudio.com/items?itemName=GitHub.github-vscode-theme)
 - [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one)
 - [markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)
 - [Material Icon Theme](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme)
 - [MDX](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx)
 - [npm Intellisense](https://marketplace.visualstudio.com/items?itemName=christian-kohler.npm-intellisense)
+- [One Dark Pro](https://marketplace.visualstudio.com/items?itemName=zhuangtongfa.Material-theme)
 - [Path Intellisense](https://marketplace.visualstudio.com/items?itemName=christian-kohler.path-intellisense)
 - [Playwright Test for VSCode](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
@@ -33,7 +32,6 @@ My personal VS Code setup.
 - [ShellCheck](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck)
 - [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint)
 - [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
-- [Todo Tree](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree)
 - [WSL](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl)
 - [YAML](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 
@@ -45,7 +43,12 @@ Apply the following user settings.
 {
   "cSpell.ignoreRegExpList": ["/\\w+([0-9]+\\w*)+/"],
   "cSpell.language": "en,fr",
-  "cSpell.enableFiletypes": ["!json", "!mjs", "!cjs"],
+  "cSpell.enabledFileTypes": {
+    "*": true,
+    "json": false,
+    "mjs": false,
+    "cjs": false
+  },
   "diffEditor.renderSideBySide": false,
   "diffEditor.experimental.showMoves": true,
   "diffEditor.hideUnchangedRegions.enabled": true,
@@ -57,15 +60,13 @@ Apply the following user settings.
   "extensions.ignoreRecommendations": false,
   "files.trimTrailingWhitespace": true,
   "git.closeDiffOnOperation": true,
-  "javascript.updateImportsOnFileMove.enabled": "always",
+  "js/ts.updateImportsOnFileMove.enabled": "always",
   "editor.inlayHints.enabled": "on",
-  "typescript.inlayHints.parameterNames.enabled": "all",
-  "javascript.inlayHints.parameterNames.enabled": "all",
+  "js/ts.inlayHints.parameterNames.enabled": "all",
   "telemetry.telemetryLevel": "off",
   "terminal.integrated.defaultProfile.windows": "Git Bash",
   "workbench.editor.enablePreview": false,
   "workbench.enableExperiments": false,
-  "workbench.iconTheme": "material-icon-theme",
   "workbench.startupEditor": "newUntitledFile",
   "prettier.documentSelectors": ["**/*.astro"],
   "[astro]": {
@@ -100,25 +101,36 @@ Apply the following user settings.
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "todo-tree.general.tags": [
+  "projectManager.git.baseFolders": ["C:\\dev"],
+  "projectManager.git.ignoredFolders": ["node_modules", "archives"],
+  "redhat.telemetry.enabled": false,
+  "playwright.reuseBrowser": false,
+  "playwright.showTrace": false,
+  "workbench.colorTheme": "One Dark Pro",
+  "remote.extensionKind": {
+    "alefragnani.project-manager": ["workspace"]
+  },
+  "workbench.iconTheme": "material-icon-theme",
+  "files.associations": {
+    "*.story": "mdx"
+  },
+  "better-todo-tree.general.tags": [
     "IDEA",
+    "READING",
     "READ",
     "TODO",
     "NEXT",
     "DOING",
-    "READING",
     "STARTED",
     "WAIT",
     "DONE"
   ],
-  "todo-tree.highlights.defaultHighlight": {
-    "fontWeight": "bold"
-  },
-  "todo-tree.highlights.customHighlight": {
-    "READ": {
+  "better-todo-tree.regex.regex": "((//|#|<!--|;|/\\*)\\s*|^[ \\t]*(#{1,6}|[-*+]|\\d+\\.)?[ \\t]*(\\[[ xX]\\])?[ \\t]*)($TAGS)\\b:?",
+  "better-todo-tree.highlights.customHighlight": {
+    "IDEA": {
       "foreground": "#d19a66"
     },
-    "IDEA": {
+    "READ": {
       "foreground": "#d19a66"
     },
     "TODO": {
@@ -130,10 +142,10 @@ Apply the following user settings.
     "DOING": {
       "foreground": "#c678dd"
     },
-    "STARTED": {
+    "READING": {
       "foreground": "#c678dd"
     },
-    "READING": {
+    "STARTED": {
       "foreground": "#c678dd"
     },
     "WAIT": {
@@ -143,17 +155,21 @@ Apply the following user settings.
       "foreground": "#98c379"
     }
   },
-  "projectManager.git.baseFolders": ["*****TODO Add folder of projects*****"],
-  "projectManager.git.ignoredFolders": ["node_modules", "archives"],
-  "redhat.telemetry.enabled": false,
-  "playwright.reuseBrowser": false,
-  "playwright.showTrace": false,
-  "workbench.colorTheme": "One Dark Pro",
-  "claudeCode.preferredLocation": "panel",
-  "claudeCode.useTerminal": true,
-  "remote.extensionKind": {
-    "alefragnani.project-manager": ["workspace"]
-  }
+  "better-todo-tree.highlights.defaultHighlight": {
+    "fontWeight": "bold"
+  },
+  "better-todo-tree.filtering.excludeGlobs": [
+    "**/node_modules/*/**",
+    "**/dist/*/**"
+  ]
+}
+```
+
+Settings specific to WSL.
+
+```json
+{
+  "projectManager.git.baseFolders": ["~/repos"]
 }
 ```
 
