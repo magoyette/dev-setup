@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+stamp="$HOME/.local/share/crit-upgrade-check"
+upgrade="$HOME/.local/bin/crit-auto-upgrade.sh"
+bin="$HOME/.local/bin/crit-bin"
+
+if [[ ! -f "$stamp" ]] || [[ -n $(find "$stamp" -mtime +1 2>/dev/null) ]]; then
+  if [[ -x "$upgrade" ]]; then
+    "$upgrade" || printf 'crit: warning: daily upgrade check failed\n' >&2
+  fi
+  mkdir -p "$(dirname "$stamp")"
+  touch "$stamp"
+fi
+
+exec "$bin" "$@"

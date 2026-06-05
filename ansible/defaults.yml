@@ -13,6 +13,8 @@ tokei_version: "v12.1.2"
 starship_version: "v1.24.2"
 neovim_version: "v0.11.6"
 neovim_archive_name: "nvim-linux-x86_64.tar.gz"
+crit_version: "v0.16.1"
+crit_linux_amd64_sha256: "ba489abaf89f0402acf5a5ddd12305e43b72f4fef1586e429fb64dad799ef61a"
 codex_project_doc_max_bytes: 1073741824
 claude_sandbox_enabled: true
 codex_status_line:
@@ -27,6 +29,7 @@ codex_status_line:
 # Claude Code third-party marketplaces (GitHub repo paths)
 claude_code_marketplaces:
   - openai/codex-plugin-cc
+  - tomasz-tomczyk/crit
 
 # Claude Code plugins installed from the official marketplace
 claude_code_plugins:
@@ -37,6 +40,7 @@ claude_code_plugins:
   - frontend-design@claude-plugins-official
   - feature-dev@claude-plugins-official
   - codex@openai-codex
+  - crit@crit
 
 # npm global packages required by Emacs LSP mode and formatting tools
 emacs_npm_packages:

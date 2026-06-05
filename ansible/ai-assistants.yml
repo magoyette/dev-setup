@@ -13,6 +13,8 @@
     - ansible.builtin.import_tasks: tasks/claude-code.yml
     - ansible.builtin.import_tasks: tasks/codex.yml
     - ansible.builtin.import_tasks: tasks/opencode.yml
+    - name: Run Crit tasks
+      ansible.builtin.import_tasks: tasks/crit.yml
     - ansible.builtin.import_tasks: tasks/herdr.yml
     - ansible.builtin.import_tasks: tasks/ccusage.yml
     - ansible.builtin.import_tasks: tasks/global-agent-context.yml

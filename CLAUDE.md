@@ -38,7 +38,7 @@ dev-setup/
 │   ├── python.yml                # pyenv, managed CPython, pipx, uv, ansible-lint, tldr
 │   ├── starship.yml              # starship install + bash init + stow deploy
 │   ├── node.yml                  # node, bun, markdownlint, yaml, socket, agent-browser, playwright
-│   ├── ai-assistants.yml         # claude-code, codex, opencode, herdr, ccusage, ast-grep, agent-skills
+│   ├── ai-assistants.yml         # claude-code, codex, opencode, crit, herdr, ccusage, ast-grep, agent-skills
 │   ├── emacs.yml                 # emacs (skippable via playbooks_in_main_playbook)
 │   ├── neovim.yml                # neovim (skippable via playbooks_in_main_playbook)
 │   ├── defaults.yml              # Tool versions, checksums, npm packages (not user-configurable)
@@ -52,6 +52,7 @@ dev-setup/
 │       ├── claude-code.yml       # Install + stow + settings management (hooks/statusLine/sandbox)
 │       ├── codex.yml             # Install + config.toml management + hooks merge + claude-review stow deploy
 │       ├── opencode.yml          # Install via curl script + manage opencode.json
+│       ├── crit.yml              # Install Crit + disabled sharing config + agent integrations
 │       ├── herdr.yml             # Install Herdr + integrations + native session restore + skill download
 │       ├── ccusage.yml           # Install ccusage globally with Bun and link it into ~/.local/bin
 │       ├── global-agent-context.yml, agent-browser.yml, playwright.yml, ast-grep.yml
@@ -61,6 +62,7 @@ dev-setup/
 ├── starship/.config/starship.toml # Stow: Starship prompt config
 ├── claude/.claude/hooks/wsl-notify.sh # Stow: WSL-to-Windows notification hook
 ├── codex/.codex/hooks/          # Stow: Codex global hook scripts
+├── crit/.local/bin/             # Stow: Crit wrapper and daily auto-upgrade helper
 ├── claude-review/.local/bin/claude-review.sh # Stow: claude-review helper for Codex skill
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 ├── skills-claude/
@@ -72,7 +74,7 @@ dev-setup/
 ├── external-skills-codex/       # Codex-only external skills
 ├── docs/                         # Reference documentation, including researched Herdr alternatives
 ├── scripts/
-│   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh, merge-codex-hooks.sh, merge-opencode-config.sh
+│   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh, merge-codex-hooks.sh, merge-opencode-config.sh, merge-crit-config.sh
 │   ├── install-emacs-in-ubuntu.sh
 │   └── download-agent-browser-skill.sh, download-playwright-skill.sh, download-ast-grep-skill.sh, download-herdr-skill.sh
 ├── run-markdownlint.sh
@@ -117,7 +119,7 @@ Other pinned tool versions and npm packages are in `ansible/defaults.yml` (check
 | `python.yml`        | python, ansible-lint, tldr                                                               | `playbooks_in_main_playbook` |
 | `starship.yml`      | starship                                                                                 | `playbooks_in_main_playbook` |
 | `node.yml`          | node, bun, markdownlint, yaml, socket, agent-browser, playwright                         | always                       |
-| `ai-assistants.yml` | claude-code, codex, opencode, herdr, ccusage, ast-grep, agent-skills                     | always                       |
+| `ai-assistants.yml` | claude-code, codex, opencode, crit, herdr, ccusage, ast-grep, agent-skills               | always                       |
 | `emacs.yml`         | emacs (includes emacs-node)                                                              | `playbooks_in_main_playbook` |
 | `neovim.yml`        | neovim                                                                                   | `playbooks_in_main_playbook` |
 
@@ -145,6 +147,8 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Claude Code                                                                                  | `which claude` check before install                                                                                                                                                                                         |
 | OpenCode                                                                                     | `which opencode` check before install via curl script                                                                                                                                                                       |
 | OpenCode config                                                                              | `merge-opencode-config.sh` jq merge; manages schema, share, snapshot, formatter, LSP, and permission keys; rc 0 = no change, 2 = rewritten; preserves other user keys                                                       |
+| Crit                                                                                         | `crit-bin --version` check before bootstrap install; stow deploys wrapper scripts; `merge-crit-config.sh` disables sharing                                                                                                  |
+| Crit integrations                                                                            | Claude Code marketplace/plugin entries are managed in `defaults.yml`; Codex and OpenCode integrations run via `crit-bin install ...` with `changed_when: false`                                                             |
 | Herdr                                                                                        | `which herdr` before official installer; integrations run with `changed_when: false`; session restore and One Dark theme are managed in `~/.config/herdr/config.toml`                                                       |
 | Claude upgrade wrapper                                                                       | `lineinfile` (no-op if line already present)                                                                                                                                                                                |
 | Claude settings (hooks, statusLine, sandbox, permissions)                                    | `merge-claude-settings.sh` merges managed keys via `jq`; derives `allowWrite`, `allowedHosts`, and `permissions.allow`; preserves other user keys via recursive merge                                                       |
@@ -193,6 +197,11 @@ Entries in `ansible/tasks/claude-code.yml` (always applied via `ai-assistants.ym
 
 - `alias ccstatusline="bunx ccstatusline@latest"`
 - `claude()` wrapper function — runs `claude upgrade` at most once per day (stamp file: `~/.local/share/claude-upgrade-check`) before launching Claude Code; workaround for fnm multishell paths breaking auto-upgrade detection
+
+Entries managed by `ansible/tasks/crit.yml` (always applied via `ai-assistants.yml`):
+
+- `~/.local/bin/crit` — Stow-deployed wrapper that runs `crit-auto-upgrade.sh` at most once per day (stamp file: `~/.local/share/crit-upgrade-check`) before launching `~/.local/bin/crit-bin`
+- `~/.local/bin/crit-auto-upgrade.sh` — downloads and verifies the latest Linux AMD64 Crit release from GitHub when the installed `crit-bin` is out of date
 
 Entries in `ansible/tasks/starship.yml` (applied when `starship` is in `playbooks_in_main_playbook`, via `starship.yml`):
 
@@ -305,6 +314,7 @@ Current managed plugins:
 - `frontend-design` — generates production-grade frontend interfaces with distinctive design aesthetics (Anthropic Verified)
 - `feature-dev` — systematic 7-phase feature development workflow (discovery → exploration → clarifying questions → architecture → implementation → review → summary) via `/feature-dev` (Anthropic Verified)
 - `codex` — integrates the Codex CLI into Claude Code (from `openai-codex` marketplace via `openai/codex-plugin-cc`); run `/codex:setup` after first install to verify and authenticate
+- `crit` — integrates Crit review commands and skills with Claude Code (from the `crit` marketplace via `tomasz-tomczyk/crit`)
 
 ### WSL-to-Windows Notification Hook
 
@@ -397,6 +407,12 @@ OpenCode is installed via the official curl script (`curl -fsSL https://opencode
 **Config**: Ansible manages `~/.config/opencode/opencode.json` via `scripts/merge-opencode-config.sh`, setting the OpenCode schema, disabling session sharing and snapshots, enabling built-in formatters and LSP servers, and applying global permission rules for reads, edits, bash, web fetches, and web searches. Other user-managed keys in that file are preserved.
 
 **Updates**: The Ansible task is gated on `which opencode` and will not re-run once installed. To upgrade, use OpenCode's built-in upgrade mechanism (if available), or delete the binary and re-run `./run-ansible.sh ai-assistants`.
+
+## Crit
+
+Crit is installed as a Linux AMD64 bootstrap binary at `~/.local/bin/crit-bin`, with a Stow-deployed `~/.local/bin/crit` wrapper that checks for a newer GitHub release at most once per day before launching Crit. Sharing is disabled globally by managing `~/.crit.config.json` with `"share_url": ""`; other Crit config keys, including auth fields, are preserved.
+
+The Crit Claude Code plugin is installed through the managed Claude plugin marketplace list. Codex and OpenCode integrations are installed globally with `crit-bin install codex-plugin` and `crit-bin install opencode`, respectively. Crit's browser UI theme is not managed because Crit currently persists it in browser-local state rather than in `~/.crit.config.json`.
 
 ## Skills Management
 

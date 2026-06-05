@@ -195,6 +195,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
 - [ccusage](https://ccusage.com/) : usage and cost reporting for Claude Code
 - [codex](https://github.com/openai/codex) : coding agent
+- [Crit](https://crit.md/) : browser-based review UI for AI agent output, integrated with Claude Code, Codex, and OpenCode; sharing is disabled
 - [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, and OpenCode integrations; native agent session restore and the One Dark theme are enabled
 - [opencode](https://opencode.ai/) : coding agent; authenticate once with `/connect`
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
@@ -242,3 +243,4 @@ When both browser skills are installed, prefer `agent-browser` for general brows
 - [frontend-design](https://claude.com/plugins/frontend-design) : generates production-grade frontend interfaces with distinctive design direction (typography, motion, spatial composition, visual effects)
 - [feature-dev](https://claude.com/plugins/feature-dev) : systematic 7-phase feature development workflow (discovery → exploration → clarifying questions → architecture → implementation → review → summary) via `/feature-dev`
 - [codex](https://github.com/openai/codex-plugin-cc) (from `openai-codex` marketplace) : integrates the Codex CLI into Claude Code; run `/codex:setup` after install to verify and authenticate
+- [crit](https://github.com/tomasz-tomczyk/crit) (from the `crit` marketplace) : integrates Crit review commands and skills with Claude Code

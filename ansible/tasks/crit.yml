@@ -1,0 +1,55 @@
+---
+- name: Ensure ~/.local/bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Check if Crit binary is installed
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/crit-bin --version"
+  register: crit_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Download and install Crit bootstrap binary {{ crit_version }}
+  ansible.builtin.shell: |
+    set -euo pipefail
+
+    tmp_dir="$(mktemp -d)"
+    trap 'rm -rf "${tmp_dir}"' EXIT
+
+    curl -sSfL "https://github.com/tomasz-tomczyk/crit/releases/download/{{ crit_version }}/crit-linux-amd64" \
+      -o "${tmp_dir}/crit-bin"
+
+    printf '%s  %s\n' "{{ crit_linux_amd64_sha256 }}" "${tmp_dir}/crit-bin" | sha256sum --check --status
+    install -m 0755 "${tmp_dir}/crit-bin" "{{ ansible_env.HOME }}/.local/bin/crit-bin"
+  args:
+    executable: /bin/bash
+  when: crit_version_output.rc != 0
+  changed_when: true
+
+- name: Deploy Crit wrapper scripts with stow
+  ansible.builtin.command: >
+    stow
+    --dir="{{ playbook_dir }}/.."
+    --target="{{ ansible_env.HOME }}"
+    crit
+  changed_when: false
+
+- name: Merge Crit global config
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/merge-crit-config.sh {{ ansible_env.HOME }}/.crit.config.json"
+  register: crit_config_merge
+  changed_when: crit_config_merge.rc == 2
+  failed_when: crit_config_merge.rc not in [0, 2]
+
+- name: Install Crit Codex integration
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/crit-bin install codex-plugin"
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  changed_when: false
+
+- name: Install Crit OpenCode integration
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/crit-bin install opencode"
+  args:
+    chdir: "{{ ansible_env.HOME }}"
+  changed_when: false
