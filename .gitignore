@@ -2,6 +2,7 @@ ansible/vars.yml
 external-skills/ast-grep/
 external-skills/agent-browser/
 external-skills/playwright/
+external-skills/herdr/
 nvim/.config/nvim/lazy-lock.json
 claude/.claude/*
 !claude/.claude/hooks/

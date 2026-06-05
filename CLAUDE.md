@@ -38,7 +38,7 @@ dev-setup/
 │   ├── python.yml                # pyenv, managed CPython, pipx, uv, ansible-lint, tldr
 │   ├── starship.yml              # starship install + bash init + stow deploy
 │   ├── node.yml                  # node, bun, markdownlint, yaml, socket, agent-browser, playwright
-│   ├── ai-assistants.yml         # claude-code, codex, opencode, ccusage, ast-grep, agent-skills
+│   ├── ai-assistants.yml         # claude-code, codex, opencode, herdr, ccusage, ast-grep, agent-skills
 │   ├── emacs.yml                 # emacs (skippable via playbooks_in_main_playbook)
 │   ├── neovim.yml                # neovim (skippable via playbooks_in_main_playbook)
 │   ├── defaults.yml              # Tool versions, checksums, npm packages (not user-configurable)
@@ -50,8 +50,9 @@ dev-setup/
 │       ├── node.yml, bun.yml, markdownlint.yml, yaml-npm.yml, socket.yml, starship.yml
 │       ├── neovim.yml, emacs.yml, emacs-lsp-booster.yml, emacs-node.yml
 │       ├── claude-code.yml       # Install + stow + settings management (hooks/statusLine/sandbox)
-│       ├── codex.yml             # Install + config.toml management + claude-review stow deploy
+│       ├── codex.yml             # Install + config.toml management + hooks merge + claude-review stow deploy
 │       ├── opencode.yml          # Install via curl script + manage opencode.json
+│       ├── herdr.yml             # Install Herdr + integrations + native session restore + skill download
 │       ├── ccusage.yml           # Install ccusage globally with Bun and link it into ~/.local/bin
 │       ├── global-agent-context.yml, agent-browser.yml, playwright.yml, ast-grep.yml
 │       └── agent-skills.yml      # Submodule update + symlinks for Claude Code and Codex
@@ -59,7 +60,7 @@ dev-setup/
 ├── nvim/.config/nvim/init.lua    # Stow: lazy.nvim + onedark + Neogit (<Space>gg)
 ├── starship/.config/starship.toml # Stow: Starship prompt config
 ├── claude/.claude/hooks/wsl-notify.sh # Stow: WSL-to-Windows notification hook
-├── codex/.codex/                # Stow: Codex global hooks and hook scripts
+├── codex/.codex/hooks/          # Stow: Codex global hook scripts
 ├── claude-review/.local/bin/claude-review.sh # Stow: claude-review helper for Codex skill
 ├── skills/                       # Own skills (tool-agnostic, Ansible-symlinked)
 ├── skills-claude/
@@ -69,11 +70,11 @@ dev-setup/
 ├── external-skills/             # Shared third-party skills (downloaded bundles + submodules)
 ├── external-skills-claude/      # Claude-only external skills
 ├── external-skills-codex/       # Codex-only external skills
-├── docs/                         # Reference documentation
+├── docs/                         # Reference documentation, including researched Herdr alternatives
 ├── scripts/
-│   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh, merge-opencode-config.sh
+│   ├── sync-git-aliases.sh, install-git-hooks.sh, merge-claude-settings.sh, merge-codex-hooks.sh, merge-opencode-config.sh
 │   ├── install-emacs-in-ubuntu.sh
-│   └── download-agent-browser-skill.sh, download-playwright-skill.sh, download-ast-grep-skill.sh
+│   └── download-agent-browser-skill.sh, download-playwright-skill.sh, download-ast-grep-skill.sh, download-herdr-skill.sh
 ├── run-markdownlint.sh
 ├── install.sh                    # Bootstrap: installs Ansible, then runs playbook
 ├── run-ansible.sh                # Re-run playbook without reinstalling Ansible
@@ -116,7 +117,7 @@ Other pinned tool versions and npm packages are in `ansible/defaults.yml` (check
 | `python.yml`        | python, ansible-lint, tldr                                                               | `playbooks_in_main_playbook` |
 | `starship.yml`      | starship                                                                                 | `playbooks_in_main_playbook` |
 | `node.yml`          | node, bun, markdownlint, yaml, socket, agent-browser, playwright                         | always                       |
-| `ai-assistants.yml` | claude-code, codex, opencode, ccusage, ast-grep, agent-skills                            | always                       |
+| `ai-assistants.yml` | claude-code, codex, opencode, herdr, ccusage, ast-grep, agent-skills                     | always                       |
 | `emacs.yml`         | emacs (includes emacs-node)                                                              | `playbooks_in_main_playbook` |
 | `neovim.yml`        | neovim                                                                                   | `playbooks_in_main_playbook` |
 
@@ -144,15 +145,16 @@ Each sub-playbook checks `playbooks_in_main_playbook` via `meta: end_play` and s
 | Claude Code                                                                                  | `which claude` check before install                                                                                                                                                                                         |
 | OpenCode                                                                                     | `which opencode` check before install via curl script                                                                                                                                                                       |
 | OpenCode config                                                                              | `merge-opencode-config.sh` jq merge; manages schema, share, snapshot, formatter, LSP, and permission keys; rc 0 = no change, 2 = rewritten; preserves other user keys                                                       |
+| Herdr                                                                                        | `which herdr` before official installer; integrations run with `changed_when: false`; session restore and One Dark theme are managed in `~/.config/herdr/config.toml`                                                       |
 | Claude upgrade wrapper                                                                       | `lineinfile` (no-op if line already present)                                                                                                                                                                                |
 | Claude settings (hooks, statusLine, sandbox, permissions)                                    | `merge-claude-settings.sh` merges managed keys via `jq`; derives `allowWrite`, `allowedHosts`, and `permissions.allow`; preserves other user keys via recursive merge                                                       |
 | Claude Code marketplaces                                                                     | `claude plugin marketplace list` check; `claude plugin marketplace add <source>` for each entry in `claude_code_marketplaces` (`defaults.yml`) not listed                                                                   |
 | Claude Code plugins                                                                          | `claude plugin list` output filtered to user-scoped entries via awk; `claude plugin install <name>@<marketplace> --scope user` for each entry in `claude_code_plugins` (`defaults.yml`) not listed                          |
-| Codex config/hooks                                                                           | `file`/`copy`/`lineinfile` for `~/.codex/config.toml` (project docs, status line, writable roots); `codex` stow deploys `hooks.json`; `claude-review` stow deploys helper script to `~/.local/bin`                          |
+| Codex config/hooks                                                                           | `lineinfile` for `~/.codex/config.toml`; `codex` stow deploys hook scripts; `merge-codex-hooks.sh` preserves user/Herdr entries while managing this repo's hooks                                                            |
 | Global agent context                                                                         | `file state=link force=true` for `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.config/opencode/AGENTS.md`; parent dir created via `file state=directory` for the OpenCode path                                       |
 | agent-browser browser + Linux deps                                                           | `agent-browser install --with-deps` always runs (`changed_when: false`)                                                                                                                                                     |
 | Playwright deps/browsers                                                                     | `npx playwright install-deps` and `install <browser>` always run (`changed_when: false`)                                                                                                                                    |
-| Skills (agent-browser, Playwright, ast-grep)                                                 | Downloaded into `external-skills/` with `creates:` on `SKILL.md`; legacy copies under `skills/` are removed before symlink discovery                                                                                        |
+| Skills (agent-browser, Playwright, ast-grep, Herdr)                                          | Downloaded into `external-skills/` with `creates:` on `SKILL.md`; legacy copies under `skills/` are removed before symlink discovery                                                                                        |
 | Checked-in own skills                                                                        | Stored under `skills/`, `skills-claude/`, or `skills-codex/`; auto-symlinked by `agent-skills.yml` to the matching agent targets                                                                                            |
 | Emacs                                                                                        | `meta: end_play` when excluded; deps via `apt`; build via `--version` check; emacs-lsp-booster via SHA-256 checksum; LSP npm via `npm list -g`                                                                              |
 | External skills                                                                              | `git submodule update --init --remote --merge` (`changed_when: false`)                                                                                                                                                      |
@@ -318,17 +320,49 @@ Installs `agent-browser` from npm and runs `agent-browser install --with-deps` t
 
 Installs `playwright` + `@playwright/cli` npm packages, system deps (`npx playwright install-deps`), and browsers from `playwright_browsers` in `vars.yml`. Skill downloaded from GitHub by `download-playwright-skill.sh` into `external-skills/playwright/` (gitignored); the downloader mirrors the current upstream `cli-client/skill` bundle and derives its reference files from `SKILL.md` so newly added docs are picked up automatically. To update, delete the directory and re-run. Keep `agent-browser` as the default generic browser automation skill; use Playwright when the user explicitly asks for it or needs Playwright-specific capabilities such as cross-browser coverage, request routing/mocking, tracing, or storage-state workflows.
 
+## Herdr
+
+Installs Herdr via its official installer (`curl -fsSL https://herdr.dev/install.sh | sh`) when `which herdr` is missing; upgrades are left to `herdr update`.
+
+`ansible/tasks/herdr.yml` installs official Herdr integrations for Claude Code, Codex, and OpenCode after those agent config directories exist:
+
+- `herdr integration install claude`
+- `herdr integration install codex`
+- `herdr integration install opencode`
+
+Ansible also manages `~/.config/herdr/config.toml` with native agent session restore enabled and Herdr's built-in One Dark theme:
+
+```toml
+[session]
+resume_agents_on_restore = true
+
+[theme]
+name = "one-dark"
+```
+
+Herdr is terminal/session orchestration and state reporting. It does not change Claude/Codex sandbox policy, writable roots, network access, or browser automation permissions.
+
+Source references:
+
+- <https://github.com/ogulcancelik/herdr>
+- <https://herdr.dev/docs/install/>
+- <https://herdr.dev/docs/quick-start/>
+- <https://herdr.dev/docs/integrations/>
+- <https://herdr.dev/docs/session-state/>
+- <https://herdr.dev/docs/configuration/>
+- <https://raw.githubusercontent.com/ogulcancelik/herdr/master/SKILL.md>
+
 ## Codex Configuration
 
-Ansible manages `~/.codex/config.toml`: `project_doc_fallback_filenames = ["CLAUDE.md"]`, `project_doc_max_bytes` (from `defaults.yml`), `status_line` (from `defaults.yml`), and `writable_roots` (from `ai_assistants_sandbox_writable_roots` in `vars.yml`). Global context: `~/.codex/AGENTS.md` symlinked to `global-agent-context.md`. The `codex` stow package deploys `~/.codex/hooks.json` and hook scripts. The `claude-review` stow package deploys `claude-review.sh` to `~/.local/bin/` so the Codex `claude-review` skill works from any repository.
+Ansible manages `~/.codex/config.toml`: `project_doc_fallback_filenames = ["CLAUDE.md"]`, `project_doc_max_bytes` (from `defaults.yml`), `status_line` (from `defaults.yml`), `[features].hooks = true`, and `writable_roots` (from `ai_assistants_sandbox_writable_roots` in `vars.yml`). Global context: `~/.codex/AGENTS.md` symlinked to `global-agent-context.md`. The `codex` stow package deploys hook scripts under `~/.codex/hooks/`, and `scripts/merge-codex-hooks.sh` writes a real `~/.codex/hooks.json` that preserves user-managed and Herdr hook entries while managing this repo's hooks. The `claude-review` stow package deploys `claude-review.sh` to `~/.local/bin/` so the Codex `claude-review` skill works from any repository.
 
-`codex/.codex/hooks.json` registers global Codex hooks:
+`scripts/merge-codex-hooks.sh` registers global Codex hooks:
 
 - **PermissionRequest** — sends a Windows toast that approval is required, without returning an allow/deny decision
 - **Stop** — sends a Windows toast that input is waiting and returns valid JSON so Codex stops normally
 - **PostToolUse** — for `Edit|Write` (`apply_patch`) edits, `validate-edited-files.sh` extracts changed paths and runs `shellcheck`, `markdownlint-cli2`, JSON parsing, or `yaml valid` as appropriate; Markdown excludes `.claude/`, `external-skills*`, and `skills*`
 
-Codex hooks are stable in Codex `0.124.0+`, so this setup does not set `[features].codex_hooks = true`.
+Codex hooks are stable in Codex `0.124.0+`; this setup sets `[features].hooks = true` and does not set the deprecated `[features].codex_hooks` flag.
 
 This repository also tracks project-scoped Codex custom agents under `.codex/agents/`.
 Unlike user-scoped skills, these agents are available only in this repository when
@@ -378,7 +412,7 @@ Skills are deployed to `~/.claude/skills/` and `~/.agents/skills/` (both real di
 - Current shared own skills: none
 - Current Claude-only own skills: `codex-review`
 - Current Codex-only own skills: `claude-review`
-- Current external skills: `agent-browser`, `ast-grep`, `playwright`, `humanizer` (<https://github.com/blader/humanizer>)
+- Current external skills: `agent-browser`, `ast-grep`, `herdr`, `playwright`, `humanizer` (<https://github.com/blader/humanizer>)
 
 ## Troubleshooting
 

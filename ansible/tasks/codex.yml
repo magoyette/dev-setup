@@ -49,6 +49,19 @@
     insertafter: "^\\[tui\\]\\s*$"
     line: "status_line = {{ codex_status_line | to_json }}"
 
+- name: Ensure Codex features section exists in config
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/config.toml"
+    regexp: "^\\[features\\]\\s*$"
+    line: "[features]"
+
+- name: Enable Codex hooks feature in config
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.codex/config.toml"
+    regexp: "^\\s*hooks\\s*="
+    insertafter: "^\\[features\\]\\s*$"
+    line: "hooks = true"
+
 - name: Ensure Codex sandbox workspace-write section exists in config
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.codex/config.toml"
@@ -62,13 +75,19 @@
     insertafter: "^\\[sandbox_workspace_write\\]\\s*$"
     line: "writable_roots = {{ ai_assistants_sandbox_writable_roots | to_json }}"
 
-- name: Deploy Codex hooks with stow
+- name: Deploy Codex hook scripts with stow
   ansible.builtin.command: >
     stow
     --dir="{{ playbook_dir }}/.."
     --target="{{ ansible_env.HOME }}"
     codex
   changed_when: false
+
+- name: Merge Codex hooks
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/merge-codex-hooks.sh {{ ansible_env.HOME }}/.codex/hooks.json"
+  register: codex_hooks_merge
+  changed_when: codex_hooks_merge.rc == 2
+  failed_when: codex_hooks_merge.rc not in [0, 2]
 
 - name: Deploy claude-review script with stow
   ansible.builtin.command: >

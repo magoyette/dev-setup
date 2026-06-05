@@ -195,6 +195,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
 - [ccusage](https://ccusage.com/) : usage and cost reporting for Claude Code
 - [codex](https://github.com/openai/codex) : coding agent
+- [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, and OpenCode integrations; native agent session restore and the One Dark theme are enabled
 - [opencode](https://opencode.ai/) : coding agent; authenticate once with `/connect`
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
 
@@ -225,6 +226,7 @@ External skills are provided by other projects.
 - [agent-browser](https://github.com/vercel-labs/agent-browser/tree/main/skills/agent-browser) : default browser automation skill for generic website interaction, form filling, screenshots, scraping, and login flows
 - [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright-core/src/tools/cli-client/skill) : browser automation skill (bundled with Playwright npm package)
 - [ast-grep](https://github.com/ast-grep/agent-skill) : AST-based structural code search skill
+- [herdr](https://raw.githubusercontent.com/ogulcancelik/herdr/master/SKILL.md) : control Herdr workspaces, tabs, panes, and agent state from inside a Herdr-managed pane
 - [humanizer](https://github.com/blader/humanizer) : remove signs of AI-generated writing from text
 
 When both browser skills are installed, prefer `agent-browser` for general browser automation. Use `playwright-cli` when the user explicitly asks for Playwright or needs Playwright-specific features such as cross-browser testing, routing/mocking, tracing, or storage-state workflows.

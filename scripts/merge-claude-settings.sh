@@ -26,19 +26,30 @@ sandbox_allowed_hosts="${CLAUDE_SANDBOX_ALLOWED_HOSTS:-[]}"
 webfetch_hosts="${CLAUDE_PERMISSIONS_ALLOW_WEBFETCH:-[]}"
 
 jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$sandbox_allow_write" --argjson sandbox_allowed_hosts "$sandbox_allowed_hosts" --argjson webfetch_hosts "$webfetch_hosts" '
-  .hooks = {
-    "Notification": [
-      {
-        "matcher": "permission_prompt|idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/wsl-notify.sh"
-          }
-        ]
-      }
-    ]
-  }
+  def managed_notification_hook:
+    {
+      "matcher": "permission_prompt|idle_prompt",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "~/.claude/hooks/wsl-notify.sh"
+        }
+      ]
+    };
+
+  def without_managed_notification_hooks:
+    map(
+      select(
+        (((.hooks // []) | any(.command? == "~/.claude/hooks/wsl-notify.sh")) | not)
+      )
+    );
+
+  .hooks = ((.hooks // {}) as $hooks | $hooks * {
+    "Notification": (
+      (($hooks.Notification // []) | without_managed_notification_hooks)
+      + [managed_notification_hook]
+    )
+  })
   | .statusLine = {
     "type": "command",
     "command": "bunx -y ccstatusline@latest",

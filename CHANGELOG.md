@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.19.0] - 2026-05-31
+
+### Added
+
+- Add Herdr in the `ai-assistants` sub-playbook, integrates with Claude Code, Codex, and OpenCode
+
 ## [4.18.0] - 2026-05-05
 
 ### Added
@@ -590,7 +596,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.18.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.19.0...HEAD
+[4.19.0]: https://github.com/magoyette/dev-setup/compare/v4.18.0...v4.19.0
 [4.18.0]: https://github.com/magoyette/dev-setup/compare/v4.17.0...v4.18.0
 [4.17.0]: https://github.com/magoyette/dev-setup/compare/v4.16.0...v4.17.0
 [4.16.0]: https://github.com/magoyette/dev-setup/compare/v4.15.1...v4.16.0

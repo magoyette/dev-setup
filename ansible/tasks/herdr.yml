@@ -1,0 +1,74 @@
+---
+# Herdr references:
+# - https://github.com/ogulcancelik/herdr
+# - https://herdr.dev/docs/install/
+# - https://herdr.dev/docs/integrations/
+# - https://herdr.dev/docs/session-state/
+# - https://herdr.dev/docs/configuration/
+- name: Check if Herdr is installed
+  ansible.builtin.command: which herdr
+  register: herdr_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Herdr
+  ansible.builtin.shell: curl -fsSL https://herdr.dev/install.sh | sh
+  when: herdr_check.rc != 0
+  environment:
+    HERDR_INSTALL_DIR: "{{ ansible_env.HOME }}/.local/bin"
+
+- name: Ensure Herdr config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/herdr"
+    state: directory
+    mode: "0755"
+
+- name: Ensure Herdr config file exists
+  ansible.builtin.copy:
+    content: ""
+    dest: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
+    force: false
+    mode: "0644"
+
+- name: Ensure Herdr session section exists in config
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
+    regexp: "^\\[session\\]\\s*$"
+    line: "[session]"
+
+- name: Enable Herdr native agent session restore
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
+    regexp: "^\\s*resume_agents_on_restore\\s*="
+    insertafter: "^\\[session\\]\\s*$"
+    line: "resume_agents_on_restore = true"
+
+- name: Ensure Herdr theme section exists in config
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
+    regexp: "^\\[theme\\]\\s*$"
+    line: "[theme]"
+
+- name: Configure Herdr One Dark theme
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
+    regexp: "^\\s*name\\s*="
+    insertafter: "^\\[theme\\]\\s*$"
+    line: 'name = "one-dark"'
+
+- name: Install Herdr Claude Code integration
+  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration install claude"
+  changed_when: false
+
+- name: Install Herdr Codex integration
+  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration install codex"
+  changed_when: false
+
+- name: Install Herdr OpenCode integration
+  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration install opencode"
+  changed_when: false
+
+- name: Download Herdr skill from GitHub
+  ansible.builtin.command:
+    cmd: "{{ playbook_dir }}/../scripts/download-herdr-skill.sh"
+    creates: "{{ playbook_dir }}/../external-skills/herdr/SKILL.md"
