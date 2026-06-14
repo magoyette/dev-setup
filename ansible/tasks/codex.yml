@@ -75,6 +75,15 @@
     insertafter: "^\\[sandbox_workspace_write\\]\\s*$"
     line: "writable_roots = {{ ai_assistants_sandbox_writable_roots | to_json }}"
 
+- name: Merge Codex MCP servers
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/merge-codex-mcps.sh {{ ansible_env.HOME }}/.codex/config.toml"
+  environment:
+    AI_ASSISTANTS_MCP_CATALOG: "{{ ai_assistants_mcp_catalog | to_json }}"
+    AI_ASSISTANTS_MCPS: "{{ ai_assistants_mcps | to_json }}"
+  register: codex_mcps_merge
+  changed_when: codex_mcps_merge.rc == 2
+  failed_when: codex_mcps_merge.rc not in [0, 2]
+
 - name: Deploy Codex hook scripts with stow
   ansible.builtin.command: >
     stow

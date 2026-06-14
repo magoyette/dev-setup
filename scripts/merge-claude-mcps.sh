@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-config_file="${1:-$HOME/.config/opencode/opencode.json}"
+config_file="${1:-$HOME/.claude.json}"
 config_dir="$(dirname "$config_file")"
 tmp_input="$(mktemp)"
 tmp_output="$(mktemp)"
@@ -32,45 +32,15 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
   def enabled_servers:
     reduce $enabled[] as $name ({};
       .[$name] = {
-        "type": "remote",
+        "type": "http",
         "url": $catalog[$name].url
       }
     );
 
-  ."$schema" = "https://opencode.ai/config.json"
-  | .share = "disabled"
-  | .snapshot = false
-  | .formatter = true
-  | .lsp = true
-  | .permission = {
-      "read": {
-        "*": "allow",
-        "*.env": "deny",
-        "*.env.*": "deny",
-        "*.env.example": "allow"
-      },
-      "edit": {
-        "*": "allow",
-        "*.env": "deny",
-        "*.env.*": "deny",
-        "*.env.example": "allow"
-      },
-      "bash": {
-        "*": "ask",
-        "git *": "ask",
-        "git commit *": "deny",
-        "git diff *": "allow",
-        "git status *": "allow",
-        "git push *": "deny",
-        "grep *": "allow"
-      },
-      "webfetch": "ask",
-      "websearch": "ask"
-    }
-  | .mcp = (
-      ((.mcp // {}) | with_entries(select(.key as $key | managed_names | index($key) | not)))
-      + enabled_servers
-    )
+  .mcpServers = (
+    ((.mcpServers // {}) | with_entries(select(.key as $key | managed_names | index($key) | not)))
+    + enabled_servers
+  )
 ' "$tmp_input" >"$tmp_output"
 
 if [[ -f "$config_file" ]] && cmp -s "$tmp_output" "$config_file"; then

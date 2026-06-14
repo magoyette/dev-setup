@@ -46,6 +46,15 @@
   changed_when: claude_settings_merge.rc == 2
   failed_when: claude_settings_merge.rc not in [0, 2]
 
+- name: Merge Claude Code MCP servers
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/merge-claude-mcps.sh {{ ansible_env.HOME }}/.claude.json"
+  environment:
+    AI_ASSISTANTS_MCP_CATALOG: "{{ ai_assistants_mcp_catalog | to_json }}"
+    AI_ASSISTANTS_MCPS: "{{ ai_assistants_mcps | to_json }}"
+  register: claude_mcps_merge
+  changed_when: claude_mcps_merge.rc == 2
+  failed_when: claude_mcps_merge.rc not in [0, 2]
+
 - name: Get configured Claude Code marketplaces
   ansible.builtin.command: claude plugin marketplace list
   register: claude_marketplace_list
@@ -67,6 +76,11 @@
   register: claude_plugin_list
   changed_when: false
   failed_when: false
+
+- name: Remove legacy Context7 Claude Code plugin
+  ansible.builtin.command: claude plugin uninstall context7@claude-plugins-official --scope user
+  changed_when: true
+  when: "'context7@claude-plugins-official' in claude_plugin_list.stdout_lines"
 
 - name: Install Claude Code plugins
   ansible.builtin.command: claude plugin install {{ item }} --scope user

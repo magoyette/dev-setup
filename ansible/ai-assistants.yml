@@ -10,6 +10,17 @@
       ansible.builtin.meta: end_play
       when: playbooks_in_main_playbook is defined and 'ai-assistants' not in playbooks_in_main_playbook
 
+    - name: Validate enabled AI assistant MCP servers
+      ansible.builtin.assert:
+        that:
+          - ai_assistants_mcps | type_debug == 'list'
+          - ai_assistants_mcps | unique | length == ai_assistants_mcps | length
+          - ai_assistants_mcps | difference(ai_assistants_mcp_catalog.keys() | list) | length == 0
+        fail_msg: >-
+          ai_assistants_mcps must be a list of unique supported names. Unknown names: {{
+            ai_assistants_mcps | difference(ai_assistants_mcp_catalog.keys() | list) | join(', ')
+          }}. Supported names: {{ ai_assistants_mcp_catalog.keys() | list | join(', ') }}.
+
     - ansible.builtin.import_tasks: tasks/claude-code.yml
     - ansible.builtin.import_tasks: tasks/codex.yml
     - ansible.builtin.import_tasks: tasks/opencode.yml

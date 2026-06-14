@@ -29,6 +29,10 @@ Claude Code configuration has two main locations:
 while preserving unrelated user keys. Claude Code marketplaces and plugins are
 declared in `ansible/defaults.yml`.
 
+`scripts/merge-claude-mcps.sh` manages the shared user-scoped HTTP MCP servers
+in `~/.claude.json`. The playbook removes the legacy Context7 Claude plugin so
+Context7 is configured consistently with Codex and OpenCode.
+
 Repository-local PostToolUse hooks validate edited shell, Markdown, JSON, and
 YAML files. Inspect `.claude/settings.json` for the active definitions and
 exclusions.
@@ -42,6 +46,11 @@ and upgrades the Bun-installed package when a newer release is available.
 including the `CLAUDE.md` fallback, status line, hooks feature, and writable
 roots.
 
+`scripts/merge-codex-mcps.sh` manages the shared MCP sections in
+`~/.codex/config.toml` while preserving other configured servers. It edits the
+configuration directly so provisioning does not start interactive MCP
+authentication.
+
 The `codex` Stow package deploys hook scripts. `scripts/merge-codex-hooks.sh`
 updates `~/.codex/hooks.json` while preserving user-managed and Herdr entries.
 The hooks provide WSL notifications and post-edit validation.
@@ -53,7 +62,8 @@ when explicitly spawned.
 
 OpenCode is installed by `ansible/tasks/opencode.yml`.
 `scripts/merge-opencode-config.sh` manages selected global settings while
-preserving other user keys.
+preserving other user keys, including MCP servers outside the shared managed
+catalog.
 
 OpenCode's global context is deployed to
 `~/.config/opencode/AGENTS.md`. Skills are discovered through the shared skill
@@ -61,6 +71,14 @@ deployment paths.
 
 Authentication is a one-time interactive operation and is not managed by
 Ansible.
+
+## Shared MCP Servers
+
+`ai_assistants_mcp_catalog` in `ansible/defaults.yml` defines the supported
+shared HTTP MCP servers. The user-configurable `ai_assistants_mcps` list enables
+or removes those managed names across Claude Code, Codex, and OpenCode.
+Reconciliation is authoritative only for names in the catalog; unrelated
+user-managed MCP servers are preserved.
 
 ## Crit And Herdr
 

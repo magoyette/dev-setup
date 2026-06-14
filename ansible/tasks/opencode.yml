@@ -17,6 +17,9 @@
 
 - name: Merge OpenCode global config
   ansible.builtin.command: "{{ playbook_dir }}/../scripts/merge-opencode-config.sh {{ ansible_env.HOME }}/.config/opencode/opencode.json"
+  environment:
+    AI_ASSISTANTS_MCP_CATALOG: "{{ ai_assistants_mcp_catalog | to_json }}"
+    AI_ASSISTANTS_MCPS: "{{ ai_assistants_mcps | to_json }}"
   register: opencode_config_merge
   changed_when: opencode_config_merge.rc == 2
   failed_when: opencode_config_merge.rc not in [0, 2]

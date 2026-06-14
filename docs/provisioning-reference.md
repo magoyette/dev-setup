@@ -107,7 +107,8 @@ When adding a Stow package:
 - Python and uv: `ansible/tasks/python.yml`
 - Claude Code: `ansible/tasks/claude-code.yml` and merge scripts named
   `merge-claude-*`
-- Codex: `ansible/tasks/codex.yml` and `scripts/merge-codex-hooks.sh`
+- Codex: `ansible/tasks/codex.yml`, `scripts/merge-codex-hooks.sh`, and
+  `scripts/merge-codex-mcps.sh`
 - OpenCode: `ansible/tasks/opencode.yml` and
   `scripts/merge-opencode-config.sh`
 - Crit: `ansible/tasks/crit.yml` and `scripts/merge-crit-config.sh`

@@ -17,6 +17,14 @@ crit_version: "v0.16.1"
 crit_linux_amd64_sha256: "ba489abaf89f0402acf5a5ddd12305e43b72f4fef1586e429fb64dad799ef61a"
 codex_project_doc_max_bytes: 1073741824
 claude_sandbox_enabled: true
+ai_assistants_mcp_catalog:
+  context7:
+    url: https://mcp.context7.com/mcp
+  grep:
+    url: https://mcp.grep.app
+ai_assistants_mcps:
+  - context7
+  - grep
 codex_status_line:
   - model-with-reasoning
   - fast-mode
@@ -33,7 +41,6 @@ claude_code_marketplaces:
 
 # Claude Code plugins installed from the official marketplace
 claude_code_plugins:
-  - context7@claude-plugins-official
   - skill-creator@claude-plugins-official
   - claude-md-management@claude-plugins-official
   - claude-code-setup@claude-plugins-official

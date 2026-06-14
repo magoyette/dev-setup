@@ -59,6 +59,8 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   Extra writable roots for the sandboxes of Codex (`writable_roots`) and Claude Code (`sandbox.filesystem.allowWrite`). Default: `[]`.
 - `ai_assistants_sandbox_allowed_hosts`
   Hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`). Default to hosts needed by the agent skills.
+- `ai_assistants_mcps`
+  MCP servers enabled globally in Claude Code, Codex, and OpenCode. Supported values are `context7` and `grep`. Default: `[context7, grep]`. Removing a value removes that managed MCP from all three assistants without affecting user-managed MCP servers.
 - `pyenv_version`
   pyenv version installed for the Python sub-playbook. Default: `"v2.5.3"`.
 - `uv_version`
@@ -238,7 +240,6 @@ When both browser skills are installed, prefer `agent-browser` for general brows
 
 [Claude Code plugins](https://claude.com/plugins) that are installed with Ansible.
 
-- [context7](https://claude.com/plugins/context7) : MCP server for technical documentation. Add "use context7" to the prompt to leverage it.
 - [skill-creator](https://claude.com/plugins/skill-creator) : toolkit for Claude Code skills development.
 - [claude-md-management](https://claude.com/plugins/claude-md-management) : audits `CLAUDE.md` quality, trigger with `audit my CLAUDE.md files`. `/revise-claude-md` command capture learnings after a session in `CLAUDE.md`
 - [claude-code-setup](https://claude.com/plugins/claude-code-setup) : plugin that recommends improvements for Claude Code. Trigger with "recommend automations for this project", "setup Claude Code", "which MCPs should I use", etc.
@@ -246,3 +247,18 @@ When both browser skills are installed, prefer `agent-browser` for general brows
 - [feature-dev](https://claude.com/plugins/feature-dev) : systematic 7-phase feature development workflow (discovery → exploration → clarifying questions → architecture → implementation → review → summary) via `/feature-dev`
 - [codex](https://github.com/openai/codex-plugin-cc) (from `openai-codex` marketplace) : integrates the Codex CLI into Claude Code; run `/codex:setup` after install to verify and authenticate
 - [crit](https://github.com/tomasz-tomczyk/crit) (from the `crit` marketplace) : integrates Crit review commands and skills with Claude Code
+
+## Shared MCP Servers
+
+The `ai_assistants_mcps` variable enables managed HTTP MCP servers globally in
+Claude Code, Codex, and OpenCode:
+
+- [Context7](https://context7.com/) (`context7`) provides current,
+  version-specific library documentation and code examples.
+- [Grep by Vercel](https://grep.app/) (`grep`) searches code across public
+  GitHub repositories.
+
+The supported names and URLs are defined in `ansible/defaults.yml`. Removing a
+name from `ai_assistants_mcps` removes that managed MCP from all three
+assistants on the next AI assistants playbook run. MCP servers added separately
+by the user are preserved.
