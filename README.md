@@ -195,7 +195,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 
 - [claude-code](https://github.com/anthropics/claude-code) : coding agent (with [sandboxing](https://code.claude.com/docs/en/sandboxing) enabled by default)
 - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
-- [ccusage](https://ccusage.com/) : usage and cost reporting for Claude Code
+- [ccusage](https://ccusage.com/) : usage and cost reporting for Claude Code, Codex, and OpenCode; upgraded to the latest release on each playbook run
 - [codex](https://github.com/openai/codex) : coding agent
 - [Crit](https://crit.md/) : browser-based review UI for AI agent output, integrated with Claude Code, Codex, and OpenCode; sharing is disabled
 - [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, and OpenCode integrations; native agent session restore and the One Dark theme are enabled

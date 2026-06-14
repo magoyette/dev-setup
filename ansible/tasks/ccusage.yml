@@ -1,13 +1,23 @@
 ---
-- name: Check if ccusage is installed
+- name: Check installed ccusage version
   ansible.builtin.command: "{{ ansible_env.HOME }}/.bun/bin/ccusage --version"
-  register: ccusage_check
+  register: ccusage_version_output
   failed_when: false
   changed_when: false
 
-- name: Install ccusage globally with Bun
-  ansible.builtin.command: "{{ ansible_env.HOME }}/.bun/bin/bun install -g ccusage"
-  when: ccusage_check.rc != 0
+- name: Check latest ccusage version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm view ccusage version"
+  register: ccusage_latest_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Install or upgrade ccusage globally with Bun
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.bun/bin/bun install -g ccusage@latest"
+  when: >-
+    ccusage_version_output.rc != 0 or
+    (ccusage_latest_version_output.rc == 0 and
+    ccusage_version_output.stdout | trim != ccusage_latest_version_output.stdout | trim)
+  changed_when: true
 
 - name: Ensure ~/.local/bin exists for ccusage symlink
   ansible.builtin.file:

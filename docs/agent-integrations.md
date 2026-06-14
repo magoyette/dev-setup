@@ -33,6 +33,9 @@ Repository-local PostToolUse hooks validate edited shell, Markdown, JSON, and
 YAML files. Inspect `.claude/settings.json` for the active definitions and
 exclusions.
 
+The AI assistants playbook checks the installed and latest `ccusage` versions
+and upgrades the Bun-installed package when a newer release is available.
+
 ## Codex
 
 `ansible/tasks/codex.yml` manages selected values in `~/.codex/config.toml`,
