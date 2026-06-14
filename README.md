@@ -107,11 +107,13 @@ git alias
 
 ## CLAUDE.md
 
-`CLAUDE.md` is the context file for coding agents in this repository.
+`CLAUDE.md` is the concise context file for coding agents in this repository.
+Detailed provisioning, integration, and workflow notes live under `docs/` and
+are referenced from `CLAUDE.md` so agents load them only when relevant.
 
 Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code. Ansible also deploys global Codex hooks for WSL-to-Windows notifications and post-edit validation.
 
-For global user-level context, Ansible also deploys [`global-agent-context.md`](global-agent-context.md) to both `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. That file is a concise shared list of the CLI tools installed by this setup that are useful for an AI agent and doesn't have an Agent Skill. It also carries runtime guidance for the pyenv-managed `python3` and `uv` workflow used by this setup and hallucination reduction guidelines.
+For global user-level context, Ansible also deploys [`global-agent-context.md`](global-agent-context.md) to `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.config/opencode/AGENTS.md`. That file is a concise shared list of the CLI tools installed by this setup that are useful for an AI agent and doesn't have an Agent Skill. It also carries runtime guidance for the pyenv-managed `python3` and `uv` workflow and hallucination reduction guidelines.
 
 ## Agent skills
 

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.21.0] - 2026-06-14
+
+### Changed
+
+- Keep repository agent context concise and route detailed guidance to on-demand documentation
+
 ## [4.20.0] - 2026-06-05
 
 ### Added
@@ -602,7 +608,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
-[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.20.0...HEAD
+[Unreleased]: https://github.com/magoyette/dev-setup/compare/v4.21.0...HEAD
+[4.21.0]: https://github.com/magoyette/dev-setup/compare/v4.20.0...v4.21.0
 [4.20.0]: https://github.com/magoyette/dev-setup/compare/v4.19.0...v4.20.0
 [4.19.0]: https://github.com/magoyette/dev-setup/compare/v4.18.0...v4.19.0
 [4.18.0]: https://github.com/magoyette/dev-setup/compare/v4.17.0...v4.18.0
