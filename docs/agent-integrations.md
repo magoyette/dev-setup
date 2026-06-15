@@ -7,7 +7,11 @@ configuration files remain the source of truth.
 ## Context Files
 
 `global-agent-context.md` contains concise user-level guidance shared by Claude
-Code, Codex, and OpenCode.
+Code, Codex, and OpenCode. The AI assistants playbook creates the gitignored
+`global-agent-context.local.md` file when absent and appends its contents to
+the shared guidance. The combined context is generated at
+`~/.config/dev-setup/global-agent-context.md`, and each assistant's global
+context path links to it. Rerun the playbook after editing the local file.
 
 `CLAUDE.md` is the repository-level instruction file for Claude Code and is
 configured as a Codex fallback filename. Keep `CLAUDE.md` limited to durable

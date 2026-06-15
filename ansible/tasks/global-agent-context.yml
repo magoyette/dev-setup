@@ -1,14 +1,33 @@
 ---
+- name: Ensure user-specific global agent context exists
+  ansible.builtin.copy:
+    content: ""
+    dest: "{{ playbook_dir }}/../global-agent-context.local.md"
+    force: false
+    mode: "0600"
+
+- name: Ensure shared global agent context directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/dev-setup"
+    state: directory
+    mode: "0700"
+
+- name: Generate shared global agent context
+  ansible.builtin.template:
+    src: global-agent-context.md.j2
+    dest: "{{ ansible_env.HOME }}/.config/dev-setup/global-agent-context.md"
+    mode: "0600"
+
 - name: Deploy shared global agent context for Claude Code
   ansible.builtin.file:
-    src: "{{ playbook_dir }}/../global-agent-context.md"
+    src: "{{ ansible_env.HOME }}/.config/dev-setup/global-agent-context.md"
     dest: "{{ ansible_env.HOME }}/.claude/CLAUDE.md"
     state: link
     force: true
 
 - name: Deploy shared global agent context for Codex
   ansible.builtin.file:
-    src: "{{ playbook_dir }}/../global-agent-context.md"
+    src: "{{ ansible_env.HOME }}/.config/dev-setup/global-agent-context.md"
     dest: "{{ ansible_env.HOME }}/.codex/AGENTS.md"
     state: link
     force: true
@@ -21,7 +40,7 @@
 
 - name: Deploy shared global agent context for OpenCode
   ansible.builtin.file:
-    src: "{{ playbook_dir }}/../global-agent-context.md"
+    src: "{{ ansible_env.HOME }}/.config/dev-setup/global-agent-context.md"
     dest: "{{ ansible_env.HOME }}/.config/opencode/AGENTS.md"
     state: link
     force: true

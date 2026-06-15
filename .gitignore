@@ -1,4 +1,5 @@
 ansible/vars.yml
+global-agent-context.local.md
 external-skills/ast-grep/
 external-skills/agent-browser/
 external-skills/playwright/

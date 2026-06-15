@@ -1,0 +1,6 @@
+{{ lookup('ansible.builtin.file', playbook_dir + '/../global-agent-context.md', rstrip=true) }}
+{% set local_context = lookup('ansible.builtin.file', playbook_dir + '/../global-agent-context.local.md', rstrip=true) %}
+{% if local_context | trim %}
+
+{{ local_context }}
+{% endif %}

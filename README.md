@@ -115,7 +115,18 @@ are referenced from `CLAUDE.md` so agents load them only when relevant.
 
 Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code. Ansible also deploys global Codex hooks for WSL-to-Windows notifications and post-edit validation.
 
-For global user-level context, Ansible also deploys [`global-agent-context.md`](global-agent-context.md) to `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.config/opencode/AGENTS.md`. That file is a concise shared list of the CLI tools installed by this setup that are useful for an AI agent and doesn't have an Agent Skill. It also carries runtime guidance for the pyenv-managed `python3` and `uv` workflow and hallucination reduction guidelines.
+For global user-level context, Ansible combines
+[`global-agent-context.md`](global-agent-context.md) with the optional,
+gitignored `global-agent-context.local.md`, then deploys the result to
+`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and
+`~/.config/opencode/AGENTS.md`. The shared file is a concise list of the CLI
+tools installed by this setup that are useful for an AI agent and don't have
+an Agent Skill. It also carries runtime guidance for the pyenv-managed
+`python3` and `uv` workflow and hallucination reduction guidelines.
+
+The AI assistants playbook creates `global-agent-context.local.md` when it is
+absent. Add personal agent instructions there and rerun the playbook to append
+them after the shared instructions without committing them to the repository.
 
 ## Agent skills
 
