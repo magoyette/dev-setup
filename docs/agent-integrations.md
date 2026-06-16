@@ -76,6 +76,24 @@ deployment paths.
 Authentication is a one-time interactive operation and is not managed by
 Ansible.
 
+## Selective Superpowers Sessions
+
+`ansible/tasks/superpowers.yml` updates the Superpowers checkout at
+`~/.local/share/superpowers` and deploys three session-specific launchers:
+
+- `claude-sp` loads the checkout with Claude Code's session-only
+  `--plugin-dir` option.
+- `codex-sp` selects `~/.codex/superpowers.config.toml`. The Superpowers Codex
+  plugin is sourced from a dev-setup-managed local marketplace and remains
+  installed but disabled in the base configuration. It is refreshed when the
+  shared checkout changes.
+- `opencode-sp` sets `OPENCODE_CONFIG` to the generated
+  `~/.config/dev-setup/opencode-superpowers.json` file.
+
+The launchers forward all arguments and retain the normal global context,
+hooks, MCP servers, permissions, Crit, and Herdr integrations. Normal assistant
+commands do not activate Superpowers.
+
 ## Shared MCP Servers
 
 `ai_assistants_mcp_catalog` in `ansible/defaults.yml` defines the supported

@@ -1,0 +1,102 @@
+---
+- name: Ensure Superpowers checkout parent directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/share"
+    state: directory
+    mode: "0755"
+
+- name: Update Superpowers checkout to latest upstream
+  ansible.builtin.git:
+    repo: https://github.com/obra/superpowers.git
+    dest: "{{ ansible_env.HOME }}/.local/share/superpowers"
+    version: main
+    update: true
+  register: superpowers_checkout
+
+- name: Ensure generated dev-setup config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/dev-setup"
+    state: directory
+    mode: "0700"
+
+- name: Ensure dev-setup Superpowers marketplace directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-marketplace/.agents/plugins"
+    state: directory
+    mode: "0755"
+
+- name: Link Superpowers checkout into Codex marketplace
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.local/share/superpowers"
+    dest: "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-marketplace/superpowers"
+    state: link
+    force: true
+
+- name: Configure dev-setup Superpowers Codex marketplace
+  ansible.builtin.copy:
+    content: |
+      {
+        "name": "dev-setup-superpowers",
+        "interface": {
+          "displayName": "dev-setup Superpowers"
+        },
+        "plugins": [
+          {
+            "name": "superpowers",
+            "source": {
+              "source": "local",
+              "path": "./superpowers"
+            }
+          }
+        ]
+      }
+    dest: "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-marketplace/.agents/plugins/marketplace.json"
+    mode: "0600"
+
+- name: Get configured Codex plugin marketplaces
+  ansible.builtin.command: codex plugin marketplace list --json
+  register: codex_marketplace_list
+  changed_when: false
+
+- name: Add dev-setup Superpowers Codex marketplace
+  ansible.builtin.command: >-
+    codex plugin marketplace add
+    {{ ansible_env.HOME }}/.config/dev-setup/superpowers-marketplace
+    --json
+  changed_when: true
+  when: "'dev-setup-superpowers' not in codex_marketplace_list.stdout"
+
+- name: Deploy Superpowers launcher scripts with stow
+  ansible.builtin.command: >
+    stow
+    --dir="{{ playbook_dir }}/.."
+    --target="{{ ansible_env.HOME }}"
+    superpowers
+  changed_when: false
+
+- name: Install or update the Codex Superpowers plugin
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/sync-codex-superpowers-plugin.sh"
+  environment:
+    SUPERPOWERS_REFRESH: "{{ superpowers_checkout.changed | lower }}"
+  register: codex_superpowers_plugin_sync
+  changed_when: codex_superpowers_plugin_sync.rc == 2
+  failed_when: codex_superpowers_plugin_sync.rc not in [0, 2]
+
+- name: Configure selective Codex Superpowers profile
+  ansible.builtin.command: >-
+    {{ playbook_dir }}/../scripts/merge-codex-superpowers-config.sh
+    {{ ansible_env.HOME }}/.codex/config.toml
+    {{ ansible_env.HOME }}/.codex/superpowers.config.toml
+  register: codex_superpowers_config_merge
+  changed_when: codex_superpowers_config_merge.rc == 2
+  failed_when: codex_superpowers_config_merge.rc not in [0, 2]
+
+- name: Configure selective OpenCode Superpowers plugin
+  ansible.builtin.copy:
+    content: |
+      {
+        "$schema": "https://opencode.ai/config.json",
+        "plugin": ["{{ ansible_env.HOME }}/.local/share/superpowers"]
+      }
+    dest: "{{ ansible_env.HOME }}/.config/dev-setup/opencode-superpowers.json"
+    mode: "0600"

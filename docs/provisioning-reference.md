@@ -111,6 +111,8 @@ When adding a Stow package:
   `scripts/merge-codex-mcps.sh`
 - OpenCode: `ansible/tasks/opencode.yml` and
   `scripts/merge-opencode-config.sh`
+- Selective Superpowers sessions: `ansible/tasks/superpowers.yml`, the
+  `superpowers` Stow package, and `scripts/*superpowers*.sh`
 - Crit: `ansible/tasks/crit.yml` and `scripts/merge-crit-config.sh`
 - Herdr: `ansible/tasks/herdr.yml`
 - Skills: `ansible/tasks/agent-skills.yml` and skill download scripts

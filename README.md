@@ -247,6 +247,19 @@ External skills are provided by other projects.
 
 When both browser skills are installed, prefer `agent-browser` for general browser automation. Use `playwright-cli` when the user explicitly asks for Playwright or needs Playwright-specific features such as cross-browser testing, routing/mocking, tracing, or storage-state workflows.
 
+## Superpowers launcher commands
+
+[Superpowers](https://github.com/obra/superpowers) is available only through
+dedicated launcher commands:
+
+- `claude-sp`
+- `codex-sp`
+- `opencode-sp`
+
+These commands activate Superpowers for that session.
+
+Normal `claude`, `codex`, and `opencode` sessions do not activate Superpowers.
+
 ## Claude Code Plugins
 
 [Claude Code plugins](https://claude.com/plugins) that are installed with Ansible.

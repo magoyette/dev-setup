@@ -24,6 +24,8 @@
     - ansible.builtin.import_tasks: tasks/claude-code.yml
     - ansible.builtin.import_tasks: tasks/codex.yml
     - ansible.builtin.import_tasks: tasks/opencode.yml
+    - name: Run Superpowers tasks
+      ansible.builtin.import_tasks: tasks/superpowers.yml
     - name: Run Crit tasks
       ansible.builtin.import_tasks: tasks/crit.yml
     - ansible.builtin.import_tasks: tasks/herdr.yml
