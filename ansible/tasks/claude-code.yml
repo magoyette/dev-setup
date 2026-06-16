@@ -96,5 +96,6 @@
 - name: Add claude wrapper function for daily auto-upgrade
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
-    line: 'claude() { local stamp="$HOME/.local/share/claude-upgrade-check"; if [[ ! -f "$stamp" ]] || [[ -n $(find "$stamp" -mtime +1 2>/dev/null) ]]; then command claude upgrade; touch "$stamp"; fi; command claude "$@"; }'
+    regexp: '^claude\(\) \{ local stamp="\$HOME/\.local/share/claude-upgrade-check";'
+    line: 'claude() { local stamp="$HOME/.local/share/claude-upgrade-check"; if [[ ! -f "$stamp" ]] || [[ -n $(find "$stamp" -mtime +1 2>/dev/null) ]]; then ENABLE_CLAUDEAI_MCP_SERVERS=false command claude upgrade; touch "$stamp"; fi; ENABLE_CLAUDEAI_MCP_SERVERS=false command claude "$@"; }'
     state: present

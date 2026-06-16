@@ -37,6 +37,11 @@ declared in `ansible/defaults.yml`.
 in `~/.claude.json`. The playbook removes the legacy Context7 Claude plugin so
 Context7 is configured consistently with Codex and OpenCode.
 
+The managed `claude` shell wrapper sets
+`ENABLE_CLAUDEAI_MCP_SERVERS=false` for both the daily auto-upgrade check and
+the launched Claude Code session, keeping Claude.ai MCP servers disabled in
+normal sessions.
+
 Repository-local PostToolUse hooks validate edited shell, Markdown, JSON, and
 YAML files. Inspect `.claude/settings.json` for the active definitions and
 exclusions.
@@ -82,7 +87,9 @@ Ansible.
 `~/.local/share/superpowers` and deploys three session-specific launchers:
 
 - `claude-sp` loads the checkout with Claude Code's session-only
-  `--plugin-dir` option.
+  `--plugin-dir` option and sets the same
+  `ENABLE_CLAUDEAI_MCP_SERVERS=false` environment variable as the normal
+  `claude` wrapper.
 - `codex-sp` selects `~/.codex/superpowers.config.toml`. The Superpowers Codex
   plugin is sourced from a dev-setup-managed local marketplace and remains
   installed but disabled in the base configuration. It is refreshed when the
@@ -93,6 +100,10 @@ Ansible.
 The launchers forward all arguments and retain the normal global context,
 hooks, MCP servers, permissions, Crit, and Herdr integrations. Normal assistant
 commands do not activate Superpowers.
+
+When changing the launch behavior of `claude`, `codex`, or `opencode`, check
+whether the corresponding `claude-sp`, `codex-sp`, or `opencode-sp` launcher
+needs the same environment or argument change.
 
 ## Shared MCP Servers
 

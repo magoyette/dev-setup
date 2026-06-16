@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-exec claude --plugin-dir "$HOME/.local/share/superpowers" "$@"
+exec env ENABLE_CLAUDEAI_MCP_SERVERS=false claude --plugin-dir "$HOME/.local/share/superpowers" "$@"

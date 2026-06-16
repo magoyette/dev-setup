@@ -259,6 +259,8 @@ dedicated launcher commands:
 These commands activate Superpowers for that session.
 
 Normal `claude`, `codex`, and `opencode` sessions do not activate Superpowers.
+The managed `claude` wrapper and `claude-sp` launcher both set
+`ENABLE_CLAUDEAI_MCP_SERVERS=false` so Claude.ai MCP servers stay disabled.
 
 ## Claude Code Plugins
 

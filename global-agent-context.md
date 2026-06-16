@@ -30,6 +30,12 @@ Check `--help` for exact flags when needed.
 - If you need to verify the active interpreter, run `command -v python3` or `python3 --version`.
 - If a repository defines `.python-version`, respect it. Otherwise the pyenv global Python is the default runtime.
 
+## Assistant Launchers
+
+- When changing how an assistant command is launched or configured, check whether
+  the corresponding Superpowers launcher also needs the same change:
+  `claude-sp`, `codex-sp`, or `opencode-sp`.
+
 ## Reducing Hallucinations
 
 - When uncertain about a fact, API, flag, or behavior, say so explicitly rather than guessing. "I'm not sure" is better than a confident wrong answer.
