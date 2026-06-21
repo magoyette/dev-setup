@@ -20,6 +20,9 @@ Read only the references relevant to the current task:
   management.
 - [`docs/development-workflow.md`](docs/development-workflow.md) for the
   completion checklist, versioning, changelog, and release process.
+- [`docs/software-update-strategies.md`](docs/software-update-strategies.md)
+  for managed software versioning, pinned/latest/install-only behavior, and
+  daily or runtime updater behavior.
 - `README.md` for user-facing setup instructions and installed-tool inventory.
 - `ansible/defaults.yml` for pinned versions and managed package/plugin lists.
 - `ansible/vars.yml.example` for user-configurable variables.
@@ -70,6 +73,8 @@ For behavior, feature, fix, or configuration changes:
   changes.
 - Update the relevant file under `docs/` when architecture or operational
   details change.
+- Update `docs/software-update-strategies.md` when managed software is added,
+  removed, pinned, unpinned, moved to latest, or given an automatic updater.
 - Add a concise entry to a concrete versioned section in `CHANGELOG.md`.
 - Do not add changelog entries for documentation-only changes to `README.md`,
   `CLAUDE.md`, or `docs/`.

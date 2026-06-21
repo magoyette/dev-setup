@@ -113,6 +113,19 @@ git alias
 Detailed provisioning, integration, and workflow notes live under `docs/` and
 are referenced from `CLAUDE.md` so agents load them only when relevant.
 
+Reference documents:
+
+- [Provisioning reference](docs/provisioning-reference.md)
+- [Agent integrations](docs/agent-integrations.md)
+- [Development workflow](docs/development-workflow.md)
+- [Software update strategies](docs/software-update-strategies.md)
+- [Socket CLI usage](docs/socket.md)
+- [VS Code setup](docs/vs-code.md)
+- [Claude Code tips](docs/claude-code-tips.md)
+- [Claude WSL notification hooks](docs/claude-wsl-notif-hooks.md)
+- [Herdr alternatives](docs/herdr-alternatives.md)
+- [WSL terminal title issues](docs/wsl-terminal-title-issues.md)
+
 Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code. Ansible also deploys global Codex hooks for WSL-to-Windows notifications and post-edit validation.
 
 For global user-level context, Ansible combines

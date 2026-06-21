@@ -17,6 +17,8 @@ Read CLAUDE.md and docs/development-workflow.md, then check:
 - Does README.md cover user-facing setup, variables, tools, or behavior changes?
 - Does the relevant regular documentation under docs/ cover architecture or operational
   changes?
+- Does docs/software-update-strategies.md cover any added, removed, pinned,
+  unpinned, latest-tracking, install-only, or automatically updated software?
 - Does CLAUDE.md need a new durable always-applicable rule or routing instruction?
 
 Report specifically which sections need updating if any.
