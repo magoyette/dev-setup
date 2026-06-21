@@ -101,6 +101,13 @@ The launchers forward all arguments and retain the normal global context,
 hooks, MCP servers, permissions, Crit, and Herdr integrations. Normal assistant
 commands do not activate Superpowers.
 
+Superpowers sessions also load dev-setup's Crit validation companion. In those
+sessions, agents must validate Superpowers implementation plans and reviewable
+artifacts with Crit before proceeding. Plans and documents use `crit <file>`,
+branch or code changes use `crit`, running web apps use `crit live <url>`, and
+static HTML previews use `crit preview <file.html>`. The agent must address
+unresolved Crit comments and continue only after Crit approval.
+
 When changing the launch behavior of `claude`, `codex`, or `opencode`, check
 whether the corresponding `claude-sp`, `codex-sp`, or `opencode-sp` launcher
 needs the same environment or argument change.
@@ -116,7 +123,11 @@ user-managed MCP servers are preserved.
 ## Crit And Herdr
 
 Crit is installed with sharing disabled. Its wrapper performs a daily upgrade
-check, and its integrations are installed for the supported coding assistants.
+check, and its Codex plugin and OpenCode integrations are force-refreshed so
+generated integration files do not stay stale after Crit upgrades. Claude Code
+receives Crit through the managed Claude plugin list. OpenCode's managed config
+loads Crit's generated `plugins/crit.ts` file explicitly because Crit will not
+rewrite an existing config file with unrelated user keys.
 
 Herdr provides terminal and session orchestration. Its integrations do not
 alter assistant sandbox policy, writable roots, network permissions, or browser

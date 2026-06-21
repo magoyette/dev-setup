@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-exec env ENABLE_CLAUDEAI_MCP_SERVERS=false claude --plugin-dir "$HOME/.local/share/superpowers" "$@"
+instruction_file="$HOME/.config/dev-setup/superpowers-crit.md"
+args=(--plugin-dir "$HOME/.local/share/superpowers")
+
+if [[ -f "$instruction_file" ]]; then
+  args+=(--append-system-prompt "$(cat "$instruction_file")")
+fi
+
+exec env ENABLE_CLAUDEAI_MCP_SERVERS=false claude "${args[@]}" "$@"

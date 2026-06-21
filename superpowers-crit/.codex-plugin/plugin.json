@@ -1,0 +1,30 @@
+{
+  "name": "superpowers-crit",
+  "version": "1.0.0",
+  "description": "Dev-setup companion instructions that require Crit validation in Superpowers sessions.",
+  "author": {
+    "name": "dev-setup"
+  },
+  "keywords": [
+    "superpowers",
+    "crit",
+    "plan-review",
+    "artifact-review"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Superpowers Crit",
+    "shortDescription": "Mandatory Crit checkpoints for dev-setup Superpowers sessions",
+    "longDescription": "Injects dev-setup guidance requiring Superpowers plans and reviewable artifacts to pass through Crit before proceeding.",
+    "developerName": "dev-setup",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Plan Review",
+      "Code Review",
+      "Hooks"
+    ],
+    "defaultPrompt": [
+      "Use Superpowers and validate the plan with Crit."
+    ]
+  }
+}

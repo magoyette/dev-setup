@@ -11,6 +11,7 @@
     dest: "{{ ansible_env.HOME }}/.local/share/superpowers"
     version: main
     update: true
+    recursive: false
   register: superpowers_checkout
 
 - name: Ensure generated dev-setup config directory exists
@@ -32,6 +33,20 @@
     state: link
     force: true
 
+- name: Link dev-setup Superpowers Crit companion into Codex marketplace
+  ansible.builtin.file:
+    src: "{{ playbook_dir }}/../superpowers-crit"
+    dest: "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-marketplace/superpowers-crit"
+    state: link
+    force: true
+
+- name: Generate Superpowers Crit validation instructions
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../superpowers-crit/instructions.md"
+    dest: "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-crit.md"
+    mode: "0600"
+  register: superpowers_crit_instructions
+
 - name: Configure dev-setup Superpowers Codex marketplace
   ansible.builtin.copy:
     content: |
@@ -46,7 +61,24 @@
             "source": {
               "source": "local",
               "path": "./superpowers"
-            }
+            },
+            "policy": {
+              "installation": "AVAILABLE",
+              "authentication": "ON_INSTALL"
+            },
+            "category": "Developer Tools"
+          },
+          {
+            "name": "superpowers-crit",
+            "source": {
+              "source": "local",
+              "path": "./superpowers-crit"
+            },
+            "policy": {
+              "installation": "AVAILABLE",
+              "authentication": "ON_INSTALL"
+            },
+            "category": "Developer Tools"
           }
         ]
       }
@@ -82,6 +114,14 @@
   changed_when: codex_superpowers_plugin_sync.rc == 2
   failed_when: codex_superpowers_plugin_sync.rc not in [0, 2]
 
+- name: Install or update the Codex Superpowers Crit companion plugin
+  ansible.builtin.command: "{{ playbook_dir }}/../scripts/sync-codex-superpowers-crit-plugin.sh"
+  environment:
+    SUPERPOWERS_CRIT_REFRESH: "{{ superpowers_crit_instructions.changed | lower }}"
+  register: codex_superpowers_crit_plugin_sync
+  changed_when: codex_superpowers_crit_plugin_sync.rc == 2
+  failed_when: codex_superpowers_crit_plugin_sync.rc not in [0, 2]
+
 - name: Configure selective Codex Superpowers profile
   ansible.builtin.command: >-
     {{ playbook_dir }}/../scripts/merge-codex-superpowers-config.sh
@@ -96,7 +136,11 @@
     content: |
       {
         "$schema": "https://opencode.ai/config.json",
-        "plugin": ["{{ ansible_env.HOME }}/.local/share/superpowers"]
+        "plugin": [
+          "{{ ansible_env.HOME }}/.config/opencode/plugins/crit.ts",
+          "{{ ansible_env.HOME }}/.local/share/superpowers"
+        ],
+        "instructions": ["{{ ansible_env.HOME }}/.config/dev-setup/superpowers-crit.md"]
       }
     dest: "{{ ansible_env.HOME }}/.config/dev-setup/opencode-superpowers.json"
     mode: "0600"

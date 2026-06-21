@@ -7,6 +7,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2026-06-21
+
+### Added
+
+- Require Crit validation for Superpowers session plans and reviewable artifacts
+  across `claude-sp`, `codex-sp`, and `opencode-sp`.
+- Force-refresh Crit integrations managed by the playbook so generated files do
+  not stay stale after Crit upgrades.
+- Load Crit's generated OpenCode plugin from the managed normal and Superpowers
+  OpenCode configurations.
+
+### Fixed
+
+- Avoid cloning Superpowers submodules during provisioning so private upstream
+  submodules do not break the checkout.
+
 ## [5.0.0] - 2026-06-16
 
 ### Fixed
@@ -646,6 +662,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts to manage the setup : install.sh and run-ansible.sh
 - Documentation in /docs with tasks to improve the setup, tips, etc.
 
+[5.1.0]: https://github.com/magoyette/dev-setup/compare/v5.0.0...v5.1.0
 [5.0.0]: https://github.com/magoyette/dev-setup/compare/v4.25.0...v5.0.0
 [4.25.0]: https://github.com/magoyette/dev-setup/compare/v4.24.0...v4.25.0
 [4.24.0]: https://github.com/magoyette/dev-setup/compare/v4.23.0...v4.24.0

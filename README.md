@@ -210,7 +210,8 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [ccstatusline](https://github.com/sirmalloc/ccstatusline) : Status line for Claude Code
 - [ccusage](https://ccusage.com/) : usage and cost reporting for Claude Code, Codex, and OpenCode; upgraded to the latest release on each playbook run
 - [codex](https://github.com/openai/codex) : coding agent
-- [Crit](https://crit.md/) : browser-based review UI for AI agent output, integrated with Claude Code, Codex, and OpenCode; sharing is disabled
+- [Crit](https://crit.md/) : browser-based review UI for AI agent output,
+  integrated with Claude Code, Codex, and OpenCode; sharing is disabled
 - [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, and OpenCode integrations; native agent session restore and the One Dark theme are enabled
 - [opencode](https://opencode.ai/) : coding agent; authenticate once with `/connect`
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
@@ -257,6 +258,11 @@ dedicated launcher commands:
 - `opencode-sp`
 
 These commands activate Superpowers for that session.
+
+Superpowers sessions also require Crit validation before agents proceed past
+implementation plans or deliver reviewable artifacts. The agent should launch
+Crit for the relevant plan, diff, live app, or static HTML preview, address
+unresolved comments, and continue only after Crit approval.
 
 Normal `claude`, `codex`, and `opencode` sessions do not activate Superpowers.
 The managed `claude` wrapper and `claude-sp` launcher both set

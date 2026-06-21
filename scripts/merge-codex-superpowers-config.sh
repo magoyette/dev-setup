@@ -3,7 +3,8 @@ set -euo pipefail
 
 config_file="${1:-$HOME/.codex/config.toml}"
 profile_file="${2:-$HOME/.codex/superpowers.config.toml}"
-section='plugins."superpowers@dev-setup-superpowers"'
+superpowers_section='plugins."superpowers@dev-setup-superpowers"'
+crit_section='plugins."superpowers-crit@dev-setup-superpowers"'
 tmp_dir="$(mktemp -d)"
 tmp_file="$tmp_dir/config"
 
@@ -12,8 +13,8 @@ trap 'rm -rf "$tmp_dir"' EXIT
 mkdir -p "$(dirname "$config_file")"
 touch "$config_file"
 
-awk -v section="$section" '
-  $0 == "[" section "]" {
+awk -v superpowers_section="$superpowers_section" -v crit_section="$crit_section" '
+  $0 == "[" superpowers_section "]" || $0 == "[" crit_section "]" {
     skip = 1
     next
   }
@@ -34,12 +35,18 @@ done
   if [[ -s "$tmp_file" ]]; then
     printf '\n'
   fi
-  printf '[%s]\n' "$section"
+  printf '[%s]\n' "$superpowers_section"
+  printf 'enabled = false\n'
+  printf '\n'
+  printf '[%s]\n' "$crit_section"
   printf 'enabled = false\n'
 } >"$tmp_dir/base"
 
 cat >"$tmp_dir/profile" <<EOF
-[$section]
+[$superpowers_section]
+enabled = true
+
+[$crit_section]
 enabled = true
 EOF
 

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+instruction_file="${DEV_SETUP_SUPERPOWERS_CRIT_INSTRUCTIONS:-$HOME/.config/dev-setup/superpowers-crit.md}"
+
+if [[ ! -f "$instruction_file" ]]; then
+  exit 0
+fi
+
+escape_for_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
+
+instructions=$(cat "$instruction_file")
+session_context="<SUPERPOWERS_CRIT_VALIDATION>\n${instructions}\n</SUPERPOWERS_CRIT_VALIDATION>"
+session_context_escaped=$(escape_for_json "$session_context")
+
+printf '{\n  "additionalContext": "%s"\n}\n' "$session_context_escaped"

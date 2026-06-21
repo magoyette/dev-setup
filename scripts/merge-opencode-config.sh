@@ -29,6 +29,8 @@ fi
 
 jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
   def managed_names: $catalog | keys;
+  def ensure_plugin($plugin):
+    ((.plugin // []) | if index($plugin) then . else . + [$plugin] end);
   def enabled_servers:
     reduce $enabled[] as $name ({};
       .[$name] = {
@@ -42,6 +44,7 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
   | .snapshot = false
   | .formatter = true
   | .lsp = true
+  | .plugin = ensure_plugin("./plugins/crit.ts")
   | .permission = {
       "read": {
         "*": "allow",

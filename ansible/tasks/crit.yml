@@ -43,13 +43,15 @@
   failed_when: crit_config_merge.rc not in [0, 2]
 
 - name: Install Crit Codex integration
-  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/crit-bin install codex-plugin"
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/crit-bin install codex-plugin --force"
   args:
     chdir: "{{ ansible_env.HOME }}"
   changed_when: false
 
+# Do not also install the `codex` integration. It and `opencode` both write
+# ~/.agents/skills/crit, but Codex uses the plugin-packaged Crit skills below.
 - name: Install Crit OpenCode integration
-  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/crit-bin install opencode"
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/crit-bin install opencode --force"
   args:
     chdir: "{{ ansible_env.HOME }}"
   changed_when: false
