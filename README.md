@@ -160,9 +160,9 @@ bundled skills and external skill directories.
 
 ## Releasing a new version
 
-Update `CHANGELOG.md` first: move entries from `[Unreleased]` to a new versioned section with today's date and update the comparison links at the bottom, then commit.
+Update `CHANGELOG.md` with the version to release, then commit.
 
-Run the release script from the repo root:
+After the commit, run the release script from the repo root:
 
 ```sh
 ./release.sh

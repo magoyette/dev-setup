@@ -3,7 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-head -17 CHANGELOG.md | batcat --paging=never -l md
+head -25 CHANGELOG.md | batcat --paging=never -l md
 
 # Prompt for version
 read -rp "Version to release (e.g. 1.2.0): " version

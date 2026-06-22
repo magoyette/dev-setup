@@ -55,7 +55,8 @@ Before running `./release.sh`:
 
 1. Ensure the appropriate versioned changelog section exists with today's
    date.
-2. Update comparison links at the bottom of `CHANGELOG.md`.
+2. Do not add per-version comparison links. Use the compare URL template near
+   the top of `CHANGELOG.md` when a version diff is needed.
 3. Commit the changelog and release changes.
 
 Then run `./release.sh`. It displays the beginning of the changelog, prompts for
