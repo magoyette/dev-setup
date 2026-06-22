@@ -55,6 +55,11 @@ jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$
     "command": "bunx -y ccstatusline@latest",
     "padding": 0
   }
+  | .attribution = ((.attribution // {}) * {
+      "commit": "",
+      "pr": "",
+      "sessionUrl": false
+    })
   | .sandbox = ((.sandbox // {}) * {
       "enabled": $sandbox_enabled,
       "filesystem": ((.sandbox.filesystem // {}) * {"allowWrite": $sandbox_allow_write})

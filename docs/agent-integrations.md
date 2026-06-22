@@ -30,7 +30,8 @@ Claude Code configuration has two main locations:
 - `.claude/agents/` contains project-scoped review agents.
 
 `scripts/merge-claude-settings.sh` manages selected home-directory settings
-while preserving unrelated user keys. Claude Code marketplaces and plugins are
+while preserving unrelated user keys. It disables Claude Code commit, pull
+request, and session-link attribution. Claude Code marketplaces and plugins are
 declared in `ansible/defaults.yml`.
 
 `scripts/merge-claude-mcps.sh` manages the shared user-scoped HTTP MCP servers
