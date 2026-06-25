@@ -145,7 +145,8 @@ them after the shared instructions without committing them to the repository.
 
 This repository supports shared agent skills and agent-specific skills.
 
-- Shared skills: `skills/` and `external-skills/`
+- Shared skills for Claude Code, Codex, and OpenCode: `skills/` and
+  `external-skills/`
 - Claude-only skills: `skills-claude/` and `external-skills-claude/`
 - Codex-only skills: `skills-codex/` and `external-skills-codex/`
 
@@ -242,12 +243,16 @@ Many agent skills and Claude Code plugins are installed by the sub-playbook, see
 
 ## Agent skills for AI Assistants
 
-Skills can be shared between Claude Code and Codex, or specific to one of the AI assistants.
+Skills can be shared between Claude Code, Codex, and OpenCode, or specific to
+one of the AI assistants.
 
 ### magoyette/dev-setup skills
 
 - `codex-review` : Claude Code skill that delegates review to Codex. Reviews uncommitted changes by default. Pass a base branch as the first argument to do a PR-style review.
 - `claude-review` : Codex skill that delegates review to Claude Code. Reviews uncommitted changes by default. Pass a base branch as the first argument to do a PR-style review.
+- `manage-npm-upgrades` : shared skill for inspecting and upgrading dependencies
+  in npm repositories while preserving cooldowns, version styles, workspaces,
+  peer compatibility, and security policy.
 
 ### External skills
 

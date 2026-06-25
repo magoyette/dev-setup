@@ -1,0 +1,4 @@
+interface:
+  display_name: "manage-npm-upgrades"
+  short_description: "Upgrade npm dependencies with policy guardrails"
+  default_prompt: "Use $manage-npm-upgrades to safely upgrade this npm repository's dependencies while preserving its cooldown and dependency policies."

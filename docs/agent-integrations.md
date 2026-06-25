@@ -140,14 +140,15 @@ configuration files for current behavior.
 ## Skills
 
 Skills are deployed to Claude Code and Codex according to their source
-directory:
+directory. OpenCode discovers the same shared skills through its native
+`~/.agents/skills/` compatibility path:
 
 | Source directory | Targets |
 | --- | --- |
-| `skills/` | Claude Code and Codex |
+| `skills/` | Claude Code, Codex, and OpenCode |
 | `skills-claude/` | Claude Code only |
 | `skills-codex/` | Codex only |
-| `external-skills/` | Claude Code and Codex |
+| `external-skills/` | Claude Code, Codex, and OpenCode |
 | `external-skills-claude/` | Claude Code only |
 | `external-skills-codex/` | Codex only |
 

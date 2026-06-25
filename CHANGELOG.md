@@ -14,6 +14,19 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [5.4.0] - 2026-06-24
+
+### Added
+
+- Add a shared npm dependency upgrade skill for Claude Code, Codex, and
+  OpenCode that preserves repository cooldowns, dependency policies,
+  workspaces, peer compatibility, and security constraints.
+
+### Changed
+
+- Document OpenCode's native discovery of shared skills through the managed
+  `~/.agents/skills/` path.
+
 ## [5.3.1] - 2026-06-22
 
 ### Changed
