@@ -17,6 +17,21 @@ crit_version: "v0.16.1"
 crit_linux_amd64_sha256: "ba489abaf89f0402acf5a5ddd12305e43b72f4fef1586e429fb64dad799ef61a"
 codex_project_doc_max_bytes: 1073741824
 claude_sandbox_enabled: true
+# OpenCode commands that should run through nono.sh when the launcher wrapper
+# finds nono.sh or nono.
+ai_assistants_nono_enabled_launchers:
+  - opencode
+  - opencode-sp
+# Enabled OpenCode launcher commands that fail closed when nono.sh or nono is
+# unavailable.
+ai_assistants_nono_required_launchers:
+  - opencode
+  - opencode-sp
+# Managed nono profile names used by the OpenCode launcher wrappers. The
+# profiles are deployed from nono/.config/nono/profiles/.
+ai_assistants_nono_profiles:
+  opencode: opencode
+  opencode_sp: opencode-sp
 ai_assistants_mcp_catalog:
   context7:
     url: https://mcp.context7.com/mcp

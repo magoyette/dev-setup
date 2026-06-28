@@ -77,6 +77,7 @@ strategy, or given a daily/runtime updater.
 | Claude sandbox runtime | Install-only npm global | `ansible/tasks/claude-code.yml` |
 | Claude Code plugins | Install-only if the user-scoped plugin is missing | `ansible/tasks/claude-code.yml` |
 | Codex CLI | Install-only npm global | `ansible/tasks/codex.yml` |
+| nono | Latest on playbook run: compares installed version to the latest GitHub release Debian package; managed profiles are Stow-deployed and validated on each run | `ansible/tasks/nono.yml`, `nono/.config/nono/profiles/` |
 | OpenCode | Install-only | `ansible/tasks/opencode.yml` |
 | Herdr | Install-only | `ansible/tasks/herdr.yml` |
 | Herdr integrations | Re-run on each playbook run with `changed_when: false` | `ansible/tasks/herdr.yml` |

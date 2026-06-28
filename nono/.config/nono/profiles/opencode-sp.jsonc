@@ -1,0 +1,15 @@
+{
+  "extends": "opencode",
+  "meta": {
+    "name": "opencode-sp",
+    "description": "dev-setup strict OpenCode Superpowers profile"
+  },
+  "filesystem": {
+    "read_file": [
+      "$HOME/.config/dev-setup/opencode-superpowers.json"
+    ],
+    "read": [
+      "$HOME/.config/dev-setup/superpowers-opencode"
+    ]
+  }
+}

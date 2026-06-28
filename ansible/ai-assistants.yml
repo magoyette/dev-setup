@@ -21,6 +21,8 @@
             ai_assistants_mcps | difference(ai_assistants_mcp_catalog.keys() | list) | join(', ')
           }}. Supported names: {{ ai_assistants_mcp_catalog.keys() | list | join(', ') }}.
 
+    - ansible.builtin.import_tasks: tasks/nono.yml
+    - ansible.builtin.import_tasks: tasks/ai-assistant-launchers.yml
     - ansible.builtin.import_tasks: tasks/claude-code.yml
     - ansible.builtin.import_tasks: tasks/codex.yml
     - ansible.builtin.import_tasks: tasks/opencode.yml

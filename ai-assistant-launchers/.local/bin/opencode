@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+real_opencode="${DEV_SETUP_REAL_OPENCODE:-$HOME/.opencode/bin/opencode}"
+
+if [[ ! -x "$real_opencode" ]]; then
+  printf 'opencode wrapper: real binary not found at %s\n' "$real_opencode" >&2
+  exit 127
+fi
+
+exec dev-setup-ai-assistant-sandbox opencode "$real_opencode" "$@"

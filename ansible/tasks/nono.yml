@@ -1,0 +1,84 @@
+---
+- name: Check if nono is installed
+  ansible.builtin.command: nono --version
+  register: nono_check
+  failed_when: false
+  changed_when: false
+
+# Upstream documents Debian/Ubuntu installation through release .deb files, not
+# an apt repository. Check GitHub releases on each playbook run so nono stays
+# current without relying on stale distro packages.
+- name: Resolve latest nono release
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/nolabs-ai/nono/releases/latest
+    headers:
+      Accept: application/vnd.github+json
+    status_code: 200
+  register: nono_latest_release
+  changed_when: false
+
+- name: Set nono release version
+  ansible.builtin.set_fact:
+    nono_release_version: "{{ nono_latest_release.json.tag_name | regex_replace('^v', '') }}"
+
+- name: Set installed nono release version
+  ansible.builtin.set_fact:
+    nono_installed_version: "{{ nono_check.stdout | regex_search('[0-9][0-9A-Za-z.-]*') | default('', true) }}"
+
+- name: Check Debian architecture for nono package
+  ansible.builtin.command: dpkg --print-architecture
+  register: nono_deb_architecture
+  changed_when: false
+  when: nono_check.rc != 0 or nono_installed_version != nono_release_version
+
+- name: Set nono Debian package asset
+  ansible.builtin.set_fact:
+    nono_deb_package_name: "nono-cli_{{ nono_release_version }}_{{ nono_deb_architecture.stdout | trim }}.deb"
+    nono_deb_package_asset: >-
+      {{
+        nono_latest_release.json.assets
+        | selectattr('name', 'equalto', 'nono-cli_' ~ nono_release_version ~ '_' ~ (nono_deb_architecture.stdout | trim) ~ '.deb')
+        | list
+        | first
+        | default({}, true)
+      }}
+  when: nono_check.rc != 0 or nono_installed_version != nono_release_version
+
+- name: Validate nono Debian package asset exists
+  ansible.builtin.assert:
+    that:
+      - nono_deb_package_asset.browser_download_url is defined
+      - nono_deb_package_asset.digest is defined
+    fail_msg: "Could not find {{ nono_deb_package_name }} in the latest nono release assets."
+  when: nono_check.rc != 0 or nono_installed_version != nono_release_version
+
+- name: Download nono Debian package
+  ansible.builtin.get_url:
+    url: "{{ nono_deb_package_asset.browser_download_url }}"
+    dest: "/tmp/{{ nono_deb_package_name }}"
+    checksum: "{{ nono_deb_package_asset.digest }}"
+    mode: "0644"
+  when: nono_check.rc != 0 or nono_installed_version != nono_release_version
+
+- name: Install nono Debian package
+  become: true
+  ansible.builtin.apt:
+    deb: "/tmp/{{ nono_deb_package_name }}"
+    state: present
+  when: nono_check.rc != 0 or nono_installed_version != nono_release_version
+
+- name: Deploy nono profiles with stow
+  ansible.builtin.command: >
+    stow
+    --dir="{{ playbook_dir }}/.."
+    --target="{{ ansible_env.HOME }}"
+    nono
+  changed_when: false
+
+- name: Validate managed nono profile for OpenCode
+  ansible.builtin.command: nono profile validate "{{ ansible_env.HOME }}/.config/nono/profiles/opencode.jsonc"
+  changed_when: false
+
+- name: Validate managed nono profile for OpenCode Superpowers
+  ansible.builtin.command: nono profile validate "{{ ansible_env.HOME }}/.config/nono/profiles/opencode-sp.jsonc"
+  changed_when: false

@@ -43,6 +43,11 @@ The managed `claude` shell wrapper sets
 the launched Claude Code session, keeping Claude.ai MCP servers disabled in
 normal sessions.
 
+Claude Code and Codex keep their native OS-level command sandboxes as the
+managed boundary for both normal and Superpowers sessions. This repository does
+not add a second `nono.sh` wrapper to `claude`, `claude-sp`, `codex`, or
+`codex-sp`.
+
 Repository-local PostToolUse hooks validate edited shell, Markdown, JSON, and
 YAML files. Inspect `.claude/settings.json` for the active definitions and
 exclusions.
@@ -81,6 +86,26 @@ deployment paths.
 
 Authentication is a one-time interactive operation and is not managed by
 Ansible.
+
+The managed `opencode` launcher runs through the strict managed `nono.sh`
+OpenCode profile when `nono.sh` or `nono` is installed. That profile extends
+nono's built-in `default` profile, grants the repository workspace and OpenCode
+state needed by the assistant, and explicitly denies expected Herdr and Docker
+socket paths. It intentionally avoids nono proxy network profiles, credential
+proxying, capability elevation, and Landlock V6 process-scope settings because
+those are unavailable or rejected by default on stock Microsoft WSL2 kernels.
+The `opencode-sp` profile extends the same managed baseline and adds only the
+Superpowers OpenCode configuration paths it needs.
+
+The playbook writes `ai_assistants_nono_*` values to
+`~/.config/dev-setup/ai-assistant-sandbox.env`, which is sourced by the managed
+launcher scripts. The user-facing `nono.sh`-managed commands are `opencode`
+and `opencode-sp`. `DEV_SETUP_NONO_*` environment variables can still override
+those generated defaults at runtime.
+
+Ansible installs or updates the official `nono` CLI package used by those
+launchers, deploys the managed profiles under `~/.config/nono/profiles/`, and
+validates them with `nono profile validate`.
 
 ## Selective Superpowers Sessions
 
@@ -133,6 +158,13 @@ rewrite an existing config file with unrelated user keys.
 Herdr provides terminal and session orchestration. Its integrations do not
 alter assistant sandbox policy, writable roots, network permissions, or browser
 automation permissions.
+
+Herdr built-in integrations use the assistant command names it supports
+directly. The managed launchers keep the default `opencode` path sandboxed via
+PATH and Stow wiring. Claude and Codex retain their native sandboxing. The
+current repository-managed Claude and Codex sandbox settings do not add Herdr's
+socket path to writable roots or network allowances, but there is no
+repository-managed native deny-list for that socket path.
 
 Inspect `ansible/tasks/crit.yml`, `ansible/tasks/herdr.yml`, and their owning
 configuration files for current behavior.

@@ -61,6 +61,9 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   Hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`). Default to hosts needed by the agent skills.
 - `ai_assistants_mcps`
   MCP servers enabled globally in Claude Code, Codex, and OpenCode. Supported values are `context7` and `grep`. Default: `[context7, grep]`. Removing a value removes that managed MCP from all three assistants without affecting user-managed MCP servers.
+- OpenCode is launched through managed `nono.sh` sandbox profiles by default.
+  See the `ai_assistants_nono_*` values in `ansible/defaults.yml` for the
+  launcher and profile defaults.
 - `pyenv_version`
   pyenv version installed for the Python sub-playbook. Default: `"v2.5.3"`.
 - `uv_version`
@@ -227,6 +230,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [Crit](https://crit.md/) : browser-based review UI for AI agent output,
   integrated with Claude Code, Codex, and OpenCode; sharing is disabled
 - [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, and OpenCode integrations; native agent session restore and the One Dark theme are enabled
+- [nono](https://nono.sh/) : OS-level sandbox used by the managed OpenCode launchers, with strict managed profiles for normal and Superpowers sessions
 - [opencode](https://opencode.ai/) : coding agent; authenticate once with `/connect`
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
 

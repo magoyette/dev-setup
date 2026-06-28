@@ -1,0 +1,41 @@
+---
+- name: Validate AI assistant nono.sh launcher configuration
+  ansible.builtin.assert:
+    that:
+      - ai_assistants_nono_enabled_launchers | type_debug == 'list'
+      - ai_assistants_nono_required_launchers | type_debug == 'list'
+      - ai_assistants_nono_enabled_launchers | unique | length == ai_assistants_nono_enabled_launchers | length
+      - ai_assistants_nono_required_launchers | unique | length == ai_assistants_nono_required_launchers | length
+      - ai_assistants_nono_required_launchers | difference(ai_assistants_nono_enabled_launchers) | length == 0
+      - ai_assistants_nono_profiles | type_debug == 'dict'
+    fail_msg: >-
+      ai_assistants_nono_enabled_launchers and ai_assistants_nono_required_launchers must be unique lists,
+      required launchers must also be enabled, and ai_assistants_nono_profiles must be a mapping.
+
+- name: Ensure generated dev-setup config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/dev-setup"
+    state: directory
+    mode: "0700"
+
+- name: Configure AI assistant sandbox launcher environment
+  ansible.builtin.copy:
+    content: |
+      if [[ -z "${DEV_SETUP_NONO_ENABLED_LAUNCHERS+x}" ]]; then
+        DEV_SETUP_NONO_ENABLED_LAUNCHERS={{ ai_assistants_nono_enabled_launchers | join(' ') | to_json }}
+      fi
+      if [[ -z "${DEV_SETUP_NONO_REQUIRED_LAUNCHERS+x}" ]]; then
+        DEV_SETUP_NONO_REQUIRED_LAUNCHERS={{ ai_assistants_nono_required_launchers | join(' ') | to_json }}
+      fi
+      : "${DEV_SETUP_NONO_PROFILE_OPENCODE:={{ ai_assistants_nono_profiles.opencode | default('opencode') | to_json }}}"
+      : "${DEV_SETUP_NONO_PROFILE_OPENCODE_SP:={{ ai_assistants_nono_profiles.opencode_sp | default('opencode-sp') | to_json }}}"
+    dest: "{{ ansible_env.HOME }}/.config/dev-setup/ai-assistant-sandbox.env"
+    mode: "0600"
+
+- name: Deploy AI assistant launcher wrappers with stow
+  ansible.builtin.command: >
+    stow
+    --dir="{{ playbook_dir }}/.."
+    --target="{{ ansible_env.HOME }}"
+    ai-assistant-launchers
+  changed_when: false

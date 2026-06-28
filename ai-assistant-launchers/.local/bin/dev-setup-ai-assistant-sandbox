@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -lt 2 ]]; then
+  printf 'usage: dev-setup-ai-assistant-sandbox <launcher-name> <command> [args...]\n' >&2
+  exit 2
+fi
+
+launcher="$1"
+shift
+command_path="$1"
+shift
+
+config_file="$HOME/.config/dev-setup/ai-assistant-sandbox.env"
+
+if [[ -f "$config_file" ]]; then
+  # shellcheck source=/dev/null
+  source "$config_file"
+fi
+
+contains_word() {
+  local needle="$1"
+  local haystack="$2"
+
+  [[ " $haystack " == *" $needle "* ]]
+}
+
+profile_var_suffix="$(printf '%s' "$launcher" | tr '[:lower:]-' '[:upper:]_')"
+profile_var="DEV_SETUP_NONO_PROFILE_${profile_var_suffix}"
+profile="${!profile_var:-$launcher}"
+
+if [[ -v DEV_SETUP_NONO_ENABLED_LAUNCHERS ]]; then
+  enabled_launchers="$DEV_SETUP_NONO_ENABLED_LAUNCHERS"
+else
+  enabled_launchers="opencode opencode-sp"
+fi
+
+if [[ -v DEV_SETUP_NONO_REQUIRED_LAUNCHERS ]]; then
+  required_launchers="$DEV_SETUP_NONO_REQUIRED_LAUNCHERS"
+else
+  required_launchers="opencode opencode-sp"
+fi
+
+if ! contains_word "$launcher" "$enabled_launchers"; then
+  exec "$command_path" "$@"
+fi
+
+if command -v nono.sh >/dev/null 2>&1; then
+  exec nono.sh run --profile "$profile" -- "$command_path" "$@"
+fi
+
+if command -v nono >/dev/null 2>&1; then
+  exec nono run --profile "$profile" -- "$command_path" "$@"
+fi
+
+if ! contains_word "$launcher" "$required_launchers"; then
+  exec "$command_path" "$@"
+fi
+
+printf 'dev-setup-ai-assistant-sandbox: nono.sh is required for %s but was not found\n' "$launcher" >&2
+exit 127

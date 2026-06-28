@@ -17,6 +17,8 @@ exec markdownlint-cli2 \
   '#external-skills' \
   '#external-skills-claude' \
   '#external-skills-codex' \
+  '#.superpowers' \
   '#skills' \
   '#skills-claude' \
-  '#skills-codex'
+  '#skills-codex' \
+  '#global-agent-context.local.md'
