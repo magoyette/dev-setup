@@ -8,4 +8,5 @@ if [[ ! -x "$real_opencode" ]]; then
   exit 127
 fi
 
+export OPENCODE_ENABLE_EXA=1
 exec dev-setup-ai-assistant-sandbox opencode "$real_opencode" "$@"

@@ -8,5 +8,6 @@ if [[ ! -x "$real_opencode" ]]; then
   exit 127
 fi
 
+export OPENCODE_ENABLE_EXA=1
 export OPENCODE_CONFIG="$HOME/.config/dev-setup/opencode-superpowers.json"
 exec dev-setup-ai-assistant-sandbox opencode-sp "$real_opencode" "$@"

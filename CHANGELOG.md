@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [5.7.0] - 2026-06-28
+
+### Added
+
+- Enable OpenCode websearch tool for all models.
+
 ## [5.6.0] - 2026-06-28
 
 ### Added

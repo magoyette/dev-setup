@@ -116,6 +116,10 @@ OpenCode's global context is deployed to
 `~/.config/opencode/AGENTS.md`. Skills are discovered through the shared skill
 deployment paths.
 
+The managed OpenCode config allows the native `websearch` tool, and the managed
+`opencode` and `opencode-sp` launchers set `OPENCODE_ENABLE_EXA=1` so websearch
+is available even when a session uses a non-OpenCode provider.
+
 Authentication is a one-time interactive operation and is not managed by
 Ansible.
 
