@@ -40,6 +40,13 @@
     state: link
     force: true
 
+- name: Link dev-setup Superpowers Crit companion as Pi package
+  ansible.builtin.file:
+    src: "{{ playbook_dir }}/../superpowers-crit"
+    dest: "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-crit-pi"
+    state: link
+    force: true
+
 - name: Generate Superpowers Crit validation instructions
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/../superpowers-crit/instructions.md"

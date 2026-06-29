@@ -32,6 +32,19 @@
     state: link
     force: true
 
+- name: Ensure Pi global config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.pi/agent"
+    state: directory
+    mode: "0755"
+
+- name: Deploy shared global agent context for Pi
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.config/dev-setup/global-agent-context.md"
+    dest: "{{ ansible_env.HOME }}/.pi/agent/AGENTS.md"
+    state: link
+    force: true
+
 - name: Ensure OpenCode global config directory exists
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.config/opencode"

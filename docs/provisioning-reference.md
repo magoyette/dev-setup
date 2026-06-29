@@ -109,6 +109,7 @@ When adding a Stow package:
   `merge-claude-*`
 - Codex: `ansible/tasks/codex.yml`, `scripts/merge-codex-hooks.sh`, and
   `scripts/merge-codex-mcps.sh`
+- Pi: `ansible/tasks/pi.yml`
 - OpenCode: `ansible/tasks/opencode.yml` and
   `scripts/merge-opencode-config.sh`
 - Selective Superpowers sessions: `ansible/tasks/superpowers.yml`, the

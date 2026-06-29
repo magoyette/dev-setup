@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config_file="$HOME/.config/dev-setup/ai-assistant-sandbox.env"
+
+if [[ -f "$config_file" ]]; then
+  # shellcheck source=/dev/null
+  source "$config_file"
+fi
+
+fnm="${DEV_SETUP_FNM:-$HOME/.local/share/fnm/fnm}"
+node_version="${DEV_SETUP_PI_NODE_VERSION:-lts-latest}"
+superpowers_path="${DEV_SETUP_SUPERPOWERS_PATH:-$HOME/.local/share/superpowers}"
+crit_pi_path="${DEV_SETUP_SUPERPOWERS_CRIT_PI_PATH:-$HOME/.config/dev-setup/superpowers-crit-pi}"
+
+if [[ ! -x "$fnm" ]]; then
+  printf 'pi-sp wrapper: fnm not found at %s\n' "$fnm" >&2
+  exit 127
+fi
+
+if [[ ! -d "$superpowers_path" ]]; then
+  printf 'pi-sp wrapper: Superpowers checkout not found at %s\n' "$superpowers_path" >&2
+  exit 127
+fi
+
+if [[ ! -d "$crit_pi_path" ]]; then
+  printf 'pi-sp wrapper: Superpowers Crit Pi package not found at %s\n' "$crit_pi_path" >&2
+  exit 127
+fi
+
+exec dev-setup-ai-assistant-sandbox pi-sp "$fnm" exec --using="$node_version" -- pi -e "$superpowers_path" -e "$crit_pi_path" "$@"

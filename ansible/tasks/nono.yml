@@ -82,3 +82,11 @@
 - name: Validate managed nono profile for OpenCode Superpowers
   ansible.builtin.command: nono profile validate "{{ ansible_env.HOME }}/.config/nono/profiles/opencode-sp.jsonc"
   changed_when: false
+
+- name: Validate managed nono profile for Pi
+  ansible.builtin.command: nono profile validate "{{ ansible_env.HOME }}/.config/nono/profiles/pi.jsonc"
+  changed_when: false
+
+- name: Validate managed nono profile for Pi Superpowers
+  ansible.builtin.command: nono profile validate "{{ ansible_env.HOME }}/.config/nono/profiles/pi-sp.jsonc"
+  changed_when: false

@@ -1,0 +1,19 @@
+{
+  "name": "dev-setup-superpowers-crit",
+  "version": "1.0.0",
+  "description": "dev-setup Superpowers Crit validation companion for Pi",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "skills",
+    "crit"
+  ],
+  "pi": {
+    "extensions": [
+      "./.pi/extensions/superpowers-crit.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  }
+}

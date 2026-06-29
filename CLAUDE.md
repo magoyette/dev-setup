@@ -16,7 +16,7 @@ Read only the references relevant to the current task:
   playbook layout, variables, idempotency patterns, shell configuration, Stow,
   and tool-specific provisioning notes.
 - [`docs/agent-integrations.md`](docs/agent-integrations.md) for Claude Code,
-  Codex, OpenCode, Crit, Herdr, hooks, global context, and skills
+  Codex, Pi, OpenCode, Crit, Herdr, hooks, global context, and skills
   management.
 - [`docs/development-workflow.md`](docs/development-workflow.md) for the
   completion checklist, versioning, changelog, and release process.

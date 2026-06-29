@@ -68,6 +68,10 @@
   ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration install opencode"
   changed_when: false
 
+- name: Install Herdr Pi integration
+  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration install pi"
+  changed_when: false
+
 - name: Download Herdr skill from GitHub
   ansible.builtin.command:
     cmd: "{{ playbook_dir }}/../scripts/download-herdr-skill.sh"

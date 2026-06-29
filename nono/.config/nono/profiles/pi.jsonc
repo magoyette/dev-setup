@@ -1,0 +1,34 @@
+{
+  "extends": "default",
+  "meta": {
+    "name": "pi",
+    "description": "dev-setup strict Pi profile"
+  },
+  "groups": {
+    "include": [
+      "node_runtime",
+      "user_caches_linux"
+    ]
+  },
+  "workdir": {
+    "access": "readwrite"
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/.pi",
+      "$HOME/.agents",
+      "$HOME/.config/dev-setup",
+      "/tmp",
+      "$TMPDIR"
+    ],
+    "deny": [
+      "$XDG_RUNTIME_DIR/herdr",
+      "$XDG_RUNTIME_DIR/herdr.sock",
+      "$XDG_RUNTIME_DIR/herdr/herdr.sock",
+      "/tmp/herdr",
+      "/tmp/herdr.sock",
+      "/var/run/docker.sock",
+      "$HOME/.docker"
+    ]
+  }
+}

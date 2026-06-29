@@ -64,6 +64,7 @@ strategy, or given a daily/runtime updater.
 | Claude Code | Daily updater: `.bashrc` wrapper runs `claude upgrade` before launch | `ansible/tasks/claude-code.yml` |
 | ccstatusline | Latest at invocation through `bunx ccstatusline@latest` alias | `ansible/tasks/claude-code.yml`, `scripts/merge-claude-settings.sh` |
 | Superpowers checkout | Upstream checkout: tracks `main` and updates on playbook run | `ansible/tasks/superpowers.yml` |
+| Pi Superpowers launcher package link | Re-linked on each playbook run | `ansible/tasks/superpowers.yml`, `superpowers-crit/` |
 | Codex Superpowers plugin | Reinstalled when the Superpowers checkout changes | `ansible/tasks/superpowers.yml`, `scripts/sync-codex-superpowers-plugin.sh` |
 | Codex Superpowers Crit companion plugin | Reinstalled when generated companion instructions change | `ansible/tasks/superpowers.yml`, `scripts/sync-codex-superpowers-crit-plugin.sh` |
 | humanizer skill | Upstream checkout: submodule updates with `git submodule update --remote --merge` | `.gitmodules`, `ansible/tasks/agent-skills.yml` |
@@ -78,6 +79,7 @@ strategy, or given a daily/runtime updater.
 | Claude Code plugins | Install-only if the user-scoped plugin is missing | `ansible/tasks/claude-code.yml` |
 | Codex CLI | Install-only npm global | `ansible/tasks/codex.yml` |
 | nono | Latest on playbook run: compares installed version to the latest GitHub release Debian package; managed profiles are Stow-deployed and validated on each run | `ansible/tasks/nono.yml`, `nono/.config/nono/profiles/` |
+| Pi Coding Agent | Latest on playbook run: compares the installed global npm package to the latest npm release | `ansible/tasks/pi.yml` |
 | OpenCode | Install-only | `ansible/tasks/opencode.yml` |
 | Herdr | Install-only | `ansible/tasks/herdr.yml` |
 | Herdr integrations | Re-run on each playbook run with `changed_when: false` | `ansible/tasks/herdr.yml` |

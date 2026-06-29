@@ -1,0 +1,42 @@
+---
+- name: Ensure Pi agent directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ ansible_env.HOME }}/.pi/agent"
+    - "{{ ansible_env.HOME }}/.pi/agent/extensions"
+    - "{{ ansible_env.HOME }}/.pi/agent/skills"
+
+- name: Check installed Pi Coding Agent package
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @earendil-works/pi-coding-agent --depth=0 --json"
+  register: pi_package_check
+  failed_when: false
+  changed_when: false
+
+- name: Set installed Pi Coding Agent version
+  ansible.builtin.set_fact:
+    pi_installed_version: >-
+      {{
+        ((pi_package_check.stdout | from_json).dependencies | default({})).get(
+          '@earendil-works/pi-coding-agent',
+          {}
+        ).get('version', '')
+        if pi_package_check.rc == 0
+        else ''
+      }}
+
+- name: Check latest Pi Coding Agent version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm view @earendil-works/pi-coding-agent version"
+  register: pi_latest_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Install or upgrade Pi Coding Agent
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g --ignore-scripts @earendil-works/pi-coding-agent@latest"
+  when: >-
+    pi_installed_version == '' or
+    (pi_latest_version_output.rc == 0 and
+    pi_installed_version != pi_latest_version_output.stdout | trim)
+  changed_when: true

@@ -29,6 +29,11 @@
       fi
       : "${DEV_SETUP_NONO_PROFILE_OPENCODE:={{ ai_assistants_nono_profiles.opencode | default('opencode') | to_json }}}"
       : "${DEV_SETUP_NONO_PROFILE_OPENCODE_SP:={{ ai_assistants_nono_profiles.opencode_sp | default('opencode-sp') | to_json }}}"
+      : "${DEV_SETUP_NONO_PROFILE_PI:={{ ai_assistants_nono_profiles.pi | default('pi') | to_json }}}"
+      : "${DEV_SETUP_NONO_PROFILE_PI_SP:={{ ai_assistants_nono_profiles.pi_sp | default('pi-sp') | to_json }}}"
+      : "${DEV_SETUP_PI_NODE_VERSION:={{ fnm_node_version | to_json }}}"
+      : "${DEV_SETUP_SUPERPOWERS_PATH:={{ (ansible_env.HOME ~ '/.local/share/superpowers') | to_json }}}"
+      : "${DEV_SETUP_SUPERPOWERS_CRIT_PI_PATH:={{ (ansible_env.HOME ~ '/.config/dev-setup/superpowers-crit-pi') | to_json }}}"
     dest: "{{ ansible_env.HOME }}/.config/dev-setup/ai-assistant-sandbox.env"
     mode: "0600"
 

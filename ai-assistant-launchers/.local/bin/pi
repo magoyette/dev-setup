@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config_file="$HOME/.config/dev-setup/ai-assistant-sandbox.env"
+
+if [[ -f "$config_file" ]]; then
+  # shellcheck source=/dev/null
+  source "$config_file"
+fi
+
+fnm="${DEV_SETUP_FNM:-$HOME/.local/share/fnm/fnm}"
+node_version="${DEV_SETUP_PI_NODE_VERSION:-lts-latest}"
+
+if [[ ! -x "$fnm" ]]; then
+  printf 'pi wrapper: fnm not found at %s\n' "$fnm" >&2
+  exit 127
+fi
+
+exec dev-setup-ai-assistant-sandbox pi "$fnm" exec --using="$node_version" -- pi "$@"

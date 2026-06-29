@@ -25,6 +25,7 @@
     - ansible.builtin.import_tasks: tasks/ai-assistant-launchers.yml
     - ansible.builtin.import_tasks: tasks/claude-code.yml
     - ansible.builtin.import_tasks: tasks/codex.yml
+    - ansible.builtin.import_tasks: tasks/pi.yml
     - ansible.builtin.import_tasks: tasks/opencode.yml
     - name: Run Superpowers tasks
       ansible.builtin.import_tasks: tasks/superpowers.yml

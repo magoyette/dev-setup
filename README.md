@@ -32,7 +32,29 @@ wsl --shutdown
 - Configure the Windows Terminal for Ubuntu
   - I set Windows Terminal to `DejaVuSansM Nerd Font Mono` at `13 pt`
   - I set the Theme to `One Half Dark`. Neovim uses One Dark, while Bat uses One Half Dark.
+- Pi uses modified Enter keybindings for multiline input and follow-up queueing. Add Pi's documented Windows Terminal `Shift+Enter` and `Alt+Enter` `sendInput` actions if you use those shortcuts.
 - Add an Action for `Rename tab` associated to `Ctrl+Alt+Shift+R`
+
+Add to actions in Windows Terminal config:
+
+```txt
+  {
+    "command":
+    {
+      "action": "sendInput",
+      "input": "\u001b[13;2u"
+    },
+    "id": "User.sendInput.8882FD6D"
+  },
+  {
+    "command":
+      {
+        "action": "sendInput",
+        "input": "\u001b[13;3u"
+      },
+    "id": "User.sendInput.237E8A98"
+  }
+```
 
 ## Dev Setup
 
@@ -61,7 +83,8 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   Hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`). Default to hosts needed by the agent skills.
 - `ai_assistants_mcps`
   MCP servers enabled globally in Claude Code, Codex, and OpenCode. Supported values are `context7` and `grep`. Default: `[context7, grep]`. Removing a value removes that managed MCP from all three assistants without affecting user-managed MCP servers.
-- OpenCode is launched through managed `nono.sh` sandbox profiles by default.
+- OpenCode and Pi are launched through managed `nono.sh` sandbox profiles by
+  default.
   See the `ai_assistants_nono_*` values in `ansible/defaults.yml` for the
   launcher and profile defaults.
 - `pyenv_version`
@@ -134,11 +157,11 @@ Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_byte
 For global user-level context, Ansible combines
 [`global-agent-context.md`](global-agent-context.md) with the optional,
 gitignored `global-agent-context.local.md`, then deploys the result to
-`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and
+`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.pi/agent/AGENTS.md`, and
 `~/.config/opencode/AGENTS.md`. The shared file is a concise list of the CLI
-tools installed by this setup that are useful for an AI agent and don't have
-an Agent Skill. It also carries runtime guidance for the pyenv-managed
-`python3` and `uv` workflow and hallucination reduction guidelines.
+tools installed by this setup that are useful for an AI agent and don't have an
+Agent Skill. It also carries runtime guidance for the pyenv-managed `python3`
+and `uv` workflow and hallucination reduction guidelines.
 
 The AI assistants playbook creates `global-agent-context.local.md` when it is
 absent. Add personal agent instructions there and rerun the playbook to append
@@ -148,10 +171,10 @@ them after the shared instructions without committing them to the repository.
 
 This repository supports shared agent skills and agent-specific skills.
 
-- Shared skills for Claude Code, Codex, and OpenCode: `skills/` and
+- Shared skills for Claude Code, Codex, Pi, and OpenCode: `skills/` and
   `external-skills/`
 - Claude-only skills: `skills-claude/` and `external-skills-claude/`
-- Codex-only skills: `skills-codex/` and `external-skills-codex/`
+- Codex-targeted skills: `skills-codex/` and `external-skills-codex/`; Pi also reads them through the shared `~/.agents/skills/` path
 
 ## Pre-commit hook
 
@@ -228,10 +251,11 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [ccusage](https://ccusage.com/) : usage and cost reporting for Claude Code, Codex, and OpenCode; upgraded to the latest release on each playbook run
 - [codex](https://github.com/openai/codex) : coding agent
 - [Crit](https://crit.md/) : browser-based review UI for AI agent output,
-  integrated with Claude Code, Codex, and OpenCode; sharing is disabled
-- [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, and OpenCode integrations; native agent session restore and the One Dark theme are enabled
-- [nono](https://nono.sh/) : OS-level sandbox used by the managed OpenCode launchers, with strict managed profiles for normal and Superpowers sessions
+  integrated with Claude Code, Codex, Pi, and OpenCode; sharing is disabled
+- [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, Pi, and OpenCode integrations; native agent session restore and the One Dark theme are enabled
+- [nono](https://nono.sh/) : OS-level sandbox used by the managed OpenCode and Pi launchers, with strict managed profiles for normal assistant sessions and Superpowers sessions
 - [opencode](https://opencode.ai/) : coding agent; authenticate once with `/connect`
+- [Pi](https://pi.dev/) : coding agent; upgraded to the latest release on each playbook run; authenticate once with `/login`
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
 
 Many agent skills and Claude Code plugins are installed by the sub-playbook, see the dedicated sections below.
@@ -247,8 +271,10 @@ Many agent skills and Claude Code plugins are installed by the sub-playbook, see
 
 ## Agent skills for AI Assistants
 
-Skills can be shared between Claude Code, Codex, and OpenCode, or specific to
-one of the AI assistants.
+Skills can be shared between Claude Code, Codex, Pi, and OpenCode, or specific
+to one of the AI assistants. Pi reads the shared `~/.agents/skills/` path, so
+it inherits Codex-specific skills like `claude-review` without a second private
+copy under `~/.pi/agent/skills/`.
 
 ### magoyette/dev-setup skills
 
@@ -278,6 +304,7 @@ dedicated launcher commands:
 - `claude-sp`
 - `codex-sp`
 - `opencode-sp`
+- `pi-sp`
 
 These commands activate Superpowers for that session.
 
@@ -286,8 +313,10 @@ implementation plans or deliver reviewable artifacts. The agent should launch
 Crit for the relevant plan, diff, live app, or static HTML preview, address
 unresolved comments, and continue only after Crit approval.
 
-Normal `claude`, `codex`, and `opencode` sessions do not activate Superpowers.
-The managed `claude` wrapper and `claude-sp` launcher both set
+Normal `claude`, `codex`, `pi`, and `opencode` sessions do not activate
+Superpowers. The managed `pi-sp` launcher loads the Superpowers Pi package and
+the dev-setup Crit validation companion. The managed `claude` wrapper and
+`claude-sp` launcher both set
 `ENABLE_CLAUDEAI_MCP_SERVERS=false` so Claude.ai MCP servers stay disabled.
 
 ## Claude Code Plugins
@@ -305,7 +334,7 @@ The managed `claude` wrapper and `claude-sp` launcher both set
 ## Shared MCP Servers
 
 The `ai_assistants_mcps` variable enables managed HTTP MCP servers globally in
-Claude Code, Codex, and OpenCode:
+Claude Code, Codex, Pi, and OpenCode:
 
 - [Context7](https://context7.com/) (`context7`) provides current,
   version-specific library documentation and code examples.

@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [5.6.0] - 2026-06-28
+
+### Added
+
+- Add Pi coding agent with `nono.sh` sandboxing.
+
 ## [5.5.0] - 2026-06-28
 
 ### Added

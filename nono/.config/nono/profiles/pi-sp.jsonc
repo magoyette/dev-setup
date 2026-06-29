@@ -1,0 +1,16 @@
+{
+  "extends": "pi",
+  "meta": {
+    "name": "pi-sp",
+    "description": "dev-setup strict Pi Superpowers profile"
+  },
+  "filesystem": {
+    "read": [
+      "$HOME/.local/share/superpowers",
+      "$HOME/.config/dev-setup/superpowers-crit-pi"
+    ],
+    "read_file": [
+      "$HOME/.config/dev-setup/superpowers-crit.md"
+    ]
+  }
+}
