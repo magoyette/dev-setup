@@ -176,6 +176,9 @@ This repository supports shared agent skills and agent-specific skills.
 - Claude-only skills: `skills-claude/` and `external-skills-claude/`
 - Codex-targeted skills: `skills-codex/` and `external-skills-codex/`; Pi also reads them through the shared `~/.agents/skills/` path
 
+See [Front-end agent hooks](docs/front-end-agent-hooks.md) for the project-local
+Impeccable installation and design-hook workflow.
+
 ## Pre-commit hook
 
 The pre-commit hook runs `ansible-playbook ansible/playbook.yml --syntax-check` when staged files include `ansible/*.yml`.

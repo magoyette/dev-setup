@@ -14,6 +14,13 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [5.8.0] - 2026-06-28
+
+### Added
+
+- Document installation of the [Impeccable](https://impeccable.style/) agent skill in
+  specific project directories.
+
 ## [5.7.0] - 2026-06-28
 
 ### Added
