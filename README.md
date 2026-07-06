@@ -167,6 +167,8 @@ The AI assistants playbook creates `global-agent-context.local.md` when it is
 absent. Add personal agent instructions there and rerun the playbook to append
 them after the shared instructions without committing them to the repository.
 
+OpenCode bash permissions are managed in `scripts/merge-opencode-config.sh`.
+
 ## Agent skills
 
 This repository supports shared agent skills and agent-specific skills.

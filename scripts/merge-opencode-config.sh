@@ -60,12 +60,23 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
       },
       "bash": {
         "*": "ask",
+        "eza *": "allow",
         "git *": "ask",
         "git commit *": "deny",
         "git diff *": "allow",
         "git status *": "allow",
         "git push *": "deny",
-        "grep *": "allow"
+        "markdownlint-cli2 \"*.md\"": "allow",
+        "node --version": "allow",
+        "npm --version": "allow",
+        "npm audit": "allow",
+        "npm audit --json": "allow",
+        "npm config list --location=project": "allow",
+        "npm explain *": "allow",
+        "npm ls *": "allow",
+        "npm outdated --json": "allow",
+        "npm run check": "allow",
+        "npm view *": "allow"
       },
       "webfetch": "ask",
       "websearch": "ask"

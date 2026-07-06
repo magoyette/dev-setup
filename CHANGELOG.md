@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [5.9.0] - 2026-07-02
+
+### Changed
+
+- Allow OpenCode sessions to run without asking read-only commands for npm, eza and Markdownlint.
+
 ## [5.8.0] - 2026-06-28
 
 ### Added
