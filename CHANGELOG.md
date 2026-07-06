@@ -14,6 +14,14 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [5.10.0] - 2026-07-06
+
+### Added
+
+- Document project-local installation of
+  [Web Quality Skills](https://github.com/addyosmani/web-quality-skills) for
+  Claude Code, Codex, and OpenCode-compatible front-end reviews.
+
 ## [5.9.1] - 2026-07-04
 
 ### Fixed
