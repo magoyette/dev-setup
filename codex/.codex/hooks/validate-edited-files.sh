@@ -63,6 +63,19 @@ yaml_valid_file() {
     yaml valid < "$1"
 }
 
+markdownlint_file() {
+    file_dir=$(dirname -- "$1")
+
+    repo_root=$(git -C "$file_dir" rev-parse --show-toplevel 2>/dev/null || true)
+    config_file="${repo_root}/.markdownlint.jsonc"
+
+    if [ -n "$repo_root" ] && [ -f "$config_file" ]; then
+        markdownlint-cli2 --config "$config_file" "$1"
+    else
+        markdownlint-cli2 "$1"
+    fi
+}
+
 failures=0
 mapfile -t changed_paths < <(extract_paths | sed '/^$/d' | sort -u)
 
@@ -80,7 +93,7 @@ for changed_path in "${changed_paths[@]}"; do
         *.md)
             case "$file" in
                 */.claude/*|*/external-skills*|*/skills*) ;;
-                *) run_check "markdownlint-cli2 $changed_path" markdownlint-cli2 "$file" || failures=1 ;;
+                *) run_check "markdownlint-cli2 $changed_path" markdownlint_file "$file" || failures=1 ;;
             esac
             ;;
         *.json)

@@ -14,6 +14,13 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [5.9.1] - 2026-07-04
+
+### Fixed
+
+- Make AI agent Markdown hooks use each repository's markdownlint
+  configuration so disabled rules stay disabled during post-edit validation.
+
 ## [5.9.0] - 2026-07-02
 
 ### Changed

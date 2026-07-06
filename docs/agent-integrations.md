@@ -50,7 +50,9 @@ not add a second `nono.sh` wrapper to `claude`, `claude-sp`, `codex`, or
 
 Repository-local PostToolUse hooks validate edited shell, Markdown, JSON, and
 YAML files. Inspect `.claude/settings.json` for the active definitions and
-exclusions.
+exclusions. Markdown validation uses the edited file's git root
+`.markdownlint.jsonc` when present so hook checks match `./run-markdownlint.sh`
+rule configuration.
 
 The AI assistants playbook checks the installed and latest `ccusage` versions
 and upgrades the Bun-installed package when a newer release is available.
