@@ -27,10 +27,13 @@
       - libmagickcore-dev
     state: present
 
-- name: Install tree-sitter library
+- name: Install Emacs feature build dependencies
   become: true
   ansible.builtin.apt:
-    name: libtree-sitter0
+    name:
+      - libtree-sitter0
+      - libtree-sitter-dev
+      - "{{ emacs_libgccjit_dev_package }}"
     state: present
 
 - name: Check installed Emacs version

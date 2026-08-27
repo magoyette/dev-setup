@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [5.11.0] - 2026-08-26
+
+### Changed
+
+- Upgrade Emacs to 31.1 and improve `scripts/install-emacs-in-ubuntu.sh`.
+
 ## [5.10.0] - 2026-07-06
 
 ### Added
