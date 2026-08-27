@@ -14,6 +14,13 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [6.0.0] - 2026-08-27
+
+### Changed
+
+- Move `agent-browser` and Playwright provisioning from the `node` sub-playbook to the `ai-assistants`
+  sub-playbook.
+
 ## [5.11.0] - 2026-08-26
 
 ### Changed

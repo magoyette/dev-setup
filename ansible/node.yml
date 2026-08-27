@@ -15,5 +15,3 @@
     - ansible.builtin.import_tasks: tasks/markdownlint.yml
     - ansible.builtin.import_tasks: tasks/yaml-npm.yml
     - ansible.builtin.import_tasks: tasks/socket.yml
-    - ansible.builtin.import_tasks: tasks/agent-browser.yml
-    - ansible.builtin.import_tasks: tasks/playwright.yml

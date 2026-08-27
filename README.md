@@ -246,8 +246,6 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [yaml](https://github.com/eemeli/yaml) : YAML parser and validator installed globally via npm, used by Claude Code and Codex hooks for YAML syntax validation
 - [Socket](https://socket.dev/) : security CLI installed globally via npm; `socket login` and `socket wrapper on` remain manual. See [Socket CLI usage](docs/socket.md)
 - [Node](https://nodejs.org) : JavaScript and Typescript runtime
-- [agent-browser](https://github.com/vercel-labs/agent-browser) : browser automation CLI for AI agents with Chrome for Testing provisioning
-- [playwright-cli](https://github.com/microsoft/playwright/tree/main/packages/playwright-core/src/tools/cli-client) : browser automation for testing front-end changes
 
 ### ai-assistants sub-playbook
 
@@ -262,6 +260,8 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [opencode](https://opencode.ai/) : coding agent; authenticate once with `/connect`
 - [Pi](https://pi.dev/) : coding agent; upgraded to the latest release on each playbook run; authenticate once with `/login`
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
+- [agent-browser](https://github.com/vercel-labs/agent-browser) : browser automation CLI for AI agents with Chrome for Testing provisioning
+- [playwright-cli](https://github.com/microsoft/playwright/tree/main/packages/playwright-core/src/tools/cli-client) : browser automation for testing front-end changes
 
 Many agent skills and Claude Code plugins are installed by the sub-playbook, see the dedicated sections below.
 

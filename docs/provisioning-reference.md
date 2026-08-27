@@ -13,8 +13,8 @@ source of truth.
 | `core.yml` | Apt packages, shell configuration, Git, Difftastic, Hadolint, Tokei, and Zoxide |
 | `python.yml` | pyenv, managed CPython, pipx, uv, ansible-lint, and tldr |
 | `starship.yml` | Starship installation and shell initialization |
-| `node.yml` | Node, Bun, Markdown/YAML tools, Socket, agent-browser, and Playwright |
-| `ai-assistants.yml` | Coding assistants, integrations, hooks, and agent skills |
+| `node.yml` | Node, Bun, Markdown/YAML tools, and Socket |
+| `ai-assistants.yml` | Coding assistants, integrations, hooks, agent skills, and browser automation (agent-browser, Playwright) |
 | `emacs.yml` | Emacs, emacs-lsp-booster, and Emacs LSP packages |
 | `neovim.yml` | Neovim and its Stow-managed configuration |
 
