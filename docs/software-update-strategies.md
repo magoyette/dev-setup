@@ -15,6 +15,7 @@ strategy, or given a daily/runtime updater.
 | Latest on playbook run | The playbook checks or installs the latest upstream version when it runs. |
 | Daily updater | A shell wrapper checks for upgrades at most once per day before launching the tool. |
 | Latest at invocation | A command alias or wrapper resolves the latest package when the command runs. |
+| Self-updating | The tool upgrades itself at runtime; no repository-managed wrapper logic is involved. |
 | Upstream checkout | A git checkout or submodule tracks an upstream branch during playbook runs. |
 | Install-only | The playbook installs the tool if missing but does not upgrade it afterward. |
 | Repeated asset install | The package may be install-only, but its runtime assets or dependencies are refreshed each run. |
@@ -62,7 +63,7 @@ strategy, or given a daily/runtime updater.
 | Crit bootstrap binary | Pinned: `crit_version` plus binary checksum | `ansible/defaults.yml`, `ansible/tasks/crit.yml` |
 | Crit runtime binary | Daily updater through the Stow-managed `crit` wrapper | `crit/.local/bin/crit`, `crit/.local/bin/crit-auto-upgrade.sh` |
 | ccusage | Latest on playbook run: compares installed version to `npm view ccusage version` and installs `ccusage@latest` | `ansible/tasks/ccusage.yml` |
-| Claude Code | Daily updater: `.bashrc` wrapper runs `claude upgrade` before launch | `ansible/tasks/claude-code.yml` |
+| Claude Code | Self-updating: Claude Code upgrades itself | `ansible/tasks/claude-code.yml` |
 | ccstatusline | Latest at invocation through `bunx ccstatusline@latest` alias | `ansible/tasks/claude-code.yml`, `scripts/merge-claude-settings.sh` |
 | Superpowers checkout | Upstream checkout: tracks `main` and updates on playbook run | `ansible/tasks/superpowers.yml` |
 | Pi Superpowers launcher package link | Re-linked on each playbook run | `ansible/tasks/superpowers.yml`, `superpowers-crit/` |
@@ -75,7 +76,7 @@ strategy, or given a daily/runtime updater.
 | zoxide | Install-only | `ansible/tasks/zoxide.yml` |
 | ansible-lint | Install-only through pipx | `ansible/tasks/ansible-lint.yml` |
 | tldr | Install-only through pipx | `ansible/tasks/tldr.yml` |
-| Claude Code initial install | Install-only; daily updater handles subsequent upgrades | `ansible/tasks/claude-code.yml` |
+| Claude Code initial install | Install-only; Claude Code upgrades itself afterward | `ansible/tasks/claude-code.yml` |
 | Claude sandbox runtime | Install-only npm global | `ansible/tasks/claude-code.yml` |
 | Claude Code plugins | Install-only if the user-scoped plugin is missing | `ansible/tasks/claude-code.yml` |
 | Codex CLI | Install-only npm global | `ansible/tasks/codex.yml` |

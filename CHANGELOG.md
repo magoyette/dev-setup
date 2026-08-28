@@ -14,6 +14,13 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [6.1.0] - 2026-08-27
+
+### Removed
+
+- Remove the `claude()` `.bashrc` wrapper that ran `claude upgrade` once per day since Claude Code
+  now upgrades itself.
+
 ## [6.0.0] - 2026-08-27
 
 ### Changed

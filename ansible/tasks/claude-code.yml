@@ -93,9 +93,19 @@
     line: 'alias ccstatusline="bunx ccstatusline@latest"'
     state: present
 
-- name: Add claude wrapper function for daily auto-upgrade
+- name: Export Claude.ai MCP servers disable variable
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: 'export ENABLE_CLAUDEAI_MCP_SERVERS=false'
+    state: present
+
+- name: Remove legacy claude wrapper function for daily auto-upgrade
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     regexp: '^claude\(\) \{ local stamp="\$HOME/\.local/share/claude-upgrade-check";'
-    line: 'claude() { local stamp="$HOME/.local/share/claude-upgrade-check"; if [[ ! -f "$stamp" ]] || [[ -n $(find "$stamp" -mtime +1 2>/dev/null) ]]; then ENABLE_CLAUDEAI_MCP_SERVERS=false command claude upgrade; touch "$stamp"; fi; ENABLE_CLAUDEAI_MCP_SERVERS=false command claude "$@"; }'
-    state: present
+    state: absent
+
+- name: Remove legacy claude upgrade check stamp file
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/share/claude-upgrade-check"
+    state: absent

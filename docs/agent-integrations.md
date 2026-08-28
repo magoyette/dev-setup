@@ -38,10 +38,9 @@ declared in `ansible/defaults.yml`.
 in `~/.claude.json`. The playbook removes the legacy Context7 Claude plugin so
 Context7 is configured consistently with Codex and OpenCode.
 
-The managed `claude` shell wrapper sets
-`ENABLE_CLAUDEAI_MCP_SERVERS=false` for both the daily auto-upgrade check and
-the launched Claude Code session, keeping Claude.ai MCP servers disabled in
-normal sessions.
+`.bashrc` exports `ENABLE_CLAUDEAI_MCP_SERVERS=false`, keeping Claude.ai MCP
+servers disabled for normal Claude Code sessions. Claude Code upgrades itself;
+the playbook no longer manages a daily upgrade wrapper.
 
 Claude Code and Codex keep their native OS-level command sandboxes as the
 managed boundary for both normal and Superpowers sessions. This repository does
@@ -152,8 +151,8 @@ validates them with `nono profile validate`.
 
 - `claude-sp` loads the checkout with Claude Code's session-only
   `--plugin-dir` option and sets the same
-  `ENABLE_CLAUDEAI_MCP_SERVERS=false` environment variable as the normal
-  `claude` wrapper.
+  `ENABLE_CLAUDEAI_MCP_SERVERS=false` environment variable that `.bashrc`
+  exports for normal sessions.
 - `codex-sp` selects `~/.codex/superpowers.config.toml`. The Superpowers Codex
   plugin is sourced from a dev-setup-managed local marketplace and remains
   installed but disabled in the base configuration. It is refreshed when the

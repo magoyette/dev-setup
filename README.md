@@ -320,9 +320,8 @@ unresolved comments, and continue only after Crit approval.
 
 Normal `claude`, `codex`, `pi`, and `opencode` sessions do not activate
 Superpowers. The managed `pi-sp` launcher loads the Superpowers Pi package and
-the dev-setup Crit validation companion. The managed `claude` wrapper and
-`claude-sp` launcher both set
-`ENABLE_CLAUDEAI_MCP_SERVERS=false` so Claude.ai MCP servers stay disabled.
+the dev-setup Crit validation companion. `.bashrc` exports
+`ENABLE_CLAUDEAI_MCP_SERVERS=false` to disable Claude.ai MCP servers.
 
 ## Claude Code Plugins
 
