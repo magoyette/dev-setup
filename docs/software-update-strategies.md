@@ -44,7 +44,7 @@ strategy, or given a daily/runtime updater.
 | Python build dependencies | Apt safe-upgrade when the core playbook runs; ensured present by the Python playbook | `ansible/tasks/python.yml` |
 | Emacs build dependencies | Apt safe-upgrade when the core playbook runs; ensured present by the Emacs playbook | `ansible/tasks/emacs.yml` |
 | ImageMagick development packages | Apt safe-upgrade when the core playbook runs; ensured present by the Emacs playbook | `ansible/tasks/emacs.yml` |
-| tree-sitter library and development headers | Apt safe-upgrade when the core playbook runs; ensured present by the Emacs playbook | `ansible/tasks/emacs.yml` |
+| libtree-sitter | Pinned: `tree_sitter_version` plus source tarball checksum; built from source into `/usr/local` | `ansible/defaults.yml`, `ansible/tasks/libtree-sitter.yml` |
 | libgccjit development package | Pinned: `emacs_libgccjit_dev_package`; ensured present by the Emacs playbook | `ansible/defaults.yml`, `ansible/tasks/emacs.yml` |
 | fnm | Install-only | `ansible/tasks/node.yml` |
 | Node | Moving selector: `fnm_node_version`, default `lts-latest` | `ansible/defaults.yml`, `ansible/tasks/node.yml` |

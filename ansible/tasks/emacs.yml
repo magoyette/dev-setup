@@ -31,10 +31,16 @@
   become: true
   ansible.builtin.apt:
     name:
-      - libtree-sitter0
-      - libtree-sitter-dev
       - "{{ emacs_libgccjit_dev_package }}"
     state: present
+
+# tree-sitter is built from source into /usr/local instead of relying on the
+# apt libtree-sitter0/libtree-sitter-dev packages: Ubuntu is stuck on 0.20.8,
+# which only supports grammar ABI 13-14, while current grammar bundles ship
+# ABI 15. See tasks/libtree-sitter.yml. `apt build-dep emacs` above may still
+# transitively pull libtree-sitter-dev, but that is incidental: the source
+# build below resolves tree-sitter via pkg-config, which prefers /usr/local.
+- ansible.builtin.import_tasks: libtree-sitter.yml
 
 - name: Check installed Emacs version
   ansible.builtin.command: emacs --version
@@ -42,9 +48,20 @@
   failed_when: false
   changed_when: false
 
+- name: Check Emacs tree-sitter library ABI version
+  ansible.builtin.command: emacs -Q --batch --eval "(princ (treesit-library-abi-version))"
+  register: emacs_treesit_abi_output
+  failed_when: false
+  changed_when: false
+
 - name: Install Emacs {{ emacs_version }} from source
   ansible.builtin.command: "{{ playbook_dir }}/../scripts/install-emacs-in-ubuntu.sh {{ emacs_version }}"
-  when: emacs_version_output.rc != 0 or emacs_version not in emacs_version_output.stdout
+  when: >-
+    emacs_version_output.rc != 0 or
+    emacs_version not in emacs_version_output.stdout or
+    emacs_treesit_abi_output.rc != 0 or
+    (emacs_treesit_abi_output.stdout | trim | int) < emacs_min_treesit_abi_version or
+    libtree_sitter_installed.changed
 
 - ansible.builtin.import_tasks: emacs-lsp-booster.yml
 - name: Add emacs terminal alias

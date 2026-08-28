@@ -117,8 +117,9 @@ When adding a Stow package:
 - Crit: `ansible/tasks/crit.yml` and `scripts/merge-crit-config.sh`
 - Herdr: `ansible/tasks/herdr.yml`
 - Skills: `ansible/tasks/agent-skills.yml` and skill download scripts
-- Emacs: `ansible/tasks/emacs*.yml` and
-  `scripts/install-emacs-in-ubuntu.sh`
+- Emacs: `ansible/tasks/emacs*.yml`, `ansible/tasks/libtree-sitter.yml`,
+  `scripts/install-emacs-in-ubuntu.sh`, and
+  `scripts/install-libtree-sitter.sh`
 
 Use `README.md` for the user-facing installed-tool inventory instead of
 duplicating it here.

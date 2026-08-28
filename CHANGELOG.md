@@ -14,6 +14,13 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [6.2.0] - 2026-08-27
+
+### Fixed
+
+- Build `libtree-sitter` from source into `/usr/local` instead of relying on Ubuntu's apt package,
+  which is stuck at an ABI version too old for current tree-sitter grammars supported by Emacs.
+
 ## [6.1.0] - 2026-08-27
 
 ### Removed

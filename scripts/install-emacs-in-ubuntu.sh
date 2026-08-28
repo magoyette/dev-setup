@@ -9,13 +9,29 @@ fi
 emacs_version="$1"
 build_dir="$HOME/emacs-$emacs_version"
 tarball="$HOME/emacs-$emacs_version.tar.xz"
+tarball_name="emacs-$emacs_version.tar.xz"
+emacs_mirrors=(
+  "https://ftp.gnu.org/gnu/emacs/$tarball_name"
+  "https://mirror.csclub.uwaterloo.ca/gnu/emacs/$tarball_name"
+)
 
 cd ~
 echo "Removing previous build directory $build_dir"
 rm -rf "$build_dir"
 
 echo "Downloading and building Emacs $emacs_version"
-wget -O "$tarball" "https://ftp.gnu.org/gnu/emacs/emacs-$emacs_version.tar.xz"
+download_succeeded=false
+for url in "${emacs_mirrors[@]}"; do
+  if wget --tries=3 --timeout=20 --waitretry=5 -O "$tarball" "$url"; then
+    download_succeeded=true
+    break
+  fi
+  echo "Failed to download from $url, trying next mirror"
+done
+if [ "$download_succeeded" = false ]; then
+  echo "Failed to download Emacs $emacs_version from all mirrors"
+  exit 1
+fi
 tar -xf "$tarball"
 rm -f "$tarball"
 cd "$build_dir"

@@ -1,0 +1,18 @@
+---
+- name: Check installed libtree-sitter version
+  ansible.builtin.command: pkg-config --modversion tree-sitter
+  environment:
+    PKG_CONFIG_LIBDIR: /usr/local/lib/pkgconfig
+  register: libtree_sitter_version_output
+  failed_when: false
+  changed_when: false
+
+- name: Install libtree-sitter {{ tree_sitter_version }} from source
+  ansible.builtin.command: >-
+    {{ playbook_dir }}/../scripts/install-libtree-sitter.sh
+    {{ tree_sitter_version }} {{ tree_sitter_tarball_sha256 }}
+  register: libtree_sitter_installed
+  changed_when: true
+  when: >-
+    libtree_sitter_version_output.rc != 0 or
+    libtree_sitter_version_output.stdout | trim != tree_sitter_version
