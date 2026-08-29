@@ -74,7 +74,9 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 - `git_user_email`
   Git identity email. Default: `"you@example.com"`.
 - `git_core_editor`
-  Optional Git `core.editor` override. `nvim` is the suggested value. Default: `""`.
+  Optional Git `core.editor` override. `emacsclient -nw` is the suggested value. Default: `""`.
+- `shell_editor`
+  Optional editor command that sets both `$EDITOR` and `$VISUAL` in `~/.bashrc`. `emacsclient -nw` is the suggested value, which also exports `ALTERNATE_EDITOR=""` so the Emacs daemon starts on demand. Default: `""`.
 - `install_git_aliases`
   Install and manage this repo's Git aliases. Default: `true`. Set to `false` to skip Git alias management.
 - `ai_assistants_sandbox_writable_roots`
@@ -129,6 +131,7 @@ git alias
 
 - `e` : open Emacs with the daemon, initial buffer is `*scratch*`
 - `eg` : open Emacs with the daemon, initial buffer is Magit status
+- `er` : restart the Emacs daemon, saving open file buffers first
 - `emacs` : open Emacs without the daemon
 - `ccstatusline` : configure the Claude Code status line
 - `fd` : alias to Ubuntu's `fdfind` binary
@@ -255,7 +258,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [codex](https://github.com/openai/codex) : coding agent
 - [Crit](https://crit.md/) : browser-based review UI for AI agent output,
   integrated with Claude Code, Codex, Pi, and OpenCode; sharing is disabled
-- [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, Pi, and OpenCode integrations; native agent session restore and the One Dark theme are enabled
+- [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, Pi, and OpenCode integrations; native agent session restore, the One Dark theme, and the `F12` prefix key (avoids Emacs's `C-b`) are enabled; upgraded to the latest release on each playbook run with a live handoff for running sessions
 - [nono](https://nono.sh/) : OS-level sandbox used by the managed OpenCode and Pi launchers, with strict managed profiles for normal assistant sessions and Superpowers sessions
 - [opencode](https://opencode.ai/) : coding agent; authenticate once with `/connect`
 - [Pi](https://pi.dev/) : coding agent; upgraded to the latest release on each playbook run; authenticate once with `/login`

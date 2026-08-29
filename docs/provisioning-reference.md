@@ -84,6 +84,9 @@ Important ordering and environment constraints:
 - Starship initialization is inserted before Zoxide so Zoxide remains the
   final managed shell initialization line.
 - The `fd` link exposes Ubuntu's `fdfind` binary as `fd`.
+- When `shell_editor` is set, `ALTERNATE_EDITOR=""` is exported alongside
+  `$EDITOR`/`$VISUAL` so an `emacsclient`-based editor command auto-starts the
+  Emacs daemon instead of failing when no server is running.
 
 Inspect `ansible/tasks/shell-config.yml`, `ansible/tasks/python.yml`, and the
 owning tool task before changing shell behavior.
@@ -119,7 +122,10 @@ When adding a Stow package:
 - Skills: `ansible/tasks/agent-skills.yml` and skill download scripts
 - Emacs: `ansible/tasks/emacs*.yml`, `ansible/tasks/libtree-sitter.yml`,
   `scripts/install-emacs-in-ubuntu.sh`, and
-  `scripts/install-libtree-sitter.sh`
+  `scripts/install-libtree-sitter.sh`. After an Emacs version bump, run the
+  `er` shell function to restart the running daemon against the newly
+  installed binary — a daemon started from the previous build otherwise
+  keeps running and causes an `emacsclient` version mismatch.
 
 Use `README.md` for the user-facing installed-tool inventory instead of
 duplicating it here.

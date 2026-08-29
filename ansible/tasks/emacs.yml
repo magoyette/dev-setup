@@ -85,4 +85,11 @@
     line: "alias eg='emacsclient -t -a \"\" --eval \"(progn (magit-status) nil)\"'"
     state: present
 
+- name: Add emacs daemon restart function
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: "^er\\(\\)"
+    line: "er() { emacsclient -e '(let ((confirm-kill-emacs nil) (confirm-kill-processes nil)) (save-buffers-kill-emacs t))' >/dev/null 2>&1; for _ in $(seq 50); do emacsclient -e t >/dev/null 2>&1 || break; sleep 0.1; done; emacs --daemon; }"
+    state: present
+
 - ansible.builtin.import_tasks: emacs-node.yml

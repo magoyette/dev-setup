@@ -14,6 +14,30 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [6.4.0] - 2026-08-29
+
+### Changed
+
+- Document how to use the Emacs daemon through `emacsclient` for Git's `core.editor`, `$EDITOR`,
+  and `$VISUAL`.
+- Upgrade Herdr to the latest release on each playbook run instead of
+  install-only, using `herdr update --handoff` so running sessions are handed
+  off live instead of blocking the update.
+
+### Added
+
+- Export `ALTERNATE_EDITOR=""` so `emacsclient` starts the Emacs daemon on first
+  use instead of failing when no server is running.
+- Set `$VISUAL` alongside `$EDITOR` from the `shell_editor` variable.
+- Add the `er` shell function to restart the Emacs daemon, saving open file
+  buffers first.
+
+### Fixed
+
+- Apply Herdr configuration changes to an already-running Herdr server, so the
+  `F12` prefix key and other managed settings take effect without manually
+  restarting Herdr.
+
 ## [6.3.0] - 2026-08-29
 
 ### Changed

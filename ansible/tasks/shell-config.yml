@@ -48,11 +48,27 @@
     line: "export BAT_THEME=OneHalfDark"
     state: present
 
+- name: Set ALTERNATE_EDITOR environment variable
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: "^export ALTERNATE_EDITOR="
+    line: 'export ALTERNATE_EDITOR=""'
+    state: present
+  when: (shell_editor | default('') | trim | length) > 0
+
 - name: Set EDITOR environment variable
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
     regexp: "^export EDITOR="
     line: "export EDITOR={{ shell_editor | quote }}"
+    state: present
+  when: (shell_editor | default('') | trim | length) > 0
+
+- name: Set VISUAL environment variable
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: "^export VISUAL="
+    line: "export VISUAL={{ shell_editor | quote }}"
     state: present
   when: (shell_editor | default('') | trim | length) > 0
 

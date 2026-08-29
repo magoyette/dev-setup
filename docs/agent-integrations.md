@@ -207,6 +207,13 @@ settings do not add Herdr's socket path to writable roots or network
 allowances, but there is no repository-managed native deny-list for that socket
 path.
 
+Herdr's prefix key is set to `F12` (instead of the default `Ctrl-B`) to avoid
+colliding with Emacs's `C-b` binding. Herdr runs a persistent headless server
+that outlives client attach/detach, so a `config.toml` edit only takes effect
+after `herdr server reload-config` or a full `herdr server stop` and relaunch
+— restarting the client alone reattaches to the same stale server. The
+playbook issues that reload itself whenever it changes a managed config line.
+
 Inspect `ansible/tasks/crit.yml`, `ansible/tasks/herdr.yml`, and their owning
 configuration files for current behavior.
 

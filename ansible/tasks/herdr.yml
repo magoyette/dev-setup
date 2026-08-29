@@ -17,6 +17,35 @@
   environment:
     HERDR_INSTALL_DIR: "{{ ansible_env.HOME }}/.local/bin"
 
+- name: Check installed Herdr version
+  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} --version"
+  register: herdr_version_check
+  changed_when: false
+  failed_when: false
+
+# Uses the same manifest as `herdr update`/install.sh so the version compared
+# here always agrees with what an upgrade would actually install.
+- name: Resolve latest Herdr release manifest
+  ansible.builtin.uri:
+    url: https://herdr.dev/latest.json
+    status_code: 200
+  register: herdr_latest_manifest
+  changed_when: false
+
+- name: Set installed and latest Herdr versions
+  ansible.builtin.set_fact:
+    herdr_installed_version: "{{ herdr_version_check.stdout | regex_search('[0-9][0-9.]*') | default('', true) }}"
+    herdr_latest_version: "{{ herdr_latest_manifest.json.version }}"
+
+# --handoff hands running panes off to the updated server live instead of
+# silently no-oping with "Herdr was not updated" while a session is attached.
+- name: Upgrade Herdr to the latest release
+  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} update --handoff"
+  when: >-
+    herdr_installed_version != '' and
+    herdr_installed_version != herdr_latest_version
+  changed_when: true
+
 - name: Ensure Herdr config directory exists
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.config/herdr"
@@ -35,6 +64,7 @@
     path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
     regexp: "^\\[session\\]\\s*$"
     line: "[session]"
+  register: herdr_session_section
 
 - name: Enable Herdr native agent session restore
   ansible.builtin.lineinfile:
@@ -42,12 +72,14 @@
     regexp: "^\\s*resume_agents_on_restore\\s*="
     insertafter: "^\\[session\\]\\s*$"
     line: "resume_agents_on_restore = true"
+  register: herdr_resume_agents
 
 - name: Ensure Herdr theme section exists in config
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
     regexp: "^\\[theme\\]\\s*$"
     line: "[theme]"
+  register: herdr_theme_section
 
 - name: Configure Herdr One Dark theme
   ansible.builtin.lineinfile:
@@ -55,12 +87,14 @@
     regexp: "^\\s*name\\s*="
     insertafter: "^\\[theme\\]\\s*$"
     line: 'name = "one-dark"'
+  register: herdr_theme_name
 
 - name: Ensure Herdr keys section exists in config
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
     regexp: "^\\[keys\\]\\s*$"
     line: "[keys]"
+  register: herdr_keys_section
 
 - name: Configure Herdr prefix key to avoid Emacs C-b collision
   ansible.builtin.lineinfile:
@@ -68,6 +102,19 @@
     regexp: "^\\s*prefix\\s*="
     insertafter: "^\\[keys\\]\\s*$"
     line: 'prefix = "f12"'
+  register: herdr_prefix_key
+
+- name: Reload Herdr config in the running server
+  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} server reload-config"
+  changed_when: false
+  failed_when: false
+  when: >-
+    herdr_session_section.changed or
+    herdr_resume_agents.changed or
+    herdr_theme_section.changed or
+    herdr_theme_name.changed or
+    herdr_keys_section.changed or
+    herdr_prefix_key.changed
 
 - name: Install Herdr Claude Code integration
   ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration install claude"
