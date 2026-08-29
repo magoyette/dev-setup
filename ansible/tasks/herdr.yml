@@ -56,6 +56,19 @@
     insertafter: "^\\[theme\\]\\s*$"
     line: 'name = "one-dark"'
 
+- name: Ensure Herdr keys section exists in config
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
+    regexp: "^\\[keys\\]\\s*$"
+    line: "[keys]"
+
+- name: Configure Herdr prefix key to avoid Emacs C-b collision
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
+    regexp: "^\\s*prefix\\s*="
+    insertafter: "^\\[keys\\]\\s*$"
+    line: 'prefix = "f12"'
+
 - name: Install Herdr Claude Code integration
   ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration install claude"
   changed_when: false

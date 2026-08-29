@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [6.3.0] - 2026-08-29
+
+### Changed
+
+- Set Herdr's prefix key to `f12` to avoid colliding with Emacs's `C-b` binding.
+
 ## [6.2.0] - 2026-08-27
 
 ### Fixed
