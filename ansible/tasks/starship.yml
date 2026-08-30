@@ -30,8 +30,9 @@
 - name: Add Starship init to bashrc before zoxide
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
-    regexp: '^eval "\$\(starship init bash\)"$'
-    line: 'eval "$(starship init bash)"'
+    # Disable Starship when TERM is dumb (ex: Emacs shell-mode buffers)
+    regexp: 'eval "\$\(starship init bash\)"'
+    line: '[ "$TERM" = "dumb" ] || eval "$(starship init bash)"'
     insertbefore: '^eval "\$\(zoxide init bash\)"$'
     state: present
 

@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [6.4.1] - 2026-08-30
+
+### Fixed
+
+- Disable Starship when TERM is dumb (ex: Emacs shell-mode buffers).
+
 ## [6.4.0] - 2026-08-29
 
 ### Changed
