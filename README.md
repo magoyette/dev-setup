@@ -50,9 +50,9 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 - `git_user_email`
   Git identity email. Default: `"you@example.com"`.
 - `git_core_editor`
-  Optional Git `core.editor` override. `emacsclient -nw` is the suggested value. Default: `""`.
+  Optional Git `core.editor` override. Default: `"emacsclient -nw"`.
 - `shell_editor`
-  Optional editor command that sets both `$EDITOR` and `$VISUAL` in `~/.bashrc`. `emacsclient -nw` is the suggested value, which also exports `ALTERNATE_EDITOR=""` so the Emacs daemon starts on demand. Default: `""`.
+  Optional editor command that sets both `$EDITOR` and `$VISUAL` in `~/.bashrc`. Default: `"emacsclient -nw"`, which also exports `ALTERNATE_EDITOR=""` so the Emacs daemon starts on demand.
 - `install_git_aliases`
   Install and manage this repo's Git aliases. Default: `true`. Set to `false` to skip Git alias management.
 - `ai_assistants_sandbox_writable_roots`
@@ -74,7 +74,7 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 - `playwright_browsers`
   Browsers to install for Playwright. Default: `["chrome"]`. Accepts any combination of `chrome`, `chromium`, `firefox`, and `webkit`.
 - `playbooks_in_main_playbook`
-  Sub-playbooks to run when invoking the main playbook. Default: `[core, python, starship, node, ai-assistants, emacs, neovim]`.
+  Sub-playbooks to run when invoking the main playbook. Default: `[core, python, starship, node, ai-assistants, emacs]`.
 
 Some sub-playbooks depend on others:
 
@@ -86,7 +86,6 @@ Some sub-playbooks depend on others:
 | `node`          | `core`                             |
 | `ai-assistants` | `core`, `node`                     |
 | `emacs`         | `core`, `node`                     |
-| `neovim`        | `core`                             |
 
 Run the bootstrap script:
 
@@ -250,10 +249,6 @@ Many agent skills and Claude Code plugins are installed by the sub-playbook, see
 - [Emacs](https://www.gnu.org/software/emacs/) : terminal text editor configured with [my personal configuration](https://github.com/magoyette/.emacs.d)
 - [libtree-sitter](https://github.com/tree-sitter/tree-sitter) : built from source into `/usr/local` so Emacs supports current (ABI 15) tree-sitter grammars, since Ubuntu's apt package is stuck on an older ABI
 - [emacs-lsp-booster](https://github.com/blahgeek/emacs-lsp-booster) : better performance in lsp-mode
-
-### neovim sub-playbook
-
-- [Neovim](https://neovim.io/) : terminal text editor
 
 ## Agent skills for AI Assistants
 

@@ -91,7 +91,7 @@ Check for missed opportunities to use idiomatic Ansible modules:
 
 ### 9. meta end_play guards for optional sub-playbooks
 
-Optional sub-playbooks such as emacs, neovim, python, and starship must begin with the
+Optional sub-playbooks such as emacs, python, and starship must begin with the
 established `meta: end_play` guard.
 
 If a new optional sub-playbook is added without this guard, flag it.

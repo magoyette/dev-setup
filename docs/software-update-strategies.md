@@ -59,7 +59,6 @@ strategy, or given a daily/runtime updater.
 | Hadolint | Pinned: `hadolint_version` | `ansible/defaults.yml`, `ansible/tasks/hadolint.yml` |
 | Tokei | Pinned: `tokei_version` | `ansible/defaults.yml`, `ansible/tasks/tokei.yml` |
 | Starship | Pinned: `starship_version` | `ansible/defaults.yml`, `ansible/tasks/starship.yml` |
-| Neovim | Pinned: `neovim_version` | `ansible/defaults.yml`, `ansible/tasks/neovim.yml` |
 | Crit bootstrap binary | Pinned: `crit_version` plus binary checksum | `ansible/defaults.yml`, `ansible/tasks/crit.yml` |
 | Crit runtime binary | Daily updater through the Stow-managed `crit` wrapper | `crit/.local/bin/crit`, `crit/.local/bin/crit-auto-upgrade.sh` |
 | ccusage | Latest on playbook run: compares installed version to `npm view ccusage version` and installs `ccusage@latest` | `ansible/tasks/ccusage.yml` |

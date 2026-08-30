@@ -112,7 +112,7 @@ Check for missed opportunities to use idiomatic Ansible modules:
 
 ### 9. `meta: end_play` guards for optional sub-playbooks
 
-Sub-playbooks that are optional (emacs, neovim, python, starship) must begin with a
+Sub-playbooks that are optional (emacs, python, starship) must begin with a
 `meta: end_play` guard:
 ```yaml
 - name: Skip if not in playbooks_in_main_playbook

@@ -14,6 +14,20 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [7.0.0] - 2026-08-30
+
+### Removed
+
+- Remove Neovim, the `neovim` sub-playbook, and its Stow-managed configuration.
+  Remove `neovim` from `playbooks_in_main_playbook` in `ansible/vars.yml`.
+  To manually uninstall, run:
+  `rm -rf ~/.config/nvim ~/.local/bin/nvim ~/.local/opt/nvim`.
+
+### Changed
+
+- Set `git_core_editor` and `shell_editor` to `emacsclient -nw` in
+  `ansible/vars.yml.example`, since this setup uses Emacs as its editor.
+
 ## [6.4.3] - 2026-08-30
 
 ### Fixed
