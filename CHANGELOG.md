@@ -14,6 +14,13 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [6.4.3] - 2026-08-30
+
+### Fixed
+
+- Document fixes for conflicts between Windows Terminal keybindings and Emacs.
+- Document fixes for Emacs keybindings unsupported in Windows terminal by default.
+
 ## [6.4.2] - 2026-08-30
 
 ### Fixed

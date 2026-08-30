@@ -29,32 +29,8 @@ wsl --shutdown
 
 ## Windows Terminal
 
-- Configure the Windows Terminal for Ubuntu
-  - I set Windows Terminal to `DejaVuSansM Nerd Font Mono` at `13 pt`
-  - I set the Theme to `One Half Dark`. Neovim uses One Dark, while Bat uses One Half Dark.
-- Pi uses modified Enter keybindings for multiline input and follow-up queueing. Add Pi's documented Windows Terminal `Shift+Enter` and `Alt+Enter` `sendInput` actions if you use those shortcuts.
-- Add an Action for `Rename tab` associated to `Ctrl+Alt+Shift+R`
-
-Add to actions in Windows Terminal config:
-
-```txt
-  {
-    "command":
-    {
-      "action": "sendInput",
-      "input": "\u001b[13;2u"
-    },
-    "id": "User.sendInput.8882FD6D"
-  },
-  {
-    "command":
-      {
-        "action": "sendInput",
-        "input": "\u001b[13;3u"
-      },
-    "id": "User.sendInput.237E8A98"
-  }
-```
+Refer to [Windows Terminal setup](docs/windows-terminal-setup.md) for details on how to configure
+Windows Terminal to work correctly with Emacs and Pi.
 
 ## Dev Setup
 
@@ -154,6 +130,7 @@ Reference documents:
 - [Claude WSL notification hooks](docs/claude-wsl-notif-hooks.md)
 - [Herdr alternatives](docs/herdr-alternatives.md)
 - [WSL terminal title issues](docs/wsl-terminal-title-issues.md)
+- [Windows Terminal setup](docs/windows-terminal-setup.md)
 
 Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code. Ansible also deploys global Codex hooks for WSL-to-Windows notifications and post-edit validation.
 
