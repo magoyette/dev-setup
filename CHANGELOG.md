@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [6.4.2] - 2026-08-30
+
+### Fixed
+
+- Make the `er` shell function more reliable to kill the Emacs daemon.
+
 ## [6.4.1] - 2026-08-30
 
 ### Fixed
