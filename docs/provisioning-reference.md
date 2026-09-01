@@ -15,7 +15,7 @@ source of truth.
 | `starship.yml` | Starship installation and shell initialization |
 | `node.yml` | Node, Bun, Markdown/YAML tools, and Socket |
 | `ai-assistants.yml` | Coding assistants, integrations, hooks, agent skills, and browser automation (agent-browser, Playwright) |
-| `emacs.yml` | Emacs, emacs-lsp-booster, and Emacs LSP packages |
+| `emacs.yml` | Emacs, emacs-lsp-booster, Emacs LSP packages, and prose (spellcheck/dictionary) dependencies |
 
 Each sub-playbook exits with `meta: end_play` when it is excluded from
 `playbooks_in_main_playbook`. This also applies when a sub-playbook is run

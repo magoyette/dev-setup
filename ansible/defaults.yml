@@ -74,6 +74,7 @@ claude_code_plugins:
 
 # npm global packages required by Emacs LSP mode and formatting tools
 emacs_npm_packages:
+  - "@ansible/ansible-language-server"
   - "@astrojs/language-server"
   - bash-language-server
   - eslint

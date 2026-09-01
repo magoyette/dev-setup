@@ -14,6 +14,17 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [7.1.0] - 2026-08-31
+
+### Added
+
+- Provision Emacs prose dependencies: `libenchant-2-dev`, `pkgconf`, and
+  hunspell (English/Canadian/French) for `jinx` spellchecking, plus a local
+  `dictd` server with GCIDE, WordNet, and English/French FreeDict databases for
+  `dictionary.el`, avoiding its unencrypted `dict.org` network fallback.
+- Add `@ansible/ansible-language-server` to `emacs_npm_packages` in
+  `ansible/defaults.yml` for `lsp-ansible` support in Emacs.
+
 ## [7.0.0] - 2026-08-30
 
 ### Removed

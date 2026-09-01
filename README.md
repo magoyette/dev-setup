@@ -85,7 +85,7 @@ Some sub-playbooks depend on others:
 | `starship`      | `core`                             |
 | `node`          | `core`                             |
 | `ai-assistants` | `core`, `node`                     |
-| `emacs`         | `core`, `node`                     |
+| `emacs`         | `core`, `node`, `python`           |
 
 Run the bootstrap script:
 
@@ -249,6 +249,8 @@ Many agent skills and Claude Code plugins are installed by the sub-playbook, see
 - [Emacs](https://www.gnu.org/software/emacs/) : terminal text editor configured with [my personal configuration](https://github.com/magoyette/.emacs.d)
 - [libtree-sitter](https://github.com/tree-sitter/tree-sitter) : built from source into `/usr/local` so Emacs supports current (ABI 15) tree-sitter grammars, since Ubuntu's apt package is stuck on an older ABI
 - [emacs-lsp-booster](https://github.com/blahgeek/emacs-lsp-booster) : better performance in lsp-mode
+- [hunspell](https://hunspell.github.io/) and [Enchant](https://github.com/rrthomas/enchant) with English and French dictionaries : spellchecking backend for `jinx` in Emacs
+- [dictd](https://en.wikipedia.org/wiki/DICT) with GCIDE, WordNet, and English/French FreeDict databases : local offline dictionary server for `dictionary.el` in Emacs, avoiding the unencrypted `dict.org` network fallback
 
 ## Agent skills for AI Assistants
 

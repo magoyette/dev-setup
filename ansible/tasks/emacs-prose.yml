@@ -1,0 +1,35 @@
+---
+- name: Install jinx spellchecking dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - hunspell
+      - hunspell-en-ca
+      - hunspell-en-us
+      - hunspell-fr-comprehensive
+      - libenchant-2-dev
+      - pkgconf
+    state: present
+
+- name: Install offline DICT server and databases
+  become: true
+  ansible.builtin.apt:
+    name:
+      - dict
+      - dict-freedict-eng-fra
+      - dict-freedict-fra-eng
+      - dict-gcide
+      - dict-wn
+      - dictd
+    state: present
+
+# The dictd package already enables and starts the unit in its postinst, so
+# this normally reports ok. It is kept to make the desired state explicit and
+# to recover if the unit is later disabled. Without a local server,
+# dictionary.el falls back to dict.org over unencrypted TCP on port 2628.
+- name: Enable and start dictd
+  become: true
+  ansible.builtin.systemd_service:
+    name: dictd
+    enabled: true
+    state: started

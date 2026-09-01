@@ -93,3 +93,4 @@
     state: present
 
 - ansible.builtin.import_tasks: emacs-node.yml
+- ansible.builtin.import_tasks: emacs-prose.yml
