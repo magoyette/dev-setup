@@ -251,6 +251,7 @@ Many agent skills and Claude Code plugins are installed by the sub-playbook, see
 - [emacs-lsp-booster](https://github.com/blahgeek/emacs-lsp-booster) : better performance in lsp-mode
 - [hunspell](https://hunspell.github.io/) and [Enchant](https://github.com/rrthomas/enchant) with English and French dictionaries : spellchecking backend for `jinx` in Emacs
 - [dictd](https://en.wikipedia.org/wiki/DICT) with GCIDE, WordNet, and English/French FreeDict databases : local offline dictionary server for `dictionary.el` in Emacs, avoiding the unencrypted `dict.org` network fallback
+- [WordNet](https://wordnet.princeton.edu/) : offline thesaurus backend providing the `wn` CLI used by `synosaurus` in Emacs
 
 ## Agent skills for AI Assistants
 

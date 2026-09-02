@@ -14,6 +14,13 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [7.2.0] - 2026-09-01
+
+### Added
+
+- Provision the `wordnet` apt package for the `wn` CLI used by the `synosaurus`
+  offline thesaurus in Emacs.
+
 ## [7.1.0] - 2026-08-31
 
 ### Added

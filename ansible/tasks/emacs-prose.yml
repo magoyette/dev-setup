@@ -11,6 +11,16 @@
       - pkgconf
     state: present
 
+# The wordnet package provides the wn CLI that synosaurus-backend-wordnet
+# shells out to for offline synonym lookups. This is distinct from dict-wn
+# below, which only serves WordNet definitions over the DICT protocol.
+- name: Install synosaurus thesaurus dependencies
+  become: true
+  ansible.builtin.apt:
+    name:
+      - wordnet
+    state: present
+
 - name: Install offline DICT server and databases
   become: true
   ansible.builtin.apt:
