@@ -14,6 +14,16 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [7.3.0] - 2026-09-09
+
+### Added
+
+- Provision pinned LTeX+ LS 18.7.0 with its bundled Java runtime for local
+  grammar and spelling diagnostics in Emacs.
+- Provision the local Remède DICT database for offline French dictionary
+  lookups in Emacs, while retaining the packaged databases and dictd's
+  localhost-only binding.
+
 ## [7.2.0] - 2026-09-01
 
 ### Added

@@ -64,6 +64,7 @@
     libtree_sitter_installed.changed
 
 - ansible.builtin.import_tasks: emacs-lsp-booster.yml
+- ansible.builtin.import_tasks: emacs-ltex-plus.yml
 - name: Add emacs terminal alias
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"

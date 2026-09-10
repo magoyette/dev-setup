@@ -45,7 +45,8 @@ strategy, or given a daily/runtime updater.
 | Emacs build dependencies | Apt safe-upgrade when the core playbook runs; ensured present by the Emacs playbook | `ansible/tasks/emacs.yml` |
 | ImageMagick development packages | Apt safe-upgrade when the core playbook runs; ensured present by the Emacs playbook | `ansible/tasks/emacs.yml` |
 | Emacs spellchecking packages | Apt safe-upgrade when the core playbook runs; ensured present by the Emacs playbook | `ansible/tasks/emacs-prose.yml` |
-| Offline DICT server and databases | Apt safe-upgrade when the core playbook runs; ensured present by the Emacs playbook | `ansible/tasks/emacs-prose.yml` |
+| Offline DICT server and packaged databases | Apt safe-upgrade when the core playbook runs; ensured present by the Emacs playbook | `ansible/tasks/emacs-prose.yml` |
+| Remède DICT database | Pinned: native 1.4.0 release assets plus SHA-256 checksums; downloaded only when installed assets do not match | `ansible/defaults.yml`, `ansible/tasks/emacs-prose.yml` |
 | WordNet CLI (`wn`) | Apt safe-upgrade when the core playbook runs; ensured present by the Emacs playbook | `ansible/tasks/emacs-prose.yml` |
 | libtree-sitter | Pinned: `tree_sitter_version` plus source tarball checksum; built from source into `/usr/local` | `ansible/defaults.yml`, `ansible/tasks/libtree-sitter.yml` |
 | libgccjit development package | Pinned: `emacs_libgccjit_dev_package`; ensured present by the Emacs playbook | `ansible/defaults.yml`, `ansible/tasks/emacs.yml` |
@@ -58,6 +59,7 @@ strategy, or given a daily/runtime updater.
 | uv | Pinned: `uv_version` | `ansible/defaults.yml`, `ansible/tasks/python.yml` |
 | Emacs | Pinned: `emacs_version` | `ansible/defaults.yml`, `ansible/tasks/emacs.yml` |
 | emacs-lsp-booster | Pinned: `emacs_lsp_booster_version` plus binary checksum | `ansible/defaults.yml`, `ansible/tasks/emacs-lsp-booster.yml` |
+| LTeX+ LS | Pinned: `ltex_plus_version` plus the GitHub-published Linux x64 archive SHA-256 digest | `ansible/defaults.yml`, `ansible/tasks/emacs-ltex-plus.yml` |
 | Difftastic | Pinned: `difftastic_version`; install is guarded by `creates` | `ansible/defaults.yml`, `ansible/tasks/difftastic.yml` |
 | Hadolint | Pinned: `hadolint_version` | `ansible/defaults.yml`, `ansible/tasks/hadolint.yml` |
 | Tokei | Pinned: `tokei_version` | `ansible/defaults.yml`, `ansible/tasks/tokei.yml` |

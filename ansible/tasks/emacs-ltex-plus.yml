@@ -1,0 +1,69 @@
+---
+- name: Ensure LTeX+ LS is supported on this platform
+  ansible.builtin.assert:
+    that:
+      - ansible_system == "Linux"
+      - ansible_architecture == "x86_64"
+    fail_msg: >-
+      LTeX+ LS is currently pinned only for Linux x86_64 because
+      ansible/defaults.yml uses the upstream Linux x64 release archive.
+
+- name: Ensure LTeX+ installation directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ ansible_env.HOME }}/.local/bin"
+    - "{{ ansible_env.HOME }}/.local/opt"
+
+- name: Check installed LTeX+ LS executable
+  ansible.builtin.stat:
+    path: >-
+      {{ ansible_env.HOME }}/.local/opt/ltex-ls-plus-{{ ltex_plus_version
+      }}/bin/ltex-ls-plus
+  register: ltex_plus_executable_stat
+
+- name: Install LTeX+ LS with its bundled Java runtime {{ ltex_plus_version }}
+  when: not ltex_plus_executable_stat.stat.exists
+  block:
+    - name: Create temporary LTeX+ download directory
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: ltex-ls-plus-
+      register: ltex_plus_tempdir
+
+    - name: Download the pinned LTeX+ LS archive
+      ansible.builtin.get_url:
+        url: >-
+          https://github.com/ltex-plus/ltex-ls-plus/releases/download/{{
+          ltex_plus_version }}/{{ ltex_plus_archive_name }}
+        dest: "{{ ltex_plus_tempdir.path }}/{{ ltex_plus_archive_name }}"
+        checksum: "sha256:{{ ltex_plus_archive_sha256 }}"
+        mode: "0644"
+
+    - name: Extract the complete LTeX+ LS archive
+      ansible.builtin.unarchive:
+        src: "{{ ltex_plus_tempdir.path }}/{{ ltex_plus_archive_name }}"
+        dest: "{{ ansible_env.HOME }}/.local/opt"
+        remote_src: true
+  always:
+    - name: Remove temporary LTeX+ download directory
+      ansible.builtin.file:
+        path: "{{ ltex_plus_tempdir.path }}"
+        state: absent
+      when:
+        - ltex_plus_tempdir is defined
+        - ltex_plus_tempdir.path is defined
+
+- name: Link LTeX+ LS commands into ~/.local/bin
+  ansible.builtin.file:
+    src: >-
+      {{ ansible_env.HOME }}/.local/opt/ltex-ls-plus-{{ ltex_plus_version
+      }}/bin/{{ item }}
+    dest: "{{ ansible_env.HOME }}/.local/bin/{{ item }}"
+    state: link
+    force: true
+  loop:
+    - ltex-ls-plus
+    - ltex-cli-plus

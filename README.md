@@ -249,9 +249,16 @@ Many agent skills and Claude Code plugins are installed by the sub-playbook, see
 - [Emacs](https://www.gnu.org/software/emacs/) : terminal text editor configured with [my personal configuration](https://github.com/magoyette/.emacs.d)
 - [libtree-sitter](https://github.com/tree-sitter/tree-sitter) : built from source into `/usr/local` so Emacs supports current (ABI 15) tree-sitter grammars, since Ubuntu's apt package is stuck on an older ABI
 - [emacs-lsp-booster](https://github.com/blahgeek/emacs-lsp-booster) : better performance in lsp-mode
+- [LTeX+ LS](https://github.com/ltex-plus/ltex-ls-plus) 18.7.0 : pinned local grammar and spelling server with its bundled Java runtime, installed under `~/.local/opt` and linked from `~/.local/bin`
 - [hunspell](https://hunspell.github.io/) and [Enchant](https://github.com/rrthomas/enchant) with English and French dictionaries : spellchecking backend for `jinx` in Emacs
-- [dictd](https://en.wikipedia.org/wiki/DICT) with GCIDE, WordNet, and English/French FreeDict databases : local offline dictionary server for `dictionary.el` in Emacs, avoiding the unencrypted `dict.org` network fallback
+- [dictd](https://en.wikipedia.org/wiki/DICT) with GCIDE, WordNet, English/French FreeDict, and Remède databases : local offline dictionary server for `dictionary.el` in Emacs, avoiding the unencrypted `dict.org` network fallback
+- `remede` : native Remède 1.4.0 French DICT database, installed from the upstream release assets
 - [WordNet](https://wordnet.princeton.edu/) : offline thesaurus backend providing the `wn` CLI used by `synosaurus` in Emacs
+
+The Emacs sub-playbook keeps all dictionary data local, so dictionary lookups
+continue to work offline and `dictd` remains bound to localhost. Remède is
+licensed under CeCILL v2.1; its upstream credits identify French Wiktionnaire
+definitions, examples, and etymologies under CC BY-SA 3.0.
 
 ## Agent skills for AI Assistants
 

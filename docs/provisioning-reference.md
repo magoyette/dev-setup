@@ -15,7 +15,7 @@ source of truth.
 | `starship.yml` | Starship installation and shell initialization |
 | `node.yml` | Node, Bun, Markdown/YAML tools, and Socket |
 | `ai-assistants.yml` | Coding assistants, integrations, hooks, agent skills, and browser automation (agent-browser, Playwright) |
-| `emacs.yml` | Emacs, emacs-lsp-booster, Emacs LSP packages, and prose (spellcheck/dictionary) dependencies |
+| `emacs.yml` | Emacs, emacs-lsp-booster, LTeX+ LS, Emacs LSP packages, and prose (spellcheck/dictionary) dependencies |
 
 Each sub-playbook exits with `meta: end_play` when it is excluded from
 `playbooks_in_main_playbook`. This also applies when a sub-playbook is run
@@ -53,6 +53,34 @@ Use the established pattern that matches the operation:
   the codes with `changed_when` and `failed_when`.
 - Use fully qualified collection names and `{{ ansible_env.HOME }}`.
 - Store versions and checksums in `ansible/defaults.yml`.
+
+## LTeX+ language server
+
+`ansible/tasks/emacs-ltex-plus.yml` installs the complete pinned Linux x64
+release archive, including its bundled Java runtime, in the versioned
+`~/.local/opt/ltex-ls-plus-<version>` directory. It links `ltex-ls-plus` and
+`ltex-cli-plus` into `~/.local/bin`. The task verifies the publisher-provided
+SHA-256 digest and leaves older versioned installations in place for separate
+cleanup. Provisioning fails early on unsupported operating systems or CPU
+architectures.
+
+## Offline DICT databases
+
+`ansible/tasks/emacs-prose.yml` installs the packaged DICT databases and adds
+one local database without modifying the package-managed
+`/var/lib/dictd/db.list`. It keeps the existing `include /var/lib/dictd/db.list`
+line in `/etc/dictd/dictd.conf` and adds a repository-managed include for
+`/etc/dictd/dev-setup-databases.conf`. The existing `listen_to 127.0.0.1` and
+localhost access rules are preserved. It also sets dictd's global locale to
+`C.utf8`, which is required for accented UTF-8 headwords to be searchable.
+
+Remède is installed from its pinned native 1.4.0 `.index` and `.dict` release
+assets after checksum verification. Database and custom configuration changes
+notify the play-level dictd restart handler. Attribution metadata is installed
+under `/usr/share/doc/dev-setup/`.
+
+The Remède files have their `dictd` ownership and mode repaired on every run,
+even when their contents already match.
 
 The project-scoped `ansible-reviewer` agents contain the detailed review
 checklist and should be used for provisioning or idempotency-sensitive changes.
@@ -119,7 +147,8 @@ When adding a Stow package:
 - Crit: `ansible/tasks/crit.yml` and `scripts/merge-crit-config.sh`
 - Herdr: `ansible/tasks/herdr.yml`
 - Skills: `ansible/tasks/agent-skills.yml` and skill download scripts
-- Emacs: `ansible/tasks/emacs*.yml`, `ansible/tasks/libtree-sitter.yml`,
+- Emacs: `ansible/tasks/emacs*.yml` (including the dedicated LTeX+ task),
+  `ansible/tasks/libtree-sitter.yml`,
   `scripts/install-emacs-in-ubuntu.sh`, and
   `scripts/install-libtree-sitter.sh`. After an Emacs version bump, run the
   `er` shell function to restart the running daemon against the newly

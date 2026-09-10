@@ -33,6 +33,180 @@
       - dictd
     state: present
 
+- name: Ensure dictd database directory has stable permissions
+  become: true
+  ansible.builtin.file:
+    path: /usr/share/dictd
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Check installed Remède index asset
+  become: true
+  ansible.builtin.stat:
+    path: /usr/share/dictd/remede.index
+    checksum_algorithm: sha256
+    get_checksum: true
+  register: remede_index_stat
+
+- name: Check installed Remède dictionary asset
+  become: true
+  ansible.builtin.stat:
+    path: /usr/share/dictd/remede.dict
+    checksum_algorithm: sha256
+    get_checksum: true
+  register: remede_dict_stat
+
+- name: Determine whether Remède assets need installation
+  ansible.builtin.set_fact:
+    remede_assets_current: >-
+      {{ remede_index_stat.stat.exists | default(false)
+         and (remede_index_stat.stat.checksum | default('')) == remede_index_sha256
+         and remede_dict_stat.stat.exists | default(false)
+         and (remede_dict_stat.stat.checksum | default('')) == remede_dict_sha256 }}
+
+- name: Download and install native Remède 1.4.0 assets
+  become: true
+  when: not remede_assets_current
+  block:
+    - name: Create temporary directory for Remède assets
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: remede-
+      register: remede_tempdir
+
+    - name: Download Remède index with checksum verification
+      ansible.builtin.get_url:
+        url: "{{ remede_index_url }}"
+        dest: "{{ remede_tempdir.path }}/remede.index"
+        checksum: "sha256:{{ remede_index_sha256 }}"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Download Remède dictionary with checksum verification
+      ansible.builtin.get_url:
+        url: "{{ remede_dict_url }}"
+        dest: "{{ remede_tempdir.path }}/remede.dict"
+        checksum: "sha256:{{ remede_dict_sha256 }}"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Install Remède index
+      ansible.builtin.copy:
+        src: "{{ remede_tempdir.path }}/remede.index"
+        remote_src: true
+        dest: /usr/share/dictd/remede.index
+        owner: dictd
+        group: dictd
+        mode: "0644"
+      notify: Restart dictd
+
+    - name: Install Remède dictionary
+      ansible.builtin.copy:
+        src: "{{ remede_tempdir.path }}/remede.dict"
+        remote_src: true
+        dest: /usr/share/dictd/remede.dict
+        owner: dictd
+        group: dictd
+        mode: "0644"
+      notify: Restart dictd
+  always:
+    - name: Remove temporary Remède asset directory
+      ansible.builtin.file:
+        path: "{{ remede_tempdir.path }}"
+        state: absent
+      when: remede_tempdir is defined and remede_tempdir.path is defined
+
+- name: Ensure Remède index ownership and permissions
+  become: true
+  ansible.builtin.file:
+    path: /usr/share/dictd/remede.index
+    state: file
+    owner: dictd
+    group: dictd
+    mode: "0644"
+  notify: Restart dictd
+
+- name: Ensure Remède dictionary ownership and permissions
+  become: true
+  ansible.builtin.file:
+    path: /usr/share/dictd/remede.dict
+    state: file
+    owner: dictd
+    group: dictd
+    mode: "0644"
+  notify: Restart dictd
+
+- name: Configure dictd UTF-8 locale
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/dictd/dictd.conf
+    regexp: '^locale\s+'
+    insertafter: '^listen_to 127\.0\.0\.1$'
+    line: locale C.utf8
+    state: present
+  notify: Restart dictd
+
+- name: Add managed dictd database include
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/dictd/dictd.conf
+    regexp: '^include /etc/dictd/dev-setup-databases.conf$'
+    insertafter: '^include /var/lib/dictd/db.list$'
+    line: include /etc/dictd/dev-setup-databases.conf
+    state: present
+  notify: Restart dictd
+
+- name: Install managed dictd database definitions
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/dictd/dev-setup-databases.conf
+    content: |
+      # Managed by magoyette/dev-setup. Do not edit.
+      database remede
+      {
+        data /usr/share/dictd/remede.dict
+        index /usr/share/dictd/remede.index
+      }
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart dictd
+
+- name: Ensure dictionary attribution documentation directory exists
+  become: true
+  ansible.builtin.file:
+    path: /usr/share/doc/dev-setup
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install dictionary attribution metadata
+  become: true
+  ansible.builtin.copy:
+    dest: /usr/share/doc/dev-setup/dictd-databases.txt
+    content: |
+      Offline DICT databases managed by magoyette/dev-setup
+
+      Remède 1.4.0
+      -------------
+      Native DICT assets are downloaded from:
+      https://github.com/camarm-dev/remede/releases/tag/1.4.0
+      The release assets are installed without rebuilding them.
+
+      Remède software is governed by the CeCILL v2.1 license under French law.
+      Remède's upstream data credits identify definitions, examples, and
+      etymologies from the French Wiktionnaire, licensed under CC BY-SA 3.0.
+      See https://docs.remede.camarm.fr/database/credits for the complete
+      credits, including other wordlist and service sources.
+    owner: root
+    group: root
+    mode: "0644"
+
 # The dictd package already enables and starts the unit in its postinst, so
 # this normally reports ok. It is kept to make the desired state explicit and
 # to recover if the unit is later disabled. Without a local server,
