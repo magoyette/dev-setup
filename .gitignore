@@ -7,4 +7,5 @@ external-skills/herdr/
 claude/.claude/*
 !claude/.claude/hooks/
 !claude/.claude/hooks/*
+claude/.claude/hooks/herdr-agent-state.sh
 .cache/

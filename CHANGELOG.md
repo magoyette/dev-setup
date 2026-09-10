@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [7.3.1] - 2026-09-10
+
+### Fixed
+
+- Stop tracking the Herdr-generated Claude hook.
+
 ## [7.3.0] - 2026-09-09
 
 ### Added
