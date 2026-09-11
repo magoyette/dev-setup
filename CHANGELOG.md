@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [7.4.0] - 2026-09-10
+
+### Added
+
+- Make bat, Herdr, delta, and ccstatusline themes configurable with `ansible/vars.yml`
+
 ## [7.3.1] - 2026-09-10
 
 ### Fixed

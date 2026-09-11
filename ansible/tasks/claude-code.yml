@@ -17,13 +17,17 @@
     claude
   changed_when: false
 
-- name: Deploy ccstatusline dotfiles with stow
-  ansible.builtin.command: >
-    stow
-    --dir="{{ playbook_dir }}/.."
-    --target="{{ ansible_env.HOME }}"
-    ccstatusline
-  changed_when: false
+- name: Ensure ccstatusline config directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/ccstatusline"
+    state: directory
+    mode: "0755"
+
+- name: Deploy ccstatusline configuration with selected theme
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/../ccstatusline/.config/ccstatusline/settings.json"
+    dest: "{{ ansible_env.HOME }}/.config/ccstatusline/settings.json"
+    mode: "0644"
 
 - name: Check if sandbox-runtime is installed
   ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @anthropic-ai/sandbox-runtime"

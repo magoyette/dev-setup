@@ -124,6 +124,10 @@ Stow packages mirror paths relative to the user's home directory. Editing a
 Stow-managed file in this repository may immediately affect the live user
 configuration through an existing symlink.
 
+The ccstatusline settings file is an exception: `ansible/tasks/claude-code.yml`
+renders it directly so `ccstatusline_theme` can be applied without modifying a
+Stow source file through a live symlink.
+
 When adding a Stow package:
 
 1. Create the package with the target directory structure.
@@ -134,6 +138,8 @@ When adding a Stow package:
 ## Tool-Specific Routing
 
 - Git aliases: `scripts/sync-git-aliases.sh`
+- Delta themes: `ansible/tasks/git.yml` downloads and includes Delta's upstream
+  `themes.gitconfig` when a named `delta_theme` is selected.
 - Python and uv: `ansible/tasks/python.yml`
 - Claude Code: `ansible/tasks/claude-code.yml` and merge scripts named
   `merge-claude-*`

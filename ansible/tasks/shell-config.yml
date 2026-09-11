@@ -45,7 +45,8 @@
 - name: Set BAT_THEME
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
-    line: "export BAT_THEME=OneHalfDark"
+    regexp: "^export BAT_THEME="
+    line: "export BAT_THEME={{ bat_theme | quote }}"
     state: present
 
 - name: Set ALTERNATE_EDITOR environment variable

@@ -86,7 +86,7 @@
     path: "{{ ansible_env.HOME }}/.config/herdr/config.toml"
     regexp: "^\\s*name\\s*="
     insertafter: "^\\[theme\\]\\s*$"
-    line: 'name = "one-dark"'
+    line: 'name = "{{ herdr_theme }}"'
   register: herdr_theme_name
 
 - name: Ensure Herdr keys section exists in config

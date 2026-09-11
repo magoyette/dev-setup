@@ -35,6 +35,74 @@
     scope: global
     value: "default"
 
+- name: Validate delta theme selector
+  ansible.builtin.assert:
+    that:
+      - delta_theme is string
+      - delta_theme | length > 0
+      - delta_theme is not search('\s')
+    fail_msg: >-
+      delta_theme must be a non-empty value without whitespace. Use "dark", "light",
+      or a named theme from Delta's themes.gitconfig.
+
+- name: Ensure Delta themes directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/delta"
+    state: directory
+    mode: "0755"
+  when: delta_theme not in ['dark', 'light']
+
+- name: Download Delta community themes
+  ansible.builtin.get_url:
+    url: "{{ delta_themes_url }}"
+    dest: "{{ ansible_env.HOME }}/.config/delta/themes.gitconfig"
+    mode: "0644"
+  when: delta_theme not in ['dark', 'light']
+
+- name: Include Delta community themes in Git configuration
+  community.general.git_config:
+    name: include.path
+    scope: global
+    value: "{{ ansible_env.HOME }}/.config/delta/themes.gitconfig"
+    add_mode: add
+  when: delta_theme not in ['dark', 'light']
+
+- name: Read Delta community themes
+  ansible.builtin.slurp:
+    src: "{{ ansible_env.HOME }}/.config/delta/themes.gitconfig"
+  register: delta_themes_file
+  when: delta_theme not in ['dark', 'light']
+
+- name: Validate selected Delta community theme
+  ansible.builtin.assert:
+    that:
+      - delta_theme in (delta_themes_file.content | b64decode | regex_findall('(?m)^\\[delta "([^"]+)"\\]$'))
+    fail_msg: >-
+      Delta theme "{{ delta_theme }}" was not found in
+      {{ ansible_env.HOME }}/.config/delta/themes.gitconfig.
+  when: delta_theme not in ['dark', 'light']
+
+- name: Set delta named theme feature
+  community.general.git_config:
+    name: delta.features
+    scope: global
+    state: "{{ 'absent' if delta_theme in ['dark', 'light'] else 'present' }}"
+    value: "{{ delta_theme }}"
+
+- name: Set delta dark mode
+  community.general.git_config:
+    name: delta.dark
+    scope: global
+    state: "{{ 'present' if delta_theme == 'dark' else 'absent' }}"
+    value: "true"
+
+- name: Set delta light mode
+  community.general.git_config:
+    name: delta.light
+    scope: global
+    state: "{{ 'present' if delta_theme == 'light' else 'absent' }}"
+    value: "true"
+
 - name: Configure delta as git pager
   community.general.git_config:
     name: core.pager
@@ -50,12 +118,6 @@
 - name: Set delta navigate
   community.general.git_config:
     name: delta.navigate
-    scope: global
-    value: "true"
-
-- name: Set delta color theme
-  community.general.git_config:
-    name: delta.dark
     scope: global
     value: "true"
 

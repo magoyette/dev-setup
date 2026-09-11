@@ -53,6 +53,16 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   Optional Git `core.editor` override. Default: `"emacsclient -nw"`.
 - `shell_editor`
   Optional editor command that sets both `$EDITOR` and `$VISUAL` in `~/.bashrc`. Default: `"emacsclient -nw"`, which also exports `ALTERNATE_EDITOR=""` so the Emacs daemon starts on demand.
+- `bat_theme`
+  bat syntax-highlighting theme. Default: `"OneHalfDark"`.
+- `herdr_theme`
+  Herdr theme name. Default: `"one-dark"`.
+- `delta_theme`
+  delta color theme or mode. Default: `"dark"`; accepts `"dark"`, `"light"`,
+  or a named theme from [Delta's upstream `themes.gitconfig`](https://github.com/dandavison/delta/blob/main/themes.gitconfig),
+  such as `"colibri"`.
+- `ccstatusline_theme`
+  ccstatusline powerline theme. Default: `"onedark"`.
 - `install_git_aliases`
   Install and manage this repo's Git aliases. Default: `true`. Set to `false` to skip Git alias management.
 - `ai_assistants_sandbox_writable_roots`
