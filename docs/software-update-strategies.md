@@ -34,7 +34,6 @@ strategy, or given a daily/runtime updater.
 | `fzf` | Apt safe-upgrade | `ansible/tasks/apt-packages.yml` |
 | `git` | Apt safe-upgrade | `ansible/tasks/apt-packages.yml` |
 | `git-delta` | Apt safe-upgrade | `ansible/tasks/apt-packages.yml` |
-| Delta community themes | Latest on playbook run when `delta_theme` is a named theme; downloads the upstream `themes.gitconfig` file | `ansible/defaults.yml`, `ansible/tasks/git.yml` |
 | `jq` | Apt safe-upgrade | `ansible/tasks/apt-packages.yml` |
 | `pandoc` | Apt safe-upgrade | `ansible/tasks/apt-packages.yml` |
 | `ripgrep` | Apt safe-upgrade | `ansible/tasks/apt-packages.yml` |

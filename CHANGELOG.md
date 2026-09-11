@@ -14,6 +14,14 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [7.5.0] - 2026-09-10
+
+### Changed
+
+- Restrict Delta configuration to the independently configurable
+  `delta_syntax_theme`; remove support for `delta_theme`, `delta.dark`, and
+  `delta.light`.
+
 ## [7.4.0] - 2026-09-10
 
 ### Added

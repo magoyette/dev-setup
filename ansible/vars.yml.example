@@ -5,8 +5,7 @@ git_core_editor: "emacsclient -nw"
 shell_editor: "emacsclient -nw" # sets $EDITOR and $VISUAL
 bat_theme: "OneHalfDark"
 herdr_theme: "one-dark"
-# accepts "dark", "light", or a named theme from Delta's themes.gitconfig
-delta_theme: "dark"
+delta_syntax_theme: "OneHalfDark"
 ccstatusline_theme: "onedark"
 install_git_aliases: true
 ai_assistants_sandbox_writable_roots: []

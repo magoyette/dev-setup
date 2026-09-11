@@ -138,8 +138,8 @@ When adding a Stow package:
 ## Tool-Specific Routing
 
 - Git aliases: `scripts/sync-git-aliases.sh`
-- Delta themes: `ansible/tasks/git.yml` downloads and includes Delta's upstream
-  `themes.gitconfig` when a named `delta_theme` is selected.
+- Delta syntax theme: `ansible/tasks/git.yml` manages Delta's
+  `delta.syntax-theme` setting from `delta_syntax_theme`.
 - Python and uv: `ansible/tasks/python.yml`
 - Claude Code: `ansible/tasks/claude-code.yml` and merge scripts named
   `merge-claude-*`

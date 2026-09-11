@@ -57,10 +57,9 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   bat syntax-highlighting theme. Default: `"OneHalfDark"`.
 - `herdr_theme`
   Herdr theme name. Default: `"one-dark"`.
-- `delta_theme`
-  delta color theme or mode. Default: `"dark"`; accepts `"dark"`, `"light"`,
-  or a named theme from [Delta's upstream `themes.gitconfig`](https://github.com/dandavison/delta/blob/main/themes.gitconfig),
-  such as `"colibri"`.
+- `delta_syntax_theme`
+  delta syntax-highlighting theme. Default: `"OneHalfDark"`; accepts syntax
+  theme names supported by bat/Delta, including names with spaces.
 - `ccstatusline_theme`
   ccstatusline powerline theme. Default: `"onedark"`.
 - `install_git_aliases`

@@ -35,73 +35,53 @@
     scope: global
     value: "default"
 
-- name: Validate delta theme selector
-  ansible.builtin.assert:
-    that:
-      - delta_theme is string
-      - delta_theme | length > 0
-      - delta_theme is not search('\s')
-    fail_msg: >-
-      delta_theme must be a non-empty value without whitespace. Use "dark", "light",
-      or a named theme from Delta's themes.gitconfig.
+- name: Check for legacy Delta community themes include
+  ansible.builtin.command:
+    argv:
+      - git
+      - config
+      - --global
+      - --get-all
+      - include.path
+  register: delta_include_paths
+  changed_when: false
+  failed_when: false
 
-- name: Ensure Delta themes directory exists
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.config/delta"
-    state: directory
-    mode: "0755"
-  when: delta_theme not in ['dark', 'light']
-
-- name: Download Delta community themes
-  ansible.builtin.get_url:
-    url: "{{ delta_themes_url }}"
-    dest: "{{ ansible_env.HOME }}/.config/delta/themes.gitconfig"
-    mode: "0644"
-  when: delta_theme not in ['dark', 'light']
-
-- name: Include Delta community themes in Git configuration
+- name: Remove legacy Delta community themes include
   community.general.git_config:
     name: include.path
     scope: global
-    value: "{{ ansible_env.HOME }}/.config/delta/themes.gitconfig"
-    add_mode: add
-  when: delta_theme not in ['dark', 'light']
+    state: absent
+  when:
+    - delta_include_paths.stdout_lines | length > 0
+    - >-
+      delta_include_paths.stdout_lines |
+      difference([ansible_env.HOME ~ '/.config/delta/themes.gitconfig']) |
+      length == 0
 
-- name: Read Delta community themes
-  ansible.builtin.slurp:
-    src: "{{ ansible_env.HOME }}/.config/delta/themes.gitconfig"
-  register: delta_themes_file
-  when: delta_theme not in ['dark', 'light']
-
-- name: Validate selected Delta community theme
-  ansible.builtin.assert:
-    that:
-      - delta_theme in (delta_themes_file.content | b64decode | regex_findall('(?m)^\\[delta "([^"]+)"\\]$'))
-    fail_msg: >-
-      Delta theme "{{ delta_theme }}" was not found in
-      {{ ansible_env.HOME }}/.config/delta/themes.gitconfig.
-  when: delta_theme not in ['dark', 'light']
-
-- name: Set delta named theme feature
+- name: Remove legacy Delta named theme feature
   community.general.git_config:
     name: delta.features
     scope: global
-    state: "{{ 'absent' if delta_theme in ['dark', 'light'] else 'present' }}"
-    value: "{{ delta_theme }}"
+    state: absent
 
-- name: Set delta dark mode
+- name: Remove legacy Delta dark mode
   community.general.git_config:
     name: delta.dark
     scope: global
-    state: "{{ 'present' if delta_theme == 'dark' else 'absent' }}"
-    value: "true"
+    state: absent
 
-- name: Set delta light mode
+- name: Remove legacy Delta light mode
   community.general.git_config:
     name: delta.light
     scope: global
-    state: "{{ 'present' if delta_theme == 'light' else 'absent' }}"
-    value: "true"
+    state: absent
+
+- name: Set delta syntax theme
+  community.general.git_config:
+    name: delta.syntax-theme
+    scope: global
+    value: "{{ delta_syntax_theme }}"
 
 - name: Configure delta as git pager
   community.general.git_config:
