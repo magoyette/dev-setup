@@ -97,7 +97,7 @@ strategy, or given a daily/runtime updater.
 | Playwright npm package | Install-only npm global | `ansible/tasks/playwright.yml` |
 | Playwright CLI npm package | Install-only npm global | `ansible/tasks/playwright.yml` |
 | ast-grep CLI | Install-only npm global | `ansible/tasks/ast-grep.yml` |
-| Emacs LSP npm packages | Install-only npm globals; if any package is missing, the full list is installed | `ansible/defaults.yml`, `ansible/tasks/emacs-node.yml` |
+| Emacs LSP npm packages | Install-only npm globals; each top-level package is checked independently and only missing packages are installed | `ansible/defaults.yml`, `ansible/tasks/emacs-node.yml` |
 | agent-browser skill download script | Install-only because the task uses `creates`; active shared external skills are otherwise linked by `agent-skills.yml` | `ansible/tasks/agent-browser.yml`, `scripts/download-agent-browser-skill.sh` |
 | Playwright skill download script | Install-only because the task uses `creates`; active shared external skills are otherwise linked by `agent-skills.yml` | `ansible/tasks/playwright.yml`, `scripts/download-playwright-skill.sh` |
 | ast-grep skill download script | Install-only because the task uses `creates`; active shared external skills are otherwise linked by `agent-skills.yml` | `ansible/tasks/ast-grep.yml`, `scripts/download-ast-grep-skill.sh` |

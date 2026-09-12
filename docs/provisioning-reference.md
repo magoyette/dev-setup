@@ -85,6 +85,15 @@ even when their contents already match.
 The project-scoped `ansible-reviewer` agents contain the detailed review
 checklist and should be used for provisioning or idempotency-sensitive changes.
 
+## Emacs npm packages
+
+`ansible/tasks/emacs-node.yml` checks each package in `emacs_npm_packages`
+individually at the global npm top level. Do not combine these checks: `npm
+list` can return success when only one requested package is present or when a
+matching package exists only as another global package's dependency. Only
+missing top-level packages are installed, preserving the install-only update
+strategy, and the task verifies that the Prettier executable can run afterward.
+
 ## Configuration Merge Scripts
 
 Merge scripts under `scripts/` manage selected keys while preserving unrelated

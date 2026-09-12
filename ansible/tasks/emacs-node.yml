@@ -1,12 +1,92 @@
 ---
 # Packages are defined in defaults.yml under emacs_npm_packages.
-# npm list -g returns rc != 0 if any package is missing, triggering a full install.
-- name: Check if Emacs LSP npm packages are installed
-  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g {{ emacs_npm_packages | join(' ') }}"
-  register: emacs_npm_check
+# Check each top-level package separately because npm list returns success when
+# any package in a multi-package query is present, including as a dependency.
+- name: Check Emacs npm packages
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.local/share/fnm/fnm"
+      - exec
+      - "--using={{ fnm_node_version }}"
+      - --
+      - npm
+      - list
+      - --global
+      - --depth=0
+      - "{{ item }}"
+  loop: "{{ emacs_npm_packages }}"
+  loop_control:
+    label: "{{ item }}"
+  register: emacs_npm_checks
   failed_when: false
   changed_when: false
 
-- name: Install Emacs LSP npm packages
-  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm install -g {{ emacs_npm_packages | join(' ') }}"
-  when: emacs_npm_check.rc != 0
+- name: Install missing Emacs npm packages
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.local/share/fnm/fnm"
+      - exec
+      - "--using={{ fnm_node_version }}"
+      - --
+      - npm
+      - install
+      - --global
+      - "{{ item.item }}"
+  loop: "{{ emacs_npm_checks.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when: item.rc != 0
+
+- name: Verify Emacs npm packages
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.local/share/fnm/fnm"
+      - exec
+      - "--using={{ fnm_node_version }}"
+      - --
+      - npm
+      - list
+      - --global
+      - --depth=0
+      - "{{ item }}"
+  loop: "{{ emacs_npm_packages }}"
+  loop_control:
+    label: "{{ item }}"
+  register: emacs_npm_verification
+  failed_when: false
+  changed_when: false
+
+- name: Assert Emacs npm packages are installed
+  ansible.builtin.assert:
+    that:
+      - >-
+        emacs_npm_verification.results
+        | selectattr('rc', 'ne', 0)
+        | list
+        | length == 0
+    fail_msg: >-
+      Emacs npm packages missing for {{ fnm_node_version }}:
+      {{ emacs_npm_verification.results
+         | selectattr('rc', 'ne', 0)
+         | map(attribute='item')
+         | join(', ') }}
+    quiet: true
+
+- name: Check Prettier executable
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_env.HOME }}/.local/share/fnm/fnm"
+      - exec
+      - "--using={{ fnm_node_version }}"
+      - --
+      - prettier
+      - --version
+  register: emacs_prettier_check
+  failed_when: false
+  changed_when: false
+
+- name: Assert Prettier executable is available
+  ansible.builtin.assert:
+    that:
+      - emacs_prettier_check.rc == 0
+    fail_msg: "Prettier is not executable for {{ fnm_node_version }}: {{ emacs_prettier_check.stderr | default('') }}"

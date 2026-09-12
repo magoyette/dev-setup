@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [7.5.1] - 2026-09-11
+
+### Fixed
+
+- Fix Emacs npm package issue that caused dependencies to not be installed.
+
 ## [7.5.0] - 2026-09-10
 
 ### Changed

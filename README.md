@@ -256,6 +256,7 @@ Many agent skills and Claude Code plugins are installed by the sub-playbook, see
 ### emacs sub-playbook
 
 - [Emacs](https://www.gnu.org/software/emacs/) : terminal text editor configured with [my personal configuration](https://github.com/magoyette/.emacs.d)
+- [Prettier](https://prettier.io/) and Node-based language servers : formatting and language support installed globally for the fnm-managed Node runtime
 - [libtree-sitter](https://github.com/tree-sitter/tree-sitter) : built from source into `/usr/local` so Emacs supports current (ABI 15) tree-sitter grammars, since Ubuntu's apt package is stuck on an older ABI
 - [emacs-lsp-booster](https://github.com/blahgeek/emacs-lsp-booster) : better performance in lsp-mode
 - [LTeX+ LS](https://github.com/ltex-plus/ltex-ls-plus) 18.7.0 : pinned local grammar and spelling server with its bundled Java runtime, installed under `~/.local/opt` and linked from `~/.local/bin`
