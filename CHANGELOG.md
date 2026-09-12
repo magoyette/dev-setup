@@ -14,6 +14,14 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [8.0.0] - 2026-09-11
+
+### Removed
+
+- Remove the Superpowers integration and its dedicated assistant launchers.
+  Existing managed plugins, configuration, profiles, and checkout artifacts are
+  removed automatically on the next AI assistants playbook run.
+
 ## [7.5.1] - 2026-09-11
 
 ### Fixed

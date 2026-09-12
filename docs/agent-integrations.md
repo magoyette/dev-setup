@@ -46,10 +46,8 @@ Context7 is configured consistently with Codex and OpenCode.
 servers disabled for normal Claude Code sessions. Claude Code upgrades itself;
 the playbook no longer manages a daily upgrade wrapper.
 
-Claude Code and Codex keep their native OS-level command sandboxes as the
-managed boundary for both normal and Superpowers sessions. This repository does
-not add a second `nono.sh` wrapper to `claude`, `claude-sp`, `codex`, or
-`codex-sp`.
+Claude Code and Codex keep their native OS-level command sandboxes. This
+repository does not add a second `nono.sh` wrapper to `claude` or `codex`.
 
 Repository-local PostToolUse hooks validate edited shell, Markdown, JSON, and
 YAML files. Inspect `.claude/settings.json` for the active definitions and
@@ -105,11 +103,6 @@ Pi discovers shared and Codex-targeted skills through the shared
 `~/.pi/agent/skills/`, because Pi scans both paths and duplicate names trigger
 skill-conflict messages.
 
-The managed `pi-sp` launcher loads Superpowers with Pi's temporary package
-option (`pi -e ~/.local/share/superpowers`) and also loads the dev-setup
-Superpowers Crit companion as a Pi package from
-`~/.config/dev-setup/superpowers-crit-pi`.
-
 ## OpenCode
 
 OpenCode is installed by `ansible/tasks/opencode.yml`.
@@ -122,8 +115,8 @@ OpenCode's global context is deployed to
 deployment paths.
 
 The managed OpenCode config allows the native `websearch` tool, and the managed
-`opencode` and `opencode-sp` launchers set `OPENCODE_ENABLE_EXA=1` so websearch
-is available even when a session uses a non-OpenCode provider.
+`opencode` launcher sets `OPENCODE_ENABLE_EXA=1` so websearch is available even
+when a session uses a non-OpenCode provider.
 
 Authentication is a one-time interactive operation and is not managed by
 Ansible.
@@ -135,51 +128,16 @@ state needed by the assistant, and explicitly denies expected Herdr and Docker
 socket paths. It intentionally avoids nono proxy network profiles, credential
 proxying, capability elevation, and Landlock V6 process-scope settings because
 those are unavailable or rejected by default on stock Microsoft WSL2 kernels.
-The `opencode-sp` profile extends the same managed baseline and adds only the
-Superpowers OpenCode configuration paths it needs.
 
 The playbook writes `ai_assistants_nono_*` values to
 `~/.config/dev-setup/ai-assistant-sandbox.env`, which is sourced by the managed
-launcher scripts. The user-facing `nono.sh`-managed commands are `opencode`,
-`opencode-sp`, `pi`, and `pi-sp`. `DEV_SETUP_NONO_*` environment variables can
-still override those generated defaults at runtime.
+launcher scripts. The user-facing `nono.sh`-managed commands are `opencode` and
+`pi`. `DEV_SETUP_NONO_*` environment variables can still override those
+generated defaults at runtime.
 
 Ansible installs or updates the official `nono` CLI package used by those
 launchers, deploys the managed profiles under `~/.config/nono/profiles/`, and
 validates them with `nono profile validate`.
-
-## Selective Superpowers Sessions
-
-`ansible/tasks/superpowers.yml` updates the Superpowers checkout at
-`~/.local/share/superpowers` and deploys four session-specific launchers:
-
-- `claude-sp` loads the checkout with Claude Code's session-only
-  `--plugin-dir` option and sets the same
-  `ENABLE_CLAUDEAI_MCP_SERVERS=false` environment variable that `.bashrc`
-  exports for normal sessions.
-- `codex-sp` selects `~/.codex/superpowers.config.toml`. The Superpowers Codex
-  plugin is sourced from a dev-setup-managed local marketplace and remains
-  installed but disabled in the base configuration. It is refreshed when the
-  shared checkout changes.
-- `opencode-sp` sets `OPENCODE_CONFIG` to the generated
-  `~/.config/dev-setup/opencode-superpowers.json` file.
-- `pi-sp` runs Pi with the Superpowers Pi package and the dev-setup Crit
-  validation companion loaded as temporary Pi packages.
-
-The launchers forward all arguments and retain the normal global context,
-hooks, MCP servers, permissions, Crit, and Herdr integrations. Normal assistant
-commands do not activate Superpowers.
-
-Superpowers sessions also load dev-setup's Crit validation companion. In those
-sessions, agents must validate Superpowers implementation plans and reviewable
-artifacts with Crit before proceeding. Plans and documents use `crit <file>`,
-branch or code changes use `crit`, running web apps use `crit live <url>`, and
-static HTML previews use `crit preview <file.html>`. The agent must address
-unresolved Crit comments and continue only after Crit approval.
-
-When changing the launch behavior of `claude`, `codex`, `pi`, or `opencode`,
-check whether the corresponding `claude-sp`, `codex-sp`, `pi-sp`, or
-`opencode-sp` launcher needs the same environment or argument change.
 
 ## Shared MCP Servers
 

@@ -244,7 +244,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [Crit](https://crit.md/) : browser-based review UI for AI agent output,
   integrated with Claude Code, Codex, Pi, and OpenCode; sharing is disabled
 - [Herdr](https://github.com/ogulcancelik/herdr) : terminal-native agent multiplexer with Claude Code, Codex, Pi, and OpenCode integrations; native agent session restore, the One Dark theme, and the `F12` prefix key (avoids Emacs's `C-b`) are enabled; upgraded to the latest release on each playbook run with a live handoff for running sessions
-- [nono](https://nono.sh/) : OS-level sandbox used by the managed OpenCode and Pi launchers, with strict managed profiles for normal assistant sessions and Superpowers sessions
+- [nono](https://nono.sh/) : OS-level sandbox used by the managed OpenCode and Pi launchers, with strict managed profiles
 - [opencode](https://opencode.ai/) : coding agent; authenticate once with `/connect`
 - [Pi](https://pi.dev/) : coding agent; upgraded to the latest release on each playbook run; authenticate once with `/login`
 - [ast-grep](https://ast-grep.github.io/) : AST-based structural code search and rewrite
@@ -296,28 +296,6 @@ External skills are provided by other projects.
 - [humanizer](https://github.com/blader/humanizer) : remove signs of AI-generated writing from text
 
 When both browser skills are installed, prefer `agent-browser` for general browser automation. Use `playwright-cli` when the user explicitly asks for Playwright or needs Playwright-specific features such as cross-browser testing, routing/mocking, tracing, or storage-state workflows.
-
-## Superpowers launcher commands
-
-[Superpowers](https://github.com/obra/superpowers) is available only through
-dedicated launcher commands:
-
-- `claude-sp`
-- `codex-sp`
-- `opencode-sp`
-- `pi-sp`
-
-These commands activate Superpowers for that session.
-
-Superpowers sessions also require Crit validation before agents proceed past
-implementation plans or deliver reviewable artifacts. The agent should launch
-Crit for the relevant plan, diff, live app, or static HTML preview, address
-unresolved comments, and continue only after Crit approval.
-
-Normal `claude`, `codex`, `pi`, and `opencode` sessions do not activate
-Superpowers. The managed `pi-sp` launcher loads the Superpowers Pi package and
-the dev-setup Crit validation companion. `.bashrc` exports
-`ENABLE_CLAUDEAI_MCP_SERVERS=false` to disable Claude.ai MCP servers.
 
 ## Claude Code Plugins
 

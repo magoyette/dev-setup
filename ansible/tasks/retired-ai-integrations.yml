@@ -1,0 +1,105 @@
+---
+- name: Get installed Codex plugins before retiring Superpowers
+  ansible.builtin.command: codex plugin list --json
+  register: retired_codex_plugin_list
+  changed_when: false
+  failed_when: false
+
+- name: Set installed Codex plugin IDs before retiring Superpowers
+  ansible.builtin.set_fact:
+    retired_codex_plugin_ids: >-
+      {{
+        (
+          (retired_codex_plugin_list.stdout | from_json).installed
+          if retired_codex_plugin_list.rc == 0 and retired_codex_plugin_list.stdout | length > 0
+          else []
+        )
+        | map(attribute='pluginId')
+        | list
+      }}
+
+- name: Remove retired Superpowers Codex plugins
+  ansible.builtin.command: codex plugin remove {{ item }} --json
+  changed_when: true
+  loop:
+    - superpowers@dev-setup-superpowers
+    - superpowers-crit@dev-setup-superpowers
+  when: item in retired_codex_plugin_ids
+
+- name: Get configured Codex marketplaces before retiring Superpowers
+  ansible.builtin.command: codex plugin marketplace list --json
+  register: retired_codex_marketplace_list
+  changed_when: false
+  failed_when: false
+
+- name: Set configured Codex marketplace names before retiring Superpowers
+  ansible.builtin.set_fact:
+    retired_codex_marketplace_names: >-
+      {{
+        (
+          (retired_codex_marketplace_list.stdout | from_json).marketplaces
+          if retired_codex_marketplace_list.rc == 0 and retired_codex_marketplace_list.stdout | length > 0
+          else []
+        )
+        | map(attribute='name')
+        | list
+      }}
+
+- name: Remove retired Superpowers Codex marketplace
+  ansible.builtin.command: codex plugin marketplace remove dev-setup-superpowers --json
+  changed_when: true
+  when: "'dev-setup-superpowers' in retired_codex_marketplace_names"
+
+- name: Remove retired Superpowers sections from Codex config
+  ansible.builtin.command:
+    argv:
+      - "{{ playbook_dir }}/../scripts/remove-codex-config-sections.sh"
+      - "{{ ansible_env.HOME }}/.codex/config.toml"
+      - 'plugins."superpowers@dev-setup-superpowers"'
+      - 'plugins."superpowers-crit@dev-setup-superpowers"'
+      - marketplaces.dev-setup-superpowers
+  register: retired_superpowers_codex_config_cleanup
+  changed_when: retired_superpowers_codex_config_cleanup.rc == 2
+  failed_when: retired_superpowers_codex_config_cleanup.rc not in [0, 2]
+
+- name: Check retired Superpowers Stow links
+  ansible.builtin.stat:
+    path: "{{ item.path }}"
+    follow: false
+  loop:
+    - path: "{{ ansible_env.HOME }}/.local/bin/claude-sp"
+      source: "{{ playbook_dir | dirname }}/superpowers/.local/bin/claude-sp"
+    - path: "{{ ansible_env.HOME }}/.local/bin/codex-sp"
+      source: "{{ playbook_dir | dirname }}/superpowers/.local/bin/codex-sp"
+    - path: "{{ ansible_env.HOME }}/.local/bin/opencode-sp"
+      source: "{{ playbook_dir | dirname }}/superpowers/.local/bin/opencode-sp"
+    - path: "{{ ansible_env.HOME }}/.local/bin/pi-sp"
+      source: "{{ playbook_dir | dirname }}/superpowers/.local/bin/pi-sp"
+    - path: "{{ ansible_env.HOME }}/.config/nono/profiles/opencode-sp.jsonc"
+      source: "{{ playbook_dir | dirname }}/nono/.config/nono/profiles/opencode-sp.jsonc"
+    - path: "{{ ansible_env.HOME }}/.config/nono/profiles/pi-sp.jsonc"
+      source: "{{ playbook_dir | dirname }}/nono/.config/nono/profiles/pi-sp.jsonc"
+  register: retired_superpowers_stow_links
+
+- name: Remove retired Superpowers Stow links
+  ansible.builtin.file:
+    path: "{{ item.item.path }}"
+    state: absent
+  loop: "{{ retired_superpowers_stow_links.results }}"
+  loop_control:
+    label: "{{ item.item.path }}"
+  when:
+    - item.stat.islnk | default(false)
+    - item.stat.lnk_source == item.item.source
+
+- name: Remove generated Superpowers artifacts
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ ansible_env.HOME }}/.local/share/superpowers"
+    - "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-marketplace"
+    - "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-crit-pi"
+    - "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-crit.md"
+    - "{{ ansible_env.HOME }}/.config/dev-setup/opencode-superpowers.json"
+    - "{{ ansible_env.HOME }}/.codex/superpowers.config.toml"

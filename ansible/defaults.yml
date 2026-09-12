@@ -34,23 +34,17 @@ claude_sandbox_enabled: true
 # wrapper finds nono.sh or nono.
 ai_assistants_nono_enabled_launchers:
   - opencode
-  - opencode-sp
   - pi
-  - pi-sp
 # Enabled AI assistant launcher commands that fail closed when nono.sh or nono
 # is unavailable.
 ai_assistants_nono_required_launchers:
   - opencode
-  - opencode-sp
   - pi
-  - pi-sp
 # Managed nono profile names used by the assistant launcher wrappers. The
 # profiles are deployed from nono/.config/nono/profiles/.
 ai_assistants_nono_profiles:
   opencode: opencode
-  opencode_sp: opencode-sp
   pi: pi
-  pi_sp: pi-sp
 ai_assistants_mcp_catalog:
   context7:
     url: https://mcp.context7.com/mcp

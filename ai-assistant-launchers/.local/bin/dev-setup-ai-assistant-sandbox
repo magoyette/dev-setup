@@ -32,13 +32,13 @@ profile="${!profile_var:-$launcher}"
 if [[ -v DEV_SETUP_NONO_ENABLED_LAUNCHERS ]]; then
   enabled_launchers="$DEV_SETUP_NONO_ENABLED_LAUNCHERS"
 else
-  enabled_launchers="opencode opencode-sp pi pi-sp"
+  enabled_launchers="opencode pi"
 fi
 
 if [[ -v DEV_SETUP_NONO_REQUIRED_LAUNCHERS ]]; then
   required_launchers="$DEV_SETUP_NONO_REQUIRED_LAUNCHERS"
 else
-  required_launchers="opencode opencode-sp pi pi-sp"
+  required_launchers="opencode pi"
 fi
 
 if ! contains_word "$launcher" "$enabled_launchers"; then

@@ -69,10 +69,6 @@ strategy, or given a daily/runtime updater.
 | ccusage | Latest on playbook run: compares installed version to `npm view ccusage version` and installs `ccusage@latest` | `ansible/tasks/ccusage.yml` |
 | Claude Code | Self-updating: Claude Code upgrades itself | `ansible/tasks/claude-code.yml` |
 | ccstatusline | Latest at invocation through `bunx ccstatusline@latest` alias | `ansible/tasks/claude-code.yml`, `scripts/merge-claude-settings.sh` |
-| Superpowers checkout | Upstream checkout: tracks `main` and updates on playbook run | `ansible/tasks/superpowers.yml` |
-| Pi Superpowers launcher package link | Re-linked on each playbook run | `ansible/tasks/superpowers.yml`, `superpowers-crit/` |
-| Codex Superpowers plugin | Reinstalled when the Superpowers checkout changes | `ansible/tasks/superpowers.yml`, `scripts/sync-codex-superpowers-plugin.sh` |
-| Codex Superpowers Crit companion plugin | Reinstalled when generated companion instructions change | `ansible/tasks/superpowers.yml`, `scripts/sync-codex-superpowers-crit-plugin.sh` |
 | humanizer skill | Upstream checkout: submodule updates with `git submodule update --remote --merge` | `.gitmodules`, `ansible/tasks/agent-skills.yml` |
 | agent-browser browsers and Linux dependencies | Repeated asset install through `agent-browser install --with-deps` | `ansible/tasks/agent-browser.yml` |
 | Playwright browsers and Linux dependencies | Repeated asset install through `playwright install-deps` and `playwright install` | `ansible/tasks/playwright.yml` |

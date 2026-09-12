@@ -27,8 +27,8 @@
     - ansible.builtin.import_tasks: tasks/codex.yml
     - ansible.builtin.import_tasks: tasks/pi.yml
     - ansible.builtin.import_tasks: tasks/opencode.yml
-    - name: Run Superpowers tasks
-      ansible.builtin.import_tasks: tasks/superpowers.yml
+    - name: Remove retired AI assistant integrations
+      ansible.builtin.import_tasks: tasks/retired-ai-integrations.yml
     - name: Run Crit tasks
       ansible.builtin.import_tasks: tasks/crit.yml
     - ansible.builtin.import_tasks: tasks/herdr.yml
