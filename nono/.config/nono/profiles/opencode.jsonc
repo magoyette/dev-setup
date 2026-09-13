@@ -18,8 +18,10 @@
     "allow": [
       "$HOME/.opencode",
       "$HOME/.config/opencode",
+      "$HOME/.config/hunk",
       "$HOME/.local/share/opencode",
       "$HOME/.local/share/opentui",
+      "$XDG_RUNTIME_DIR/hunk-mcp",
       "/tmp",
       "$TMPDIR"
     ],

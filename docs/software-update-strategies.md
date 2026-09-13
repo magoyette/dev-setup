@@ -61,6 +61,8 @@ strategy, or given a daily/runtime updater.
 | emacs-lsp-booster | Pinned: `emacs_lsp_booster_version` plus binary checksum | `ansible/defaults.yml`, `ansible/tasks/emacs-lsp-booster.yml` |
 | LTeX+ LS | Pinned: `ltex_plus_version` plus the GitHub-published Linux x64 archive SHA-256 digest | `ansible/defaults.yml`, `ansible/tasks/emacs-ltex-plus.yml` |
 | Difftastic | Pinned: `difftastic_version`; install is guarded by `creates` | `ansible/defaults.yml`, `ansible/tasks/difftastic.yml` |
+| Hunk | Latest stable on core playbook runs: compares the installed version to GitHub's latest release and passes that exact version to the official installer; the installer verifies the published archive checksum and updates the bundled skills atomically | `ansible/tasks/hunk.yml` |
+| Hunk review skill | Tracks the installed Hunk release; the AI assistants playbook resolves `hunk skill path hunk-review` and links that bundled directory when Hunk is present | `ansible/tasks/hunk-agent-integration.yml` |
 | Hadolint | Pinned: `hadolint_version` | `ansible/defaults.yml`, `ansible/tasks/hadolint.yml` |
 | Tokei | Pinned: `tokei_version` | `ansible/defaults.yml`, `ansible/tasks/tokei.yml` |
 | Starship | Pinned: `starship_version` | `ansible/defaults.yml`, `ansible/tasks/starship.yml` |

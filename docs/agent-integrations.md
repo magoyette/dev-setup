@@ -147,7 +147,20 @@ or removes those managed names across Claude Code, Codex, and OpenCode.
 Reconciliation is authoritative only for names in the catalog; unrelated
 user-managed MCP servers are preserved.
 
-## Crit And Herdr
+## Hunk, Crit, And Herdr
+
+Hunk is installed independently by the core sub-playbook as a terminal-native
+diff reviewer. The AI assistants sub-playbook links Hunk's bundled
+`hunk-review` skill into `~/.claude/skills/` and `~/.agents/skills/` when the
+managed Hunk binary is present. This lets agents inspect, navigate, and annotate
+an already-running Hunk session; agents do not launch the interactive TUI.
+
+Hunk stores its local session credentials and daemon coordination files under
+`$XDG_RUNTIME_DIR/hunk-mcp` and communicates with the daemon over loopback. The
+managed Pi and OpenCode nono profiles allow that runtime directory and
+`~/.config/hunk` without adding a broader network policy. If another assistant
+sandbox blocks loopback access, the Hunk skill directs the agent to request the
+normal sandbox escalation instead of exposing the daemon remotely.
 
 Crit is installed with sharing disabled. Its wrapper performs a daily upgrade
 check, and its Codex plugin and OpenCode integrations are force-refreshed so
@@ -176,8 +189,9 @@ after `herdr server reload-config` or a full `herdr server stop` and relaunch
 — restarting the client alone reattaches to the same stale server. The
 playbook issues that reload itself whenever it changes a managed config line.
 
-Inspect `ansible/tasks/crit.yml`, `ansible/tasks/herdr.yml`, and their owning
-configuration files for current behavior.
+Inspect `ansible/tasks/hunk-agent-integration.yml`, `ansible/tasks/crit.yml`,
+`ansible/tasks/herdr.yml`, and their owning configuration files for current
+behavior.
 
 ## Skills
 

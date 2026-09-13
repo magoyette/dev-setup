@@ -1,0 +1,79 @@
+---
+- name: Check managed Hunk binary for agent integration
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.local/opt/hunk/hunk"
+  register: hunk_agent_binary
+
+- name: Resolve bundled Hunk review skill
+  ansible.builtin.command: >-
+    {{ ansible_env.HOME }}/.local/opt/hunk/hunk skill path hunk-review
+  register: hunk_review_skill_path
+  changed_when: false
+  failed_when: false
+  when: hunk_agent_binary.stat.executable | default(false)
+
+- name: Check bundled Hunk review skill file
+  ansible.builtin.stat:
+    path: "{{ hunk_review_skill_path.stdout | trim }}"
+  register: hunk_review_skill_file
+  when:
+    - hunk_agent_binary.stat.executable | default(false)
+    - hunk_review_skill_path.rc == 0
+    - hunk_review_skill_path.stdout | trim | length > 0
+
+- name: Validate bundled Hunk review skill
+  ansible.builtin.assert:
+    that:
+      - hunk_review_skill_path.rc == 0
+      - hunk_review_skill_path.stdout | trim | length > 0
+      - hunk_review_skill_file.stat.isreg | default(false)
+    fail_msg: "The managed Hunk binary did not provide its bundled hunk-review skill."
+  when: hunk_agent_binary.stat.executable | default(false)
+
+- name: Ensure Hunk agent skill directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ ansible_env.HOME }}/.claude/skills"
+    - "{{ ansible_env.HOME }}/.agents/skills"
+  when: hunk_agent_binary.stat.executable | default(false)
+
+- name: Check existing Hunk review skill links
+  ansible.builtin.stat:
+    path: "{{ item }}/hunk-review"
+    follow: false
+  register: hunk_review_skill_links
+  loop:
+    - "{{ ansible_env.HOME }}/.claude/skills"
+    - "{{ ansible_env.HOME }}/.agents/skills"
+  when: hunk_agent_binary.stat.executable | default(false)
+
+- name: Refuse to replace unmanaged Hunk review skills
+  ansible.builtin.assert:
+    that:
+      - >-
+        not item.stat.exists or
+        (
+          item.stat.islnk | default(false) and
+          item.stat.lnk_source == (hunk_review_skill_path.stdout | trim | dirname)
+        )
+    fail_msg: >-
+      {{ item.item }}/hunk-review already exists and is not linked to the
+      dev-setup-managed Hunk skill. Remove the conflicting skill before
+      provisioning the Hunk agent integration.
+  loop: "{{ hunk_review_skill_links.results }}"
+  loop_control:
+    label: "{{ item.item }}/hunk-review"
+  when: hunk_agent_binary.stat.executable | default(false)
+
+- name: Link bundled Hunk review skill for agents
+  ansible.builtin.file:
+    src: "{{ hunk_review_skill_path.stdout | trim | dirname }}"
+    dest: "{{ item }}/hunk-review"
+    state: link
+  loop:
+    - "{{ ansible_env.HOME }}/.claude/skills"
+    - "{{ ansible_env.HOME }}/.agents/skills"
+  when: hunk_agent_binary.stat.executable | default(false)

@@ -60,6 +60,9 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 - `delta_syntax_theme`
   delta syntax-highlighting theme. Default: `"OneHalfDark"`; accepts syntax
   theme names supported by bat/Delta, including names with spaces.
+- `hunk_theme`
+  Hunk review theme. Default: `"one-dark-pro"`; accepts a built-in or custom
+  Hunk theme identifier.
 - `ccstatusline_theme`
   ccstatusline powerline theme. Default: `"onedark"`.
 - `install_git_aliases`
@@ -202,6 +205,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [eza](https://github.com/eza-community/eza) : modern alternative to `ls`
 - [git](https://git-scm.com/) : installed from `ppa:git-core/ppa`
 - Difftastic : structural diff tool (secondary diff tool for git commands, invoked via `git dt*` aliases)
+- [Hunk](https://www.hunk.dev/) : terminal-native diff review tool with watch mode and optional live agent annotations
 - [fd](https://github.com/sharkdp/fd) : fast alternative to `find`
 - [fzf](https://github.com/junegunn/fzf) : interactive fuzzy finder for shell workflows
 - [hadolint](https://github.com/hadolint/hadolint) : Dockerfile linter installed from the upstream Linux release binary
@@ -293,6 +297,7 @@ External skills are provided by other projects.
 - [playwright](https://github.com/microsoft/playwright/tree/main/packages/playwright-core/src/tools/cli-client/skill) : browser automation skill (bundled with Playwright npm package)
 - [ast-grep](https://github.com/ast-grep/agent-skill) : AST-based structural code search skill
 - [herdr](https://raw.githubusercontent.com/ogulcancelik/herdr/master/SKILL.md) : control Herdr workspaces, tabs, panes, and agent state from inside a Herdr-managed pane
+- [hunk-review](https://www.hunk.dev/docs/agents/review-skill/) : inspect and annotate an already-running Hunk review session from an AI assistant
 - [humanizer](https://github.com/blader/humanizer) : remove signs of AI-generated writing from text
 
 When both browser skills are installed, prefer `agent-browser` for general browser automation. Use `playwright-cli` when the user explicitly asks for Playwright or needs Playwright-specific features such as cross-browser testing, routing/mocking, tracing, or storage-state workflows.

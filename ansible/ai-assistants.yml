@@ -31,6 +31,8 @@
       ansible.builtin.import_tasks: tasks/retired-ai-integrations.yml
     - name: Run Crit tasks
       ansible.builtin.import_tasks: tasks/crit.yml
+    - name: Configure Hunk agent integration
+      ansible.builtin.import_tasks: tasks/hunk-agent-integration.yml
     - ansible.builtin.import_tasks: tasks/herdr.yml
     - ansible.builtin.import_tasks: tasks/ccusage.yml
     - ansible.builtin.import_tasks: tasks/global-agent-context.yml

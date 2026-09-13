@@ -27,6 +27,8 @@
     - ansible.builtin.import_tasks: tasks/shell-config.yml
     - ansible.builtin.import_tasks: tasks/git.yml
     - ansible.builtin.import_tasks: tasks/difftastic.yml
+    - name: Run Hunk tasks
+      ansible.builtin.import_tasks: tasks/hunk.yml
     - ansible.builtin.import_tasks: tasks/hadolint.yml
     - ansible.builtin.import_tasks: tasks/tokei.yml
     - ansible.builtin.import_tasks: tasks/zoxide.yml

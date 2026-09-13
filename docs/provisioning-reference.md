@@ -10,7 +10,7 @@ source of truth.
 
 | Sub-playbook | Primary responsibilities |
 | --- | --- |
-| `core.yml` | Apt packages, shell configuration, Git, Difftastic, Hadolint, Tokei, and Zoxide |
+| `core.yml` | Apt packages, shell configuration, Git, Difftastic, Hunk, Hadolint, Tokei, and Zoxide |
 | `python.yml` | pyenv, managed CPython, pipx, uv, ansible-lint, and tldr |
 | `starship.yml` | Starship installation and shell initialization |
 | `node.yml` | Node, Bun, Markdown/YAML tools, and Socket |

@@ -17,7 +17,9 @@
     "allow": [
       "$HOME/.pi",
       "$HOME/.agents",
+      "$HOME/.config/hunk",
       "$HOME/.config/dev-setup",
+      "$XDG_RUNTIME_DIR/hunk-mcp",
       "/tmp",
       "$TMPDIR"
     ],

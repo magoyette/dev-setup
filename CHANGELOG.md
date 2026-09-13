@@ -14,6 +14,13 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [8.1.0] - 2026-09-13
+
+### Added
+
+- Add Hunk in core sub-playbook as a diff tool
+- Add Hunk agent skills for annotations on reviews in ai-assistants sub-playbook
+
 ## [8.0.0] - 2026-09-11
 
 ### Removed

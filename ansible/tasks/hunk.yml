@@ -1,0 +1,90 @@
+---
+# Hunk is installed from its self-contained Linux release, not the npm package.
+# https://www.hunk.dev/docs/start/install/
+- name: Check installed Hunk version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/opt/hunk/hunk --version"
+  register: hunk_version_check
+  changed_when: false
+  failed_when: false
+
+- name: Resolve latest Hunk release
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/modem-dev/hunk/releases/latest
+    headers:
+      Accept: application/vnd.github+json
+    status_code: 200
+  register: hunk_latest_release
+  changed_when: false
+
+- name: Set installed and latest Hunk versions
+  ansible.builtin.set_fact:
+    hunk_installed_version: >-
+      {{ hunk_version_check.stdout | regex_search('[0-9]+\.[0-9]+\.[0-9]+') | default('', true) }}
+    hunk_latest_version: "{{ hunk_latest_release.json.tag_name | regex_replace('^v', '') }}"
+
+- name: Validate latest Hunk release metadata
+  ansible.builtin.assert:
+    that:
+      - hunk_latest_version is match('^[0-9]+\.[0-9]+\.[0-9]+$')
+      - not hunk_latest_release.json.draft
+      - not hunk_latest_release.json.prerelease
+      - >-
+        hunk_latest_release.json.assets
+        | selectattr('name', 'equalto', 'SHA256SUMS')
+        | list
+        | length == 1
+    fail_msg: "The latest Hunk release metadata is not a stable checksummed release."
+
+- name: Install latest Hunk release
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -fsSL https://hunk.dev/install.sh |
+      sh -s -- "{{ hunk_latest_version }}" --no-modify-path
+  args:
+    executable: /bin/bash
+  environment:
+    HUNK_INSTALL_DIR: "{{ ansible_env.HOME }}/.local/opt/hunk"
+  when: hunk_installed_version != hunk_latest_version
+  changed_when: true
+
+- name: Ensure ~/.local/bin directory exists for Hunk
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Check existing Hunk PATH entry
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/hunk"
+    follow: false
+  register: hunk_path_entry
+
+- name: Refuse to replace an unmanaged Hunk PATH entry
+  ansible.builtin.assert:
+    that:
+      - >-
+        not hunk_path_entry.stat.exists or
+        (
+          hunk_path_entry.stat.islnk | default(false) and
+          hunk_path_entry.stat.lnk_source == (ansible_env.HOME ~ '/.local/opt/hunk/hunk')
+        )
+    fail_msg: >-
+      {{ ansible_env.HOME }}/.local/bin/hunk already exists and is not the
+      dev-setup-managed Hunk link. Remove the conflicting installation before
+      provisioning Hunk.
+
+- name: Link Hunk into PATH
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.local/opt/hunk/hunk"
+    dest: "{{ ansible_env.HOME }}/.local/bin/hunk"
+    state: link
+
+- name: Merge Hunk global config
+  ansible.builtin.command:
+    argv:
+      - "{{ playbook_dir }}/../scripts/merge-hunk-config.sh"
+      - "{{ ansible_env.HOME }}/.config/hunk/config.toml"
+      - "{{ hunk_theme }}"
+  register: hunk_config_merge
+  changed_when: hunk_config_merge.rc == 2
+  failed_when: hunk_config_merge.rc not in [0, 2]

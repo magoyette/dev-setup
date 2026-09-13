@@ -6,6 +6,7 @@ shell_editor: "emacsclient -nw" # sets $EDITOR and $VISUAL
 bat_theme: "OneHalfDark"
 herdr_theme: "one-dark"
 delta_syntax_theme: "OneHalfDark"
+hunk_theme: "one-dark-pro"
 ccstatusline_theme: "onedark"
 install_git_aliases: true
 ai_assistants_sandbox_writable_roots: []
