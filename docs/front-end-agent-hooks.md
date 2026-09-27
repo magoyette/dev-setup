@@ -11,7 +11,7 @@ Add these scripts to `package.json`.
 ```json
 {
   "scripts": {
-    "skills:impeccable:install": "npx impeccable@latest install -y --providers=claude,codex,opencode,pi --scope=project",
+    "skills:impeccable:install": "npx impeccable@latest install -y --providers=claude,codex,opencode --scope=project",
     "skills:impeccable:update": "npx impeccable@latest update -y"
   }
 }
@@ -29,7 +29,7 @@ directory, including its references, scripts, and nested agent definitions:
 | Provider               | Project path                 |
 | ---------------------- | ---------------------------- |
 | Claude Code            | `.claude/skills/impeccable/` |
-| Codex, OpenCode and Pi | `.agents/skills/impeccable/` |
+| Codex and OpenCode     | `.agents/skills/impeccable/` |
 
 ## Ignore generated skill files
 

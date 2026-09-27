@@ -1,13 +1,49 @@
 ---
-- name: Check if OpenCode is installed
-  ansible.builtin.command: test -x "{{ ansible_env.HOME }}/.opencode/bin/opencode"
+- name: Check installed OpenCode version
+  ansible.builtin.command: '"{{ ansible_env.HOME }}/.opencode/bin/opencode" --version'
   register: opencode_check
   failed_when: false
   changed_when: false
 
-- name: Install OpenCode
-  ansible.builtin.shell: curl -fsSL https://opencode.ai/install | bash
-  when: opencode_check.rc != 0
+- name: Back up OpenCode V1 before migration
+  ansible.builtin.shell: |
+    set -eu
+    umask 077
+    backup={{ (ansible_env.HOME ~ '/.opencode/v1-backup') | quote }}
+    mkdir -p "$backup"
+    cp -a {{ (ansible_env.HOME ~ '/.opencode/bin/opencode') | quote }} "$backup/opencode"
+    if [ -d {{ (ansible_env.HOME ~ '/.config/opencode') | quote }} ]; then
+      cp -a {{ (ansible_env.HOME ~ '/.config/opencode') | quote }} "$backup/config"
+    fi
+    touch "$backup/complete"
+  args:
+    creates: "{{ ansible_env.HOME }}/.opencode/v1-backup/complete"
+  when: opencode_check.rc == 0 and opencode_check.stdout is match('^1[.]')
+
+- name: Install OpenCode 2 or migrate OpenCode 1
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -fsSL https://opencode.ai/v2/install | bash -s -- --no-modify-path
+  args:
+    executable: /bin/bash
+  when: opencode_check.rc != 0 or opencode_check.stdout is match('^1[.]')
+
+- name: Find shell config files that may hold installer-added OpenCode PATH lines
+  ansible.builtin.find:
+    paths: "{{ ansible_env.HOME }}"
+    patterns: ['.bashrc', '.bash_profile', '.profile', '.ashrc', '.zshrc', '.zshenv']
+    file_type: file
+    hidden: true
+  register: opencode_shell_config_files
+
+- name: Remove installer-added OpenCode PATH lines from shell config files
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: '(?m)^(# opencode\n)?export PATH={{ ansible_env.HOME | regex_escape }}/\.opencode/bin:\$PATH\n?'
+    replace: ""
+  loop: "{{ opencode_shell_config_files.files }}"
+  loop_control:
+    label: "{{ item.path }}"
 
 - name: Ensure ~/.config/opencode directory exists
   ansible.builtin.file:

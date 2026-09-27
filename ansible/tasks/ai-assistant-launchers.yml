@@ -28,8 +28,6 @@
         DEV_SETUP_NONO_REQUIRED_LAUNCHERS={{ ai_assistants_nono_required_launchers | join(' ') | to_json }}
       fi
       : "${DEV_SETUP_NONO_PROFILE_OPENCODE:={{ ai_assistants_nono_profiles.opencode | default('opencode') | to_json }}}"
-      : "${DEV_SETUP_NONO_PROFILE_PI:={{ ai_assistants_nono_profiles.pi | default('pi') | to_json }}}"
-      : "${DEV_SETUP_PI_NODE_VERSION:={{ fnm_node_version | to_json }}}"
     dest: "{{ ansible_env.HOME }}/.config/dev-setup/ai-assistant-sandbox.env"
     mode: "0600"
 

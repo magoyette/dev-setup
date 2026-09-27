@@ -30,7 +30,11 @@ fi
 jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
   def managed_names: $catalog | keys;
   def ensure_plugin($plugin):
-    ((.plugin // []) | if index($plugin) then . else . + [$plugin] end);
+    (((.plugins // []) + (.plugin // []))
+      | map(if type == "array" then {package: .[0], options: .[1]} else . end)
+      | map(select((if type == "object" then .package else . end) != "./plugins/crit.ts"))
+      | reduce .[] as $entry ([]; if index($entry) then . else . + [$entry] end)
+      | if index($plugin) then . else . + [$plugin] end);
   def enabled_servers:
     reduce $enabled[] as $name ({};
       .[$name] = {
@@ -41,10 +45,11 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
 
   ."$schema" = "https://opencode.ai/config.json"
   | .share = "disabled"
-  | .snapshot = false
+  | .snapshots = false
   | .formatter = true
-  | .lsp = true
-  | .plugin = ensure_plugin("./plugins/crit.ts")
+  | .plugins = ensure_plugin("./crit-opencode")
+  | del(.snapshot, .plugin)
+  | if .lsp == true then del(.lsp) else . end
   | .permission = {
       "read": {
         "*": "allow",
@@ -60,13 +65,18 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
       },
       "bash": {
         "*": "ask",
+        "echo *": "allow",
         "eza *": "allow",
+        "fd *": "allow",
         "git *": "ask",
         "git commit *": "deny",
         "git diff *": "allow",
         "git status *": "allow",
         "git push *": "deny",
-        "markdownlint-cli2 \"*.md\"": "allow",
+        "head *": "allow",
+        "jq *": "allow",
+        "ls *": "allow",
+        "markdownlint-cli2 *": "allow",
         "node --version": "allow",
         "npm --version": "allow",
         "npm audit": "allow",
@@ -76,14 +86,26 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
         "npm ls *": "allow",
         "npm outdated --json": "allow",
         "npm run check": "allow",
-        "npm view *": "allow"
+        "npm view *": "allow",
+        "rg *": "allow",
+        "shellcheck *": "allow",
+        "tail *": "allow"
       },
       "webfetch": "ask",
       "websearch": "ask"
     }
+  | .permissions = [
+      .permission | to_entries[] | .key as $action | .value
+      | (if type == "object" then to_entries else [{key: "*", value: .}] end)[]
+      | {action: (if $action == "bash" then "shell" else $action end), resource: .key, effect: .value}
+    ]
+  | del(.permission)
   | .mcp = (
       ((.mcp // {}) | with_entries(select(.key as $key | managed_names | index($key) | not)))
-      + enabled_servers
+      | .servers = (
+          ((.servers // {}) | with_entries(select(.key as $key | managed_names | index($key) | not)))
+          + enabled_servers
+        )
     )
 ' "$tmp_input" >"$tmp_output"
 

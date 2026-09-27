@@ -103,3 +103,53 @@
     - "{{ ansible_env.HOME }}/.config/dev-setup/superpowers-crit.md"
     - "{{ ansible_env.HOME }}/.config/dev-setup/opencode-superpowers.json"
     - "{{ ansible_env.HOME }}/.codex/superpowers.config.toml"
+
+- name: Check installed Pi Coding Agent package
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm list -g @earendil-works/pi-coding-agent --depth=0 --json"
+  register: retired_pi_package_check
+  failed_when: false
+  changed_when: false
+
+- name: Set installed Pi Coding Agent version
+  ansible.builtin.set_fact:
+    retired_pi_installed_version: >-
+      {{
+        ((retired_pi_package_check.stdout | from_json).dependencies | default({})).get(
+          '@earendil-works/pi-coding-agent',
+          {}
+        ).get('version', '')
+        if retired_pi_package_check.rc == 0
+        else ''
+      }}
+
+- name: Uninstall retired Pi Coding Agent package
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/share/fnm/fnm exec --using={{ fnm_node_version }} -- npm uninstall -g @earendil-works/pi-coding-agent"
+  when: retired_pi_installed_version != ''
+  changed_when: true
+
+- name: Check retired Pi Stow links
+  ansible.builtin.stat:
+    path: "{{ item.path }}"
+    follow: false
+  loop:
+    - path: "{{ ansible_env.HOME }}/.local/bin/pi"
+      source: "{{ playbook_dir | dirname }}/ai-assistant-launchers/.local/bin/pi"
+  register: retired_pi_stow_links
+
+- name: Remove retired Pi Stow links
+  ansible.builtin.file:
+    path: "{{ item.item.path }}"
+    state: absent
+  loop: "{{ retired_pi_stow_links.results }}"
+  loop_control:
+    label: "{{ item.item.path }}"
+  when:
+    - item.stat.islnk | default(false)
+    - item.stat.lnk_source == item.item.source
+
+# Remove only the repository-managed context link; ~/.pi session and
+# authentication state is intentionally left in place.
+- name: Remove retired Pi global context link
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.pi/agent/AGENTS.md"
+    state: absent

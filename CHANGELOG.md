@@ -14,6 +14,27 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [9.0.0] - 2026-09-27
+
+### Added
+
+- Allow `rg`, `tail`, `jq`, and `shellcheck` to the commands allowed without
+  a permission prompt.
+- Allow OpenCode to access Git configuration from its non sandbox. OpenCode
+  uses Git commands to associate its sessions to the current project.
+
+### Changed
+
+- Migrate OpenCode to V2 with a V1 binary/config backup with its nono sandbox.
+- Port Crit sharing guidance and review notifications to OpenCode 2. V1 plugins
+  require V2-compatible implementations; web search now needs a search provider.
+- Stop enabling OpenCode LSP functionality, which V2 no longer provides.
+
+### Removed
+
+- Remove the Pi coding assistant. The next `ai-assistants` sub-playbook execution will
+  uninstall the Pi npm package and its integration. `~/.pi` data isn't removed.
+
 ## [8.1.0] - 2026-09-13
 
 ### Added

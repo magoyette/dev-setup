@@ -25,7 +25,6 @@
     - ansible.builtin.import_tasks: tasks/ai-assistant-launchers.yml
     - ansible.builtin.import_tasks: tasks/claude-code.yml
     - ansible.builtin.import_tasks: tasks/codex.yml
-    - ansible.builtin.import_tasks: tasks/pi.yml
     - ansible.builtin.import_tasks: tasks/opencode.yml
     - name: Remove retired AI assistant integrations
       ansible.builtin.import_tasks: tasks/retired-ai-integrations.yml

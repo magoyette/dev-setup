@@ -50,16 +50,37 @@
 
 # Do not also install the `codex` integration. It and `opencode` both write
 # ~/.agents/skills/crit, while Codex uses the plugin-packaged Crit skills below.
+- name: Inspect Crit binary for OpenCode integration refresh
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/crit-bin"
+    checksum_algorithm: sha256
+  register: crit_opencode_binary
+
+- name: Read last Crit OpenCode integration checksum
+  ansible.builtin.command: 'cat "{{ ansible_env.HOME }}/.config/opencode/crit-opencode-checksum"'
+  register: crit_opencode_checksum
+  changed_when: false
+  failed_when: false
+
+- name: Check Crit OpenCode shared helper
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.config/opencode/plugins/lib/crit-wait-notify.js"
+  register: crit_opencode_helper
+
 - name: Install Crit OpenCode integration
   ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/crit-bin install opencode --force"
   args:
     chdir: "{{ ansible_env.HOME }}"
   changed_when: false
+  when: >-
+    crit_opencode_checksum.stdout | trim != crit_opencode_binary.stat.checksum or
+    not crit_opencode_helper.stat.exists
 
-- name: Remove duplicate Crit Pi skill copies
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.pi/agent/skills/{{ item }}"
-    state: absent
-  loop:
-    - crit
-    - crit-cli
+- name: Configure Crit for OpenCode 2
+  ansible.builtin.import_tasks: opencode-crit.yml
+
+- name: Record Crit OpenCode integration checksum
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.config/opencode/crit-opencode-checksum"
+    content: "{{ crit_opencode_binary.stat.checksum }}\n"
+    mode: "0644"

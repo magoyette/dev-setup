@@ -1,18 +1,35 @@
 {
-  "extends": "default",
+  "extends": [
+    "default"
+  ],
   "meta": {
     "name": "opencode",
-    "description": "dev-setup strict OpenCode profile"
+    "version": "",
+    "description": "dev-setup strict OpenCode profile",
+    "author": null
+  },
+  "security": {
+    "signal_mode": null,
+    "process_info_mode": null,
+    "ipc_mode": null,
+    "capability_elevation": null,
+    "approval_backends": {},
+    "approval_defaults": null,
+    "wsl2_proxy_policy": null
   },
   "groups": {
     "include": [
       "opencode_linux",
       "node_runtime",
       "user_caches_linux"
+    ],
+    "exclude": [
+      "system_write_linux"
     ]
   },
-  "workdir": {
-    "access": "readwrite"
+  "commands": {
+    "allow": [],
+    "deny": []
   },
   "filesystem": {
     "allow": [
@@ -20,11 +37,41 @@
       "$HOME/.config/opencode",
       "$HOME/.config/hunk",
       "$HOME/.local/share/opencode",
+      "$HOME/.local/state/opencode",
       "$HOME/.local/share/opentui",
       "$XDG_RUNTIME_DIR/hunk-mcp",
-      "/tmp",
       "$TMPDIR"
     ],
+    "read": [
+      "$HOME/.agents/skills",
+      "$HOME/.claude/skills",
+      "$HOME/.config/dev-setup",
+      "$HOME/.gitconfig",
+      "$HOME/.config/git",
+      "/etc/gitconfig"
+    ],
+    "write": [
+      "/dev/null",
+      "/dev/zero",
+      "/dev/full",
+      "/dev/tty",
+      "/dev/stdout",
+      "/dev/stderr",
+      "/dev/fd",
+      "/dev/pts",
+      "/proc/self/fd"
+    ],
+    "allow_file": [
+      "~/.pyenv/shims/python3"
+    ],
+    "read_file": [],
+    "write_file": [],
+    "unix_socket": [],
+    "unix_socket_bind": [],
+    "unix_socket_dir": [],
+    "unix_socket_dir_bind": [],
+    "unix_socket_subtree": [],
+    "unix_socket_subtree_bind": [],
     "deny": [
       "$XDG_RUNTIME_DIR/herdr",
       "$XDG_RUNTIME_DIR/herdr.sock",
@@ -33,6 +80,48 @@
       "/tmp/herdr.sock",
       "/var/run/docker.sock",
       "$HOME/.docker"
-    ]
-  }
+    ],
+    "bypass_protection": [],
+    "suppress_save_prompt": []
+  },
+  "network": {
+    "block": false,
+    "allow_http2": false,
+    "allow_domain": [],
+    "deny_domain": [],
+    "open_port": [],
+    "open_port_range": [],
+    "listen_port": [],
+    "listen_port_range": [],
+    "connect_port": [],
+    "no_proxy": [],
+    "custom_credentials": {},
+    "tls_intercept": null,
+    "upstream_proxy": null,
+    "upstream_bypass": []
+  },
+  "diagnostics": {
+    "suppress_system_services": []
+  },
+  "linux": {
+    "af_unix_mediation": null,
+    "sandbox_policy": null
+  },
+  "env_credentials": {},
+  "credential_capture": {},
+  "credential_providers": {},
+  "credential_routes": [],
+  "workdir": {
+    "access": "readwrite"
+  },
+  "hooks": {},
+  "session_hooks": {},
+  "rollback": {
+    "exclude_patterns": [],
+    "exclude_globs": []
+  },
+  "skipdirs": [],
+  "packs": [],
+  "command_args": [],
+  "unsafe_macos_seatbelt_rules": []
 }

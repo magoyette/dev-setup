@@ -8,5 +8,71 @@ if [[ ! -x "$real_opencode" ]]; then
   exit 127
 fi
 
-export OPENCODE_ENABLE_EXA=1
-exec dev-setup-ai-assistant-sandbox opencode "$real_opencode" "$@"
+# Herdr currently registers its client plugin only in V1 tui.jsonc. Add its
+# V2 entrypoint through the client overlay without preempting V2's first-run
+# preference migration or replacing the user's other CLI plugins.
+opencode_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
+if [[ -f "$opencode_config_dir/herdr-opencode/tui.js" ]]; then
+  cli_plugins='[]'
+  if [[ -f "$opencode_config_dir/cli.json" ]]; then
+    cli_plugins="$(jq -c '.plugins // []' "$opencode_config_dir/cli.json")"
+  fi
+  cli_overlay="${OPENCODE_CLI_CONFIG_CONTENT:-}"
+  if [[ -z "$cli_overlay" ]]; then
+    cli_overlay='{}'
+  fi
+  OPENCODE_CLI_CONFIG_CONTENT="$(jq -cn --argjson overlay "$cli_overlay" \
+    --argjson plugins "$cli_plugins" --arg plugin "$opencode_config_dir/herdr-opencode" '
+      $overlay | .plugins = ((.plugins // $plugins) |
+        if index($plugin) then . else . + [$plugin] end)
+    ')"
+  export OPENCODE_CLI_CONFIG_CONTENT
+fi
+
+# V2 normally connects to a shared service, whose tools would run outside this
+# launcher's sandbox. Server-consuming commands must use a private server.
+args=("$@")
+command_name=
+command_index=-1
+skip_value=false
+for index in "${!args[@]}"; do
+  arg="${args[index]}"
+  [[ "$arg" == -- ]] && break
+  case "$arg" in
+    --server|--server=*|--no-standalone|--standalone=false)
+      printf 'opencode wrapper: shared/remote servers are incompatible with the managed private-server launcher\n' >&2
+      exit 2
+      ;;
+  esac
+  if [[ "$skip_value" == true ]]; then
+    skip_value=false
+    continue
+  fi
+  if [[ -z "$command_name" ]]; then
+    case "$arg" in
+      --log-level|--completions|--prompt|--session|-s) skip_value=true ;;
+      -*) ;;
+      *) command_name="$arg"; command_index="$index" ;;
+    esac
+  fi
+done
+standalone_index=-1
+case "$command_name" in
+  debug|plugin|mcp|upgrade|update|uninstall|acp|serve|service|pair)
+    ;;
+  auth|session)
+    if [[ -n "${args[command_index+1]:-}" && "${args[command_index+1]}" != -* ]]; then
+      standalone_index=$((command_index + 2))
+    fi
+    ;;
+  run|mini|api|models|stats|reload)
+    standalone_index=$((command_index + 1))
+    ;;
+  *)
+    standalone_index=0
+    ;;
+esac
+if [[ "$standalone_index" -ge 0 ]]; then
+  args=("${args[@]:0:standalone_index}" --standalone "${args[@]:standalone_index}")
+fi
+exec dev-setup-ai-assistant-sandbox opencode "$real_opencode" "${args[@]}"

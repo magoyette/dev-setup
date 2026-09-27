@@ -1,0 +1,14 @@
+---
+- name: Deploy OpenCode 2 Crit plugin
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../opencode-plugins/crit/"
+    dest: "{{ ansible_env.HOME }}/.config/opencode/crit-opencode/"
+    mode: "0644"
+    directory_mode: "0755"
+
+# Crit still generates a V1 server plugin. Keep its shared skills and helper,
+# but load only the managed V2 package, avoiding duplicate plugin registration.
+- name: Remove generated V1 Crit entrypoint
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/opencode/plugins/crit.ts"
+    state: absent

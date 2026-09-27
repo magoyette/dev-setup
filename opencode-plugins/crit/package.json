@@ -1,0 +1,8 @@
+{
+  "name": "dev-setup-crit-opencode",
+  "type": "module",
+  "exports": {
+    ".": "./server.js",
+    "./tui": "./tui.js"
+  }
+}

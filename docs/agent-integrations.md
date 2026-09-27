@@ -7,7 +7,7 @@ configuration files remain the source of truth.
 ## Context Files
 
 `global-agent-context.md` contains concise user-level guidance shared by Claude
-Code, Codex, Pi, and OpenCode. The AI assistants playbook creates the gitignored
+Code, Codex, and OpenCode. The AI assistants playbook creates the gitignored
 `global-agent-context.local.md` file when absent and appends its contents to
 the shared guidance. The combined context is generated at
 `~/.config/dev-setup/global-agent-context.md`, and each assistant's global
@@ -76,47 +76,43 @@ The hooks provide WSL notifications and post-edit validation.
 Project-scoped Codex agents live under `.codex/agents/` and are available only
 when explicitly spawned.
 
-## Pi
-
-Pi is installed by `ansible/tasks/pi.yml` with the fnm-managed Node runtime.
-The task compares the installed global npm package to the latest npm release
-and upgrades Pi during the playbook run when a newer release is available.
-It also creates Pi's agent, extension, and skill directories before downstream
-integration installers run.
-
-Pi's global context is deployed to `~/.pi/agent/AGENTS.md`. It points at the
-same generated context file used by Claude Code, Codex, and OpenCode, so
-`global-agent-context.local.md` applies after the playbook reruns.
-
-Authentication is a one-time interactive operation and is not managed by
-Ansible.
-
-The managed `pi` launcher runs through the strict managed `nono.sh` Pi profile
-when `nono.sh` or `nono` is installed. The launcher uses fnm to run Pi with the
-managed Node selector from `fnm_node_version`. The profile extends nono's
-built-in `default` profile, grants the repository workspace, Pi state, shared
-agent skills, and generated dev-setup context needed by the assistant, and
-explicitly denies expected Herdr and Docker socket paths.
-
-Pi discovers shared and Codex-targeted skills through the shared
-`~/.agents/skills/` path. The playbook does not also link those skills into
-`~/.pi/agent/skills/`, because Pi scans both paths and duplicate names trigger
-skill-conflict messages.
-
 ## OpenCode
 
-OpenCode is installed by `ansible/tasks/opencode.yml`.
+OpenCode 2 is installed by `ansible/tasks/opencode.yml` using the official V2
+installer. Existing managed V1 binaries trigger a one-time migration, with the
+old binary and configuration retained under `~/.opencode/v1-backup/`. Existing
+V2 installations are left installed; use `opencode upgrade` for later updates.
+The installer runs with `--no-modify-path`, and the playbook removes the
+`# opencode` PATH lines that the older V1 installer appended to shell config
+files (`~/.bashrc`, `~/.bash_profile`, `~/.profile`, `~/.ashrc`, `~/.zshrc`,
+`~/.zshenv`). Without that removal, `~/.opencode/bin` precedes `~/.local/bin`
+on `PATH` and `opencode` resolves to the real binary, bypassing the managed
+sandbox launcher.
 `scripts/merge-opencode-config.sh` manages selected global settings while
 preserving other user keys, including MCP servers outside the shared managed
-catalog.
+catalog. Managed settings use `snapshots`, ordered `permissions` with the
+`shell` action, `mcp.servers`, and `plugins`. Other supported V1 settings remain
+valid and are preserved. The former managed `lsp: true` is removed because V2
+does not run language servers; use project lint, typecheck, and compiler tasks.
+
+V2 automatically migrates terminal preferences to global `cli.json` on first
+terminal startup. Its automatic migration reads `tui.json` and stored
+preferences; `tui.jsonc` is retained but is not read by that migration.
+The launcher supplies Herdr's V2 CLI entrypoint through
+`OPENCODE_CLI_CONFIG_CONTENT`, preserving configured CLI plugins and other
+overlay settings. Move any other `tui.jsonc` customization into `cli.json`.
+Project-local
+terminal preferences need to be moved into the global client configuration.
+See the [upstream migration guide](https://opencode.ai/v2/docs/migrate-v1/).
 
 OpenCode's global context is deployed to
 `~/.config/opencode/AGENTS.md`. Skills are discovered through the shared skill
 deployment paths.
 
-The managed OpenCode config allows the native `websearch` tool, and the managed
-`opencode` launcher sets `OPENCODE_ENABLE_EXA=1` so websearch is available even
-when a session uses a non-OpenCode provider.
+The managed OpenCode config asks permission for native `websearch`. V2 selects
+a search provider on first use; connect one through `/connect` or supply its
+API-key environment variable. The V1-only `OPENCODE_ENABLE_EXA` launcher setting
+is no longer used.
 
 Authentication is a one-time interactive operation and is not managed by
 Ansible.
@@ -124,20 +120,42 @@ Ansible.
 The managed `opencode` launcher runs through the strict managed `nono.sh`
 OpenCode profile when `nono.sh` or `nono` is installed. That profile extends
 nono's built-in `default` profile, grants the repository workspace and OpenCode
-state needed by the assistant, and explicitly denies expected Herdr and Docker
+state needed by the assistant, grants read-only access to the user's Git
+configuration (without it, Git aborts on the unreadable `~/.gitconfig` and
+OpenCode registers non-git duplicate projects, hiding the sessions already
+recorded for those directories), and explicitly denies expected Herdr and Docker
 socket paths. It intentionally avoids nono proxy network profiles, credential
 proxying, capability elevation, and Landlock V6 process-scope settings because
 those are unavailable or rejected by default on stock Microsoft WSL2 kernels.
 
+The launcher selects `--standalone` for the TUI and server-backed commands so
+the private server inherits nono restrictions. Connecting to a shared or remote
+server would put tool execution under that server's policy instead. The V2
+profile also grants OpenCode's state directory and read access to shared skill
+directories and the global instruction source. Herdr's current dual-version
+integration supports V2, but its socket remains subject to the sandbox policy.
+
 The playbook writes `ai_assistants_nono_*` values to
 `~/.config/dev-setup/ai-assistant-sandbox.env`, which is sourced by the managed
-launcher scripts. The user-facing `nono.sh`-managed commands are `opencode` and
-`pi`. `DEV_SETUP_NONO_*` environment variables can still override those
+launcher scripts. The user-facing `nono.sh`-managed command is `opencode`.
+`DEV_SETUP_NONO_*` environment variables can still override those
 generated defaults at runtime.
 
 Ansible installs or updates the official `nono` CLI package used by those
 launchers, deploys the managed profiles under `~/.config/nono/profiles/`, and
-validates them with `nono profile validate`.
+validates them with `nono profile validate`. See
+[nono.sh sandbox](nono-sandbox.md) for checking access, one-off filesystem
+grants for a single execution, and permanent profile changes.
+
+Both managed profiles exclude the inherited `system_write_linux` group and
+explicitly retain its device write permissions. The launcher creates a private
+`/tmp/dev-setup-ai.*` directory with `mktemp -d` and exports it as `TMPDIR`
+before starting nono, overriding any inherited temporary directory setting.
+Only that temporary directory is granted access. This avoids Linux Landlock's
+unsupported combination of allowing all of `/tmp` while denying Herdr paths
+inside it. Tools must respect `TMPDIR`; hardcoded `/tmp` writes are blocked.
+Temporary directories remain after exit for normal system temporary-file
+cleanup. Direct profile invocations must also supply a private `TMPDIR`.
 
 ## Shared MCP Servers
 
@@ -157,27 +175,28 @@ an already-running Hunk session; agents do not launch the interactive TUI.
 
 Hunk stores its local session credentials and daemon coordination files under
 `$XDG_RUNTIME_DIR/hunk-mcp` and communicates with the daemon over loopback. The
-managed Pi and OpenCode nono profiles allow that runtime directory and
+managed OpenCode nono profile allows that runtime directory and
 `~/.config/hunk` without adding a broader network policy. If another assistant
 sandbox blocks loopback access, the Hunk skill directs the agent to request the
 normal sandbox escalation instead of exposing the daemon remotely.
 
 Crit is installed with sharing disabled. Its wrapper performs a daily upgrade
-check, and its Codex plugin and OpenCode integrations are force-refreshed so
-generated integration files do not stay stale after Crit upgrades. Claude Code
-receives Crit through the managed Claude plugin list. Pi discovers Crit's
-shared skills through `~/.agents/skills/`. OpenCode's managed config loads
-Crit's generated `plugins/crit.ts` file explicitly because Crit will not
-rewrite an existing config file with unrelated user keys.
+check. Its Codex integration is force-refreshed on playbook runs, and its
+OpenCode integration is refreshed when the Crit binary checksum changes or its
+shared helper is missing. Claude Code
+receives Crit through the managed Claude plugin list. OpenCode loads the managed V2 package
+from `~/.config/opencode/crit-opencode/`. Its server hook adds sharing guidance
+only when sharing is enabled, and its CLI plugin notifies on blocking Crit
+review commands. The incompatible generated V1 `plugins/crit.ts` is removed
+after installing Crit's integration; its shared helper and skills are retained.
 
 Herdr provides terminal and session orchestration. Its integrations do not
 alter assistant sandbox policy, writable roots, network permissions, or browser
 automation permissions.
 
 Herdr built-in integrations use the assistant command names it supports
-directly, including Pi. The managed launchers keep the default `opencode` and
-`pi` paths sandboxed via PATH and Stow wiring. Claude and Codex retain their
-native sandboxing. The current repository-managed Claude and Codex sandbox
+directly. The managed launchers keep the default `opencode` path sandboxed via
+PATH and Stow wiring. Claude and Codex retain their native sandboxing. The current repository-managed Claude and Codex sandbox
 settings do not add Herdr's socket path to writable roots or network
 allowances, but there is no repository-managed native deny-list for that socket
 path.
@@ -196,17 +215,17 @@ behavior.
 ## Skills
 
 Skills are deployed to Claude Code and the shared `~/.agents/skills/` path
-according to their source directory. Codex, Pi, and OpenCode discover the
+according to their source directory. Codex and OpenCode discover the
 shared path:
 
 | Source directory | Targets |
 | --- | --- |
-| `skills/` | Claude Code, Codex, Pi, and OpenCode |
+| `skills/` | Claude Code, Codex, and OpenCode |
 | `skills-claude/` | Claude Code only |
-| `skills-codex/` | Codex and Pi |
-| `external-skills/` | Claude Code, Codex, Pi, and OpenCode |
+| `skills-codex/` | Codex |
+| `external-skills/` | Claude Code, Codex, and OpenCode |
 | `external-skills-claude/` | Claude Code only |
-| `external-skills-codex/` | Codex and Pi |
+| `external-skills-codex/` | Codex |
 
 External skills may be downloaded bundles or Git submodules. The
 `ansible/tasks/agent-skills.yml` task handles discovery and links.

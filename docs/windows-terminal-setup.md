@@ -44,8 +44,6 @@ nothing.
 
 | Chord (`keys`)       | Sequence (`input`) | What it restores                      |
 | -------------------- | ------------------ | ------------------------------------- |
-| `shift+enter`        | `\u001b[13;2u`     | Pi: multiline input                   |
-| `alt+enter`          | `\u001b[13;3u`     | Pi: follow-up queueing                |
 | `ctrl+=`             | `\u001b[61;5u`     | Emacs: `er/expand-region`             |
 | `ctrl+,`             | `\u001b[44;5u`     | Emacs: `avy-goto-char`                |
 | `ctrl+'`             | `\u001b[39;5u`     | Emacs: `avy-goto-char-2`              |

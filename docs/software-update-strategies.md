@@ -83,8 +83,7 @@ strategy, or given a daily/runtime updater.
 | Claude Code plugins | Install-only if the user-scoped plugin is missing | `ansible/tasks/claude-code.yml` |
 | Codex CLI | Install-only npm global | `ansible/tasks/codex.yml` |
 | nono | Latest on playbook run: compares installed version to the latest GitHub release Debian package; managed profiles are Stow-deployed and validated on each run | `ansible/tasks/nono.yml`, `nono/.config/nono/profiles/` |
-| Pi Coding Agent | Latest on playbook run: compares the installed global npm package to the latest npm release | `ansible/tasks/pi.yml` |
-| OpenCode | Install-only | `ansible/tasks/opencode.yml` |
+| OpenCode | Install latest V2 when absent; migrate managed V1 once with a binary/config backup; existing V2 is install-only (`opencode upgrade` for updates) | `ansible/tasks/opencode.yml` |
 | Herdr | Latest on playbook run: compares `herdr --version` to the `https://herdr.dev/latest.json` manifest and runs `herdr update --handoff` on a mismatch, which hands off live sessions instead of requiring them to stop first | `ansible/tasks/herdr.yml` |
 | Herdr integrations | Re-run on each playbook run with `changed_when: false` | `ansible/tasks/herdr.yml` |
 | Herdr config reload | Runs `herdr server reload-config` only when a managed config line changed; tolerated failure when no server is running | `ansible/tasks/herdr.yml` |

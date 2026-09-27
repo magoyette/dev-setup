@@ -128,9 +128,19 @@
   ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration install opencode"
   changed_when: false
 
-- name: Install Herdr Pi integration
-  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration install pi"
+- name: Check Herdr Pi integration status
+  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration status"
+  register: herdr_pi_integration_status
   changed_when: false
+  failed_when: false
+
+# Pi is retired from this setup; uninstall its Herdr integration when present.
+- name: Uninstall retired Herdr Pi integration
+  ansible.builtin.command: "{{ herdr_check.stdout | default(ansible_env.HOME ~ '/.local/bin/herdr', true) }} integration uninstall pi"
+  when: >-
+    herdr_pi_integration_status.rc == 0 and
+    herdr_pi_integration_status.stdout is not search('(?m)^pi: not installed')
+  changed_when: true
 
 - name: Download Herdr skill from GitHub
   ansible.builtin.command:
