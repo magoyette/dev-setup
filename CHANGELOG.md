@@ -14,6 +14,14 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [10.0.0] - 2026-09-27
+
+### Removed
+
+- Remove the Jinx spellchecking dependencies from the Emacs sub-playbook (`hunspell`,
+  the English and French Hunspell dictionaries and `libenchant-2-dev`).
+  Personal Enchant word lists in `~/.config/enchant/*.dic` are not removed.
+
 ## [9.0.0] - 2026-09-27
 
 ### Added
