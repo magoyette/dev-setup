@@ -125,11 +125,13 @@ git alias
 - `ccstatusline` : configure the Claude Code status line
 - `fd` : alias to Ubuntu's `fdfind` binary
 
-## CLAUDE.md
+## AGENTS.md
 
-`CLAUDE.md` is the concise context file for coding agents in this repository.
+`AGENTS.md` is the concise context file for coding agents in this repository.
+Codex and OpenCode read it natively, and Claude Code v2.1.277 and later reads it
+as a fallback when no `CLAUDE.md` exists in the project or a parent directory.
 Detailed provisioning, integration, and workflow notes live under `docs/` and
-are referenced from `CLAUDE.md` so agents load them only when relevant.
+are referenced from `AGENTS.md` so agents load them only when relevant.
 
 Reference documents:
 
@@ -145,7 +147,7 @@ Reference documents:
 - [WSL terminal title issues](docs/wsl-terminal-title-issues.md)
 - [Windows Terminal setup](docs/windows-terminal-setup.md)
 
-Codex is configured to use `CLAUDE.md` as a fallback file. `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code. Ansible also deploys global Codex hooks for WSL-to-Windows notifications and post-edit validation.
+Codex `project_doc_max_bytes` is set to a very high value (1GiB) to remove in practice its size limit to be consistent with Claude Code. Ansible also deploys global Codex hooks for WSL-to-Windows notifications and post-edit validation.
 
 For global user-level context, Ansible combines
 [`global-agent-context.md`](global-agent-context.md) with the optional,

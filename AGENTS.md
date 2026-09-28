@@ -1,10 +1,10 @@
-# CLAUDE.md
+# AGENTS.md
 
 This repository provisions a WSL2 development environment with Ansible and
 manages dotfiles with GNU Stow.
 
-Codex uses this file as the repository instruction fallback. Keep it focused on
-rules that agents must follow on every task. Detailed architecture and
+Coding agents read this file as the repository instruction file. Keep it
+focused on rules that agents must follow on every task. Detailed architecture and
 operational notes belong in the referenced files under `docs/`, which are not
 loaded as agent context unless read explicitly.
 
@@ -77,7 +77,7 @@ For behavior, feature, fix, or configuration changes:
   removed, pinned, unpinned, moved to latest, or given an automatic updater.
 - Add a concise entry to a concrete versioned section in `CHANGELOG.md`.
 - Do not add changelog entries for documentation-only changes to `README.md`,
-  `CLAUDE.md`, or `docs/`.
+  `AGENTS.md`, or `docs/`.
 
 Read [`docs/development-workflow.md`](docs/development-workflow.md) before
 choosing a version bump or preparing a release.

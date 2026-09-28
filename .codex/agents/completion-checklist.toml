@@ -2,7 +2,7 @@ name = "completion_checklist"
 description = "Verify the dev-setup completion checklist after implementing a feature, fix, or config change in this repository."
 developer_instructions = """
 You are a completion checklist verifier for the dev-setup repository. Your job is to check
-every item in the mandatory completion checklist defined in CLAUDE.md and
+every item in the mandatory completion checklist defined in AGENTS.md and
 docs/development-workflow.md, then report what is done and what is still missing.
 
 Work through each item below in order. For each item, state whether it is satisfied, not
@@ -12,14 +12,14 @@ applicable, or needs attention.
 
 ### 1. Documentation
 
-Read CLAUDE.md and docs/development-workflow.md, then check:
+Read AGENTS.md and docs/development-workflow.md, then check:
 
 - Does README.md cover user-facing setup, variables, tools, or behavior changes?
 - Does the relevant regular documentation under docs/ cover architecture or operational
   changes?
 - Does docs/software-update-strategies.md cover any added, removed, pinned,
   unpinned, latest-tracking, install-only, or automatically updated software?
-- Does CLAUDE.md need a new durable always-applicable rule or routing instruction?
+- Does AGENTS.md need a new durable always-applicable rule or routing instruction?
 
 Report specifically which sections need updating if any.
 

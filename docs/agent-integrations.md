@@ -13,10 +13,11 @@ the shared guidance. The combined context is generated at
 `~/.config/dev-setup/global-agent-context.md`, and each assistant's global
 context path links to it. Rerun the playbook after editing the local file.
 
-`CLAUDE.md` is the repository-level instruction file for Claude Code and is
-configured as a Codex fallback filename. Keep `CLAUDE.md` limited to durable
-rules and routing. Files under `docs/` are regular documentation and are only
-loaded when an agent explicitly reads them.
+`AGENTS.md` is the repository-level instruction file. Codex and OpenCode read
+it natively, and Claude Code v2.1.277 and later reads it as a fallback when no
+`CLAUDE.md` exists in the project or a parent directory. Keep `AGENTS.md`
+limited to durable rules and routing. Files under `docs/` are regular
+documentation and are only loaded when an agent explicitly reads them.
 
 Codex's configured `project_doc_max_bytes` value is intentional and should not
 be changed as part of context-file cleanup.
@@ -61,8 +62,7 @@ and upgrades the Bun-installed package when a newer release is available.
 ## Codex
 
 `ansible/tasks/codex.yml` manages selected values in `~/.codex/config.toml`,
-including the `CLAUDE.md` fallback, status line, hooks feature, and writable
-roots.
+including the status line, hooks feature, and writable roots.
 
 `scripts/merge-codex-mcps.sh` manages the shared MCP sections in
 `~/.codex/config.toml` while preserving other configured servers. It edits the

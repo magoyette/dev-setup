@@ -14,6 +14,16 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [11.0.0] - 2026-09-27
+
+### Changed
+
+- Migrate from `CLAUDE.md` to `AGENTS.md`.
+
+### Removed
+
+- Remove the Codex `project_doc_fallback_filenames = ["CLAUDE.md"]` fallback.
+
 ## [10.0.0] - 2026-09-27
 
 ### Removed

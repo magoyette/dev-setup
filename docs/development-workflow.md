@@ -12,16 +12,16 @@ applicable items:
   behavior.
 - Update the relevant regular documentation under `docs/` when architecture or
   operational details change.
-- Update `CLAUDE.md` only when a durable always-applicable agent rule or routing
+- Update `AGENTS.md` only when a durable always-applicable agent rule or routing
   instruction changes.
 - Add a concise entry to a concrete versioned section in `CHANGELOG.md`.
 - Run `ansible-playbook ansible/playbook.yml --syntax-check` when a file under
   `ansible/` changes.
 - Run `shellcheck <script>` for every changed `.sh` file.
 - Run `./run-markdownlint.sh` when Markdown changes.
-- Run other file-specific validators required by `CLAUDE.md`.
+- Run other file-specific validators required by `AGENTS.md`.
 
-Documentation-only changes to `README.md`, `CLAUDE.md`, or `docs/` do not
+Documentation-only changes to `README.md`, `AGENTS.md`, or `docs/` do not
 require a changelog entry.
 
 Use the project-scoped completion-checklist agent after a completed feature,

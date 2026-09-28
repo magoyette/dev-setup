@@ -22,13 +22,6 @@
     force: false
     mode: "0644"
 
-- name: Configure Codex project doc fallback filenames at TOML root
-  ansible.builtin.lineinfile:
-    path: "{{ ansible_env.HOME }}/.codex/config.toml"
-    regexp: "^project_doc_fallback_filenames\\s*="
-    insertbefore: BOF
-    line: 'project_doc_fallback_filenames = ["CLAUDE.md"]'
-
 - name: Configure Codex project doc max bytes at TOML root
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.codex/config.toml"
