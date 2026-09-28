@@ -170,6 +170,11 @@ Microsoft WSL2 kernels. Consequences for one-off grants:
 - `--capability-elevation` (grant-on-prompt during the session) does not work
   on WSL2; nono reports the session as degraded. Use an explicit grant at
   launch instead.
+- Pathname Unix socket connections are not mediated on stock WSL2 kernels, so
+  a reachable local socket such as Herdr's `~/.config/herdr/herdr.sock` stays
+  reachable from inside the sandbox. The profile's Herdr and Docker `deny`
+  entries serve the private `TMPDIR` Landlock strategy; they do not block
+  socket connections.
 - Do not grant all of `/tmp` to work around the private `TMPDIR`; Landlock
   cannot deny the Herdr paths inside an allowed `/tmp`. Grant a private
   directory.

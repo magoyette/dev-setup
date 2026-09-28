@@ -14,6 +14,16 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [11.0.1] - 2026-09-28
+
+### Fixed
+
+- Export `HERDR_AGENT=opencode` from the managed OpenCode launcher so Herdr
+  attributes panes to OpenCode and shows agent status even though the nono
+  wrapper hides the real process from process detection.
+- Stop loading Herdr's OpenCode client plugin twice when Herdr's own
+  integration already registers it.
+
 ## [11.0.0] - 2026-09-27
 
 ### Changed

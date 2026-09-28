@@ -8,9 +8,12 @@ if [[ ! -x "$real_opencode" ]]; then
   exit 127
 fi
 
-# Herdr currently registers its client plugin only in V1 tui.jsonc. Add its
-# V2 entrypoint through the client overlay without preempting V2's first-run
-# preference migration or replacing the user's other CLI plugins.
+# Herdr registers its V2 TUI plugin in cli.json, but that registration can
+# be absent or shadowed by a preset OPENCODE_CLI_CONFIG_CONTENT plugins array.
+# Add the entrypoint through the client overlay without preempting V2's
+# first-run preference migration or replacing the user's other CLI plugins,
+# and skip the overlay entry when an equivalent registration already exists
+# so the plugin is not loaded twice.
 opencode_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/opencode"
 if [[ -f "$opencode_config_dir/herdr-opencode/tui.js" ]]; then
   cli_plugins='[]'
@@ -24,10 +27,18 @@ if [[ -f "$opencode_config_dir/herdr-opencode/tui.js" ]]; then
   OPENCODE_CLI_CONFIG_CONTENT="$(jq -cn --argjson overlay "$cli_overlay" \
     --argjson plugins "$cli_plugins" --arg plugin "$opencode_config_dir/herdr-opencode" '
       $overlay | .plugins = ((.plugins // $plugins) |
-        if index($plugin) then . else . + [$plugin] end)
+        if (index($plugin) or index("./herdr-opencode")) then .
+        else . + [$plugin] end)
     ')"
   export OPENCODE_CLI_CONFIG_CONTENT
 fi
+
+# Herdr's process detection sees the nono wrapper as the pane's foreground
+# process, not OpenCode itself, so a pane running this launcher shows no agent
+# status. The hint tells Herdr to apply its OpenCode screen manifest to that
+# process (https://herdr.dev/docs/agents/). Only processes launched through
+# this wrapper inherit it, not the surrounding pane shell.
+export HERDR_AGENT=opencode
 
 # V2 normally connects to a shared service, whose tools would run outside this
 # launcher's sandbox. Server-consuming commands must use a private server.

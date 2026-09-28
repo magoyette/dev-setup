@@ -99,8 +99,9 @@ V2 automatically migrates terminal preferences to global `cli.json` on first
 terminal startup. Its automatic migration reads `tui.json` and stored
 preferences; `tui.jsonc` is retained but is not read by that migration.
 The launcher supplies Herdr's V2 CLI entrypoint through
-`OPENCODE_CLI_CONFIG_CONTENT`, preserving configured CLI plugins and other
-overlay settings. Move any other `tui.jsonc` customization into `cli.json`.
+`OPENCODE_CLI_CONFIG_CONTENT` when no equivalent registration is already
+active, preserving configured CLI plugins and other overlay settings. Move
+any other `tui.jsonc` customization into `cli.json`.
 Project-local
 terminal preferences need to be moved into the global client configuration.
 See the [upstream migration guide](https://opencode.ai/v2/docs/migrate-v1/).
@@ -133,7 +134,17 @@ the private server inherits nono restrictions. Connecting to a shared or remote
 server would put tool execution under that server's policy instead. The V2
 profile also grants OpenCode's state directory and read access to shared skill
 directories and the global instruction source. Herdr's current dual-version
-integration supports V2, but its socket remains subject to the sandbox policy.
+integration supports V2. Its default-session socket lives under
+`~/.config/herdr/`, outside the profile's Herdr deny entries, and pathname
+Unix socket connections are not mediated on this WSL2 kernel, so that socket
+stays reachable from the sandboxed assistant.
+
+The nono wrapper is the pane's foreground process from Herdr's point of view,
+so process detection cannot attribute a pane to OpenCode on its own. The
+launcher exports `HERDR_AGENT=opencode` so Herdr applies its OpenCode screen
+manifest to the wrapped process; agent status then comes from screen
+detection, and the Herdr lifecycle plugin takes over the pane's status
+authority if it starts actively reporting.
 
 The playbook writes `ai_assistants_nono_*` values to
 `~/.config/dev-setup/ai-assistant-sandbox.env`, which is sourced by the managed
@@ -196,7 +207,10 @@ automation permissions.
 
 Herdr built-in integrations use the assistant command names it supports
 directly. The managed launchers keep the default `opencode` path sandboxed via
-PATH and Stow wiring. Claude and Codex retain their native sandboxing. The current repository-managed Claude and Codex sandbox
+PATH and Stow wiring. Claude and Codex retain their native sandboxing. The
+sandboxed OpenCode launcher exports `HERDR_AGENT=opencode` so Herdr's screen
+detection classifies panes whose real foreground process is hidden behind the
+nono wrapper. The current repository-managed Claude and Codex sandbox
 settings do not add Herdr's socket path to writable roots or network
 allowances, but there is no repository-managed native deny-list for that socket
 path.
