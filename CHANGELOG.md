@@ -14,6 +14,14 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [11.1.0] - 2026-09-30
+
+### Changed
+
+- Launch OpenCode without the nono working-directory sharing prompt. The
+  managed launcher grants the launch directory at the profile workdir level;
+  set `ai_assistants_nono_allow_cwd` to `false` to restore the prompt.
+
 ## [11.0.1] - 2026-09-28
 
 ### Fixed

@@ -43,6 +43,9 @@ ai_assistants_nono_required_launchers:
 # profiles are deployed from nono/.config/nono/profiles/.
 ai_assistants_nono_profiles:
   opencode: opencode
+# Grant each launcher's working directory through nono --allow-cwd without the
+# interactive sharing prompt. false restores the per-launch confirmation.
+ai_assistants_nono_allow_cwd: true
 ai_assistants_mcp_catalog:
   context7:
     url: https://mcp.context7.com/mcp

@@ -77,8 +77,12 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   default. Each sandbox launch gets a private `TMPDIR` under `/tmp`; tools must
   respect `TMPDIR` because the profile does not grant general `/tmp` access.
   The profile grants read-only access to the user's Git configuration so Git
-  repo detection works inside the sandbox. See the `ai_assistants_nono_*`
-  values in `ansible/defaults.yml` for the launcher and profile defaults.
+  repo detection works inside the sandbox. The launcher passes `--allow-cwd`
+  so the working directory is granted at the profile workdir level
+  (`readwrite`) without an interactive sharing prompt; set
+  `ai_assistants_nono_allow_cwd` to `false` to restore that prompt. See the
+  `ai_assistants_nono_*` values in `ansible/defaults.yml` for the launcher and
+  profile defaults.
 - `pyenv_version`
   pyenv version installed for the Python sub-playbook. Default: `"v2.5.3"`.
 - `uv_version`

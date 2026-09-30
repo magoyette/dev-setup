@@ -30,10 +30,14 @@ detection to work inside the sandbox.
 The `dev-setup-ai-assistant-sandbox` launcher sources
 `~/.config/dev-setup/ai-assistant-sandbox.env`, creates a private
 `/tmp/dev-setup-ai.*` directory and exports it as `TMPDIR`, and then execs
-`nono.sh run --profile <profile> -- <command>`. Everything after `--` is
-passed to the assistant, so the launcher cannot forward additional `nono`
-flags. Claude Code and Codex keep their native OS-level sandboxes and do not
-get a second `nono.sh` wrapper.
+`nono.sh run --profile <profile> --allow-cwd -- <command>`. `--allow-cwd`
+grants the working directory at the profile's `workdir` level (`readwrite`)
+without asking for confirmation on every launch. Set
+`DEV_SETUP_NONO_ALLOW_CWD=false` (generated from
+`ai_assistants_nono_allow_cwd`) to restore the interactive sharing prompt.
+Everything after `--` is passed to the assistant, so the launcher cannot
+forward additional `nono` flags. Claude Code and Codex keep their native
+OS-level sandboxes and do not get a second `nono.sh` wrapper.
 
 Access outside the profile grants is denied by the kernel (Landlock). A file
 with normal Unix permissions still returns `Permission denied` inside the

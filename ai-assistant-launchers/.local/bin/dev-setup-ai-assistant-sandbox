@@ -58,7 +58,14 @@ if [[ -n "$sandbox_command" ]]; then
   # Ignore inherited TMPDIR so every sandbox gets a private, narrow grant.
   TMPDIR="$(mktemp -d /tmp/dev-setup-ai.XXXXXXXXXX)"
   export TMPDIR
-  exec "$sandbox_command" run --profile "$profile" -- "$command_path" "$@"
+  # Grant the working directory up front at the profile workdir level instead
+  # of prompting on every launch. Set DEV_SETUP_NONO_ALLOW_CWD=false to get
+  # the interactive sharing prompt back.
+  sandbox_args=(run --profile "$profile")
+  if [[ "${DEV_SETUP_NONO_ALLOW_CWD:-true}" != "false" ]]; then
+    sandbox_args+=(--allow-cwd)
+  fi
+  exec "$sandbox_command" "${sandbox_args[@]}" -- "$command_path" "$@"
 fi
 
 if ! contains_word "$launcher" "$required_launchers"; then
