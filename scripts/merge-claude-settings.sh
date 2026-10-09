@@ -64,9 +64,16 @@ jq --argjson sandbox_enabled "$sandbox_enabled" --argjson sandbox_allow_write "$
       "enabled": $sandbox_enabled,
       "filesystem": ((.sandbox.filesystem // {}) * {"allowWrite": $sandbox_allow_write})
     })
-  | if ($sandbox_allowed_hosts | length) > 0 then
-      .sandbox.network = ((.sandbox.network // {}) * {"allowedHosts": $sandbox_allowed_hosts})
-    else . end
+  | .sandbox.network = (
+      if ($sandbox_allowed_hosts | length) > 0 then
+        ((.sandbox.network // {}) * {"allowedDomains": $sandbox_allowed_hosts})
+      else
+        ((.sandbox.network // {}) | del(.allowedDomains?))
+      end
+      # Drop the legacy allowedHosts key from before the allowedDomains rename.
+      | del(.allowedHosts?)
+    )
+  | if .sandbox.network == {} then del(.sandbox.network) else . end
   | .permissions = ((.permissions // {}) * {
       "allow": (
         ((.permissions.allow // []) | map(select(test("^WebFetch\\(domain:") | not)))

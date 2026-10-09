@@ -17,6 +17,9 @@ ai_assistants_sandbox_allowed_hosts:
 ai_assistants_mcps:
   - context7
   - grep
+# Opt-in: disable Windows interop for this distribution. Requires wsl --shutdown
+# after provisioning; see docs/wsl-interop.md for the impact analysis.
+wsl_disable_interop: false
 pyenv_version: "v2.5.3"
 uv_version: "0.9.21"
 python_version: "3.13.12"

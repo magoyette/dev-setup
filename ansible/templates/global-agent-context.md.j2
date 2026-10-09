@@ -4,3 +4,101 @@
 
 {{ local_context }}
 {% endif %}
+{% set writable_roots = ai_assistants_sandbox_writable_roots | default([]) %}
+{% set allowed_hosts = ai_assistants_sandbox_allowed_hosts | default([]) %}
+{% if context_assistant == 'claude-code' %}
+{% if claude_sandbox_enabled %}
+
+## Claude Code Sandbox
+
+- The managed Claude Code sandbox is enabled (`claude_sandbox_enabled`):
+  Bash commands run inside Claude Code's OS-level sandbox.
+{% if writable_roots | length %}
+- Writes are confined to the working directory plus the managed extra
+  writable roots ({{ writable_roots | join(', ') }}).
+{% else %}
+- Writes are confined to the working directory; no extra writable roots are
+  configured.
+{% endif %}
+{% if allowed_hosts | length %}
+- Network egress from sandboxed commands is confined to the managed allowed
+  hosts ({{ allowed_hosts | join(', ') }}); connections to other hosts prompt
+  for approval instead of failing silently. These restrictions apply to Bash
+  commands; the WebFetch tool follows permission rules. The list comes from
+  `ai_assistants_sandbox_allowed_hosts` in the dev-setup repository.
+{% else %}
+- Network egress from sandboxed commands is not allowlisted; connections to
+  external hosts prompt for approval. These restrictions apply to Bash
+  commands; the WebFetch tool follows permission rules.
+{% endif %}
+- When a command fails because of the sandbox, request approval to run it
+  outside the sandbox instead of retrying; `chmod` and `sudo` cannot bypass
+  OS-level denials.
+{% else %}
+
+## Claude Code Sandbox
+
+- The managed Claude Code sandbox is disabled (`claude_sandbox_enabled:
+  false`); Bash commands run without OS-level sandboxing.
+{% endif %}
+{% endif %}
+{% if context_assistant == 'codex' %}
+
+## Codex Sandbox
+
+- Codex executes commands in its native OS-level sandbox (workspace-write
+  mode); there is no managed enable/disable, so the sandbox is always active.
+{% if writable_roots | length %}
+- Writes are restricted to the workspace plus the managed extra writable
+  roots ({{ writable_roots | join(', ') }}); `/tmp` and `$TMPDIR` stay
+  writable.
+{% else %}
+- Writes are restricted to the workspace; `/tmp` and `$TMPDIR` stay
+  writable.
+{% endif %}
+- Network access is disabled inside the sandbox unless enabled in the
+  sandbox config (it is not).
+- When an operation fails because of the sandbox, ask the user to approve
+  running it outside the sandbox instead of retrying; `chmod` and `sudo`
+  cannot bypass OS-level denials.
+- The extra writable roots come from `ai_assistants_sandbox_writable_roots`
+  in the dev-setup repository.
+{% endif %}
+{% if context_assistant == 'opencode' %}
+
+## nono.sh Sandbox
+
+OpenCode runs inside the `nono.sh` OS-level sandbox (Linux Landlock) under the
+managed `opencode` profile. The launch directory is granted read/write, so work
+inside the current repository is unaffected.
+
+### Configuration
+
+- Read/write: OpenCode state (`~/.opencode`, `~/.config/opencode`,
+  `~/.local/share/opencode`, `~/.local/state/opencode`), `~/.config/hunk`,
+  `$XDG_RUNTIME_DIR/hunk-mcp`, and `$TMPDIR`.
+- Read-only: the shared skill directories, `~/.gitconfig`, `~/.config/git`,
+  `/etc/gitconfig`, and `~/.config/dev-setup`.
+- `$TMPDIR` is a private `/tmp/dev-setup-ai.*` directory; the rest of `/tmp` is
+  denied. Write temporary files under `$TMPDIR`, never hardcoded `/tmp` paths,
+  and never grant all of `/tmp` to work around it.
+- Network access is not restricted by the sandbox.
+
+### Limitations
+
+- Access outside the grants is denied by the kernel: `Permission denied` on a
+  file with normal Unix permissions is the sandbox, not a filesystem problem.
+  `chmod`, `sudo`, and retries cannot bypass it. Commonly denied: `~/.ssh`,
+  `/mnt/c`, and other paths outside the grants, including other repositories
+  under `~/repos`.
+- Git credentials are unavailable by design: fetching and pushing private
+  repositories fail with authentication errors. Commit and branch locally;
+  ask the user to run authenticated Git operations from an ordinary shell.
+- When a needed path is denied, report the exact path instead of debugging the
+  filesystem. The user can check it with `nono why`, grant one directory for a
+  session with `NONO_ALLOW="$HOME/dir" opencode`, or change the managed
+  profile in the dev-setup repository. Run diagnostics and grants from an
+  ordinary shell: `~/.config/nono` is outside the sandbox grants and
+  prompt-based elevation is unavailable on this kernel. Full details:
+  `docs/nono-sandbox.md` in the dev-setup repository.
+{% endif %}

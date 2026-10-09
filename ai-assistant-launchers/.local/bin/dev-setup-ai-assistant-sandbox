@@ -58,6 +58,11 @@ if [[ -n "$sandbox_command" ]]; then
   # Ignore inherited TMPDIR so every sandbox gets a private, narrow grant.
   TMPDIR="$(mktemp -d /tmp/dev-setup-ai.XXXXXXXXXX)"
   export TMPDIR
+  # Hide the easy WSL interop path from sandboxed processes. Pathname Unix
+  # socket connections are not mediated on stock WSL2 kernels, so the interop
+  # sockets stay reachable; disabling interop in wsl.conf is the real
+  # boundary (see docs/wsl-interop.md).
+  unset WSL_INTEROP WSLENV
   # Grant the working directory up front at the profile workdir level instead
   # of prompting on every launch. Set DEV_SETUP_NONO_ALLOW_CWD=false to get
   # the interactive sharing prompt back.
@@ -65,7 +70,67 @@ if [[ -n "$sandbox_command" ]]; then
   if [[ "${DEV_SETUP_NONO_ALLOW_CWD:-true}" != "false" ]]; then
     sandbox_args+=(--allow-cwd)
   fi
-  exec "$sandbox_command" "${sandbox_args[@]}" -- "$command_path" "$@"
+  # Pre-flight the launch with a dry run. Linux Landlock cannot enforce a
+  # deny rule inside an allowed directory, so nono refuses to start when a
+  # directory granted at launch (the --allow-cwd working directory, or
+  # NONO_ALLOW) contains a denied path. Catch that here so the conflict can
+  # be explained in launcher terms; any other pre-flight failure still
+  # falls through to nono's own report. The dry run adds milliseconds.
+  preflight_log="$(mktemp)"
+  if "$sandbox_command" "${sandbox_args[@]}" --dry-run -- true >"$preflight_log" 2>&1; then
+    preflight_status=0
+  else
+    preflight_status=$?
+  fi
+  if (( preflight_status != 0 )); then
+    if grep -Eqi 'deny-overlap|overlaps allowed parent' "$preflight_log"; then
+      remedies=()
+      if [[ "${DEV_SETUP_NONO_ALLOW_CWD:-true}" != "false" ]]; then
+        remedies+=('  - launch from a narrower working directory that contains no denied paths')
+      fi
+      if [[ -n "${NONO_ALLOW:-}" ]]; then
+        remedies+=('  - unset or narrow NONO_ALLOW')
+      fi
+      if [[ ${#remedies[@]} -eq 0 ]]; then
+        remedies+=('  - adjust the profile grants or deny rules (see docs/nono-sandbox.md)')
+      fi
+      {
+        printf 'dev-setup-ai-assistant-sandbox: nono refused to start the %s sandbox because a directory granted to this launch contains paths the sandbox profile denies. Linux Landlock cannot enforce a deny rule inside an allowed directory, so nono refuses to run rather than silently drop the denies.\n' "$launcher"
+        printf '\n'
+        printf 'Grants in effect for this launch:\n'
+        if [[ "${DEV_SETUP_NONO_ALLOW_CWD:-true}" != "false" ]]; then
+          printf '  - working directory: %s (--allow-cwd)\n' "$PWD"
+        fi
+        if [[ -n "${NONO_ALLOW:-}" ]]; then
+          printf '  - NONO_ALLOW: %s\n' "$NONO_ALLOW"
+        fi
+        printf '\n'
+        printf 'Fix by removing the overlap:\n'
+        printf '%s\n' "${remedies[@]}"
+        printf '\n'
+        printf 'The profile denies sensitive paths such as credentials and the Herdr and Docker sockets. See docs/nono-sandbox.md in the dev-setup repository. nono report follows:\n'
+        printf '\n'
+      } >&2
+    fi
+    cat "$preflight_log" >&2
+    rm -f "$preflight_log"
+    exit "$preflight_status"
+  fi
+  rm -f "$preflight_log"
+  # Do not exec into nono. Its supervisor runs non-dumpable (PR_SET_DUMPABLE(0)),
+  # which hides the pane's foreground environment from Herdr's process
+  # detection: the HERDR_AGENT=opencode hint exported by the opencode wrapper
+  # becomes unreadable and Herdr attributes the pane to no agent at all. Run
+  # nono as a foreground child so this launcher process stays the foreground
+  # process-group leader and keeps a readable environment with the hint.
+  # Ignore the terminal signals while waiting: nono is a foreground group
+  # member, receives them itself, and decides when the session ends.
+  trap '' INT TERM
+  set +e
+  "$sandbox_command" "${sandbox_args[@]}" -- "$command_path" "$@"
+  sandbox_status=$?
+  set -e
+  exit "$sandbox_status"
 fi
 
 if ! contains_word "$launcher" "$required_launchers"; then

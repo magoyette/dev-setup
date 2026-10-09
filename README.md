@@ -70,7 +70,7 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
 - `ai_assistants_sandbox_writable_roots`
   Extra writable roots for the sandboxes of Codex (`writable_roots`) and Claude Code (`sandbox.filesystem.allowWrite`). Default: `[]`.
 - `ai_assistants_sandbox_allowed_hosts`
-  Hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedHosts`). Default to hosts needed by the agent skills.
+  Hosts allowed outbound network access in the Claude Code sandbox (`sandbox.network.allowedDomains`). Default to hosts needed by the agent skills.
 - `ai_assistants_mcps`
   MCP servers enabled globally in Claude Code, Codex, and OpenCode. Supported values are `context7` and `grep`. Default: `[context7, grep]`. Removing a value removes that managed MCP from all three assistants without affecting user-managed MCP servers.
 - OpenCode is launched through a managed `nono.sh` sandbox profile by
@@ -80,9 +80,23 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   repo detection works inside the sandbox. The launcher passes `--allow-cwd`
   so the working directory is granted at the profile workdir level
   (`readwrite`) without an interactive sharing prompt; set
-  `ai_assistants_nono_allow_cwd` to `false` to restore that prompt. See the
+  `ai_assistants_nono_allow_cwd` to `false` to restore that prompt. The
+  launcher pre-flights every sandbox start with a `nono` dry run and, when
+  the resolved policy conflicts (for example launching from `$HOME`, which
+  contains credential paths the profile denies), explains the conflicting
+  grants and their fix instead of surfacing nono's raw refusal. The
+  launcher process stays the pane's foreground process so Herdr can read its
+  `HERDR_AGENT` hint and show the sandboxed session's agent status (see
+  [docs/agent-integrations.md](docs/agent-integrations.md)). See the
   `ai_assistants_nono_*` values in `ansible/defaults.yml` for the launcher and
   profile defaults.
+- `wsl_disable_interop`
+  Set to `true` to disable Windows interop for this distribution. The core
+  playbook writes `[interop] enabled=false` and `appendWindowsPath=false` to
+  `/etc/wsl.conf` and switches Git credentials from the Windows Git
+  Credential Manager to `gh`. The change applies after `wsl --shutdown`.
+  Default: `false`. See [docs/wsl-interop.md](docs/wsl-interop.md) for the
+  impact analysis.
 - `pyenv_version`
   pyenv version installed for the Python sub-playbook. Default: `"v2.5.3"`.
 - `uv_version`
@@ -155,12 +169,19 @@ Codex `project_doc_max_bytes` is set to a very high value (1GiB) to remove in pr
 
 For global user-level context, Ansible combines
 [`global-agent-context.md`](global-agent-context.md) with the optional,
-gitignored `global-agent-context.local.md`, then deploys the result to
+gitignored `global-agent-context.local.md`, extends it with a sandbox section
+for each assistant, and deploys one generated file per assistant to
 `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and
 `~/.config/opencode/AGENTS.md`. The shared file is a concise list of the CLI
 tools installed by this setup that are useful for an AI agent and don't have an
 Agent Skill. It also carries runtime guidance for the pyenv-managed `python3`
-and `uv` workflow and hallucination reduction guidelines.
+and `uv` workflow and hallucination reduction guidelines. Each assistant's
+section tells it whether its sandbox is active and what it restricts: Claude
+Code reports the state of its managed sandbox (from `claude_sandbox_enabled`,
+`ai_assistants_sandbox_writable_roots`, and
+`ai_assistants_sandbox_allowed_hosts`), Codex reports the limits of its
+always-on native sandbox, and OpenCode summarizes the managed `nono.sh`
+sandbox.
 
 The AI assistants playbook creates `global-agent-context.local.md` when it is
 absent. Add personal agent instructions there and rerun the playbook to append
@@ -222,6 +243,7 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [Hunk](https://www.hunk.dev/) : terminal-native diff review tool with watch mode and optional live agent annotations
 - [fd](https://github.com/sharkdp/fd) : fast alternative to `find`
 - [fzf](https://github.com/junegunn/fzf) : interactive fuzzy finder for shell workflows
+- [gh](https://cli.github.com/) : GitHub CLI; also the Git credential helper for GitHub when Windows interop is disabled (see [docs/wsl-interop.md](docs/wsl-interop.md))
 - [hadolint](https://github.com/hadolint/hadolint) : Dockerfile linter installed from the upstream Linux release binary
 - [jq](https://jqlang.org/) : for JSON manipulation
 - [pandoc](https://pandoc.org/) : for Markdown support

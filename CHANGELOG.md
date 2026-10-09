@@ -14,6 +14,71 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [11.2.0] - 2026-10-08
+
+### Added
+
+- Add the pinned GitHub CLI (`gh`). The new opt-in `wsl_disable_interop`
+  variable makes the core playbook write `[interop] enabled=false` and
+  `appendWindowsPath=false` to `/etc/wsl.conf` (applied after
+  `wsl --shutdown`) and configure `gh` as the Git credential helper for
+  GitHub in place of the Windows Git Credential Manager. Disabling interop
+  closes the WSL interop-socket route that the OpenCode nono sandbox cannot
+  mediate. See `docs/wsl-interop.md` for the impact analysis.
+- Generate a per-assistant global agent context instead of one shared file.
+  Each assistant's global context now appends sandbox guidance rendered from
+  the Ansible variables: OpenCode gets a concise summary of the managed
+  `nono.sh` sandbox, Claude Code gets the enabled state and the write and
+  network limits of its managed sandbox, and Codex gets the limits of its
+  always-on native sandbox. Each assistant's global context path links to
+  its own generated file.
+
+### Changed
+
+- Remove `WSL_INTEROP` and `WSLENV` from the environment of sandboxed
+  OpenCode launches. Pathname Unix socket connections remain unmediated on
+  stock WSL2 kernels, so disabling interop is the actual boundary.
+- Auto-approve additional low-risk shell commands in the managed OpenCode
+  configuration: `awk`, `cat`, `cd`, `command`, `du`, `env`, `grep`, `id`,
+  `nono why`, `pgrep`, `ps`, `sed`, `sort`, `tokei`, `wc`, and the `git log`,
+  `git show`, and `git ls-tree` subcommands. `git commit` and `git push`
+  remain denied.
+- Grant the OpenCode nono profile read access to `~/.ansible/collections` and
+  read/write access to `~/.ansible/tmp` so sandboxed OpenCode sessions can run
+  `ansible-playbook --syntax-check`: Ansible resolves `community.general` from
+  the collections path and creates a temporary directory under its controller
+  temporary directory at startup. The change applies to new sandbox launches.
+
+### Fixed
+
+- Keep Herdr agent status working for sandboxed OpenCode panes. nono 0.79.0
+  runs its supervisor process non-dumpable (`PR_SET_DUMPABLE(0)`), which
+  hides the pane's foreground environment from Herdr's process detection;
+  because the managed launcher exec'd into nono, Herdr could no longer read
+  the exported `HERDR_AGENT=opencode` hint and showed no agent at all for
+  sandboxed OpenCode panes. The launcher now ignores the terminal signals
+  while waiting and runs nono as a foreground child, staying the pane's
+  foreground process-group leader so Herdr reads the hint from the launcher
+  process. Panes launched before the change pick it up on the next launch.
+- Make the launcher explain sandbox policy conflicts instead of surfacing
+  nono's raw refusal. Linux Landlock cannot enforce a deny rule inside an
+  allowed directory, so launching `opencode` from a directory that contains
+  denied paths (for example `$HOME` with its denied credential paths, or
+  `/tmp` with the denied Herdr sockets) made nono refuse to start with a
+  policy-conflict error that never mentioned the launcher's `--allow-cwd`
+  grant. The launcher now pre-flights every start with a `nono` dry run
+  and, when the conflict is detected, prints the grants in effect for the
+  launch and how to fix them (launch from a narrower directory, or narrow or
+  unset `NONO_ALLOW`) ahead of nono's own report.
+- Upgrade Bun installations older than the tested minimum 1.4.2. Older
+  releases abort when the nono sandbox denies reads of ancestor directories,
+  which prevented sandboxed OpenCode from starting. Newer releases are kept.
+- Write Claude Code's sandbox network allowlist to the documented
+  `sandbox.network.allowedDomains` key instead of `allowedHosts`, which is
+  not part of Claude Code's settings schema. The merge script also removes
+  the stale `allowedHosts` key and drops the managed `allowedDomains` key
+  when the host list is empty, preserving user-managed network keys.
+
 ## [11.1.0] - 2026-09-30
 
 ### Changed

@@ -16,6 +16,7 @@ Check `--help` for exact flags when needed.
 - `markdownlint-cli2`: run after creating or modifying Markdown files. Uses upstream markdownlint rules.
 - `pandoc`: use to convert between Markdown and other document formats.
 - `pyenv`: use to manage the default Python runtime and per-project Python versions.
+- `gh`: use for GitHub operations (issues, releases, pull requests, API queries) instead of ad-hoc `curl` calls.
 - `socket`: use for local npm dependency and supply-chain scans when explicitly requested. Authentication with `socket login` may be required.
 - `tldr`: use for quick command examples when `--help` is too verbose.
 - `tokei`: use to count files, lines, code, comments, and blanks by language.

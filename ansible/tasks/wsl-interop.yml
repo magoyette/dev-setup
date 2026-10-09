@@ -1,0 +1,48 @@
+---
+# Optional Windows interop disable, opt-in through wsl_disable_interop in
+# ansible/vars.yml. See docs/wsl-interop.md for the impact analysis; the
+# change applies only after `wsl --shutdown` from Windows. Setting the
+# variable back to false leaves the managed [interop] section in place;
+# remove it manually and restart WSL to restore interop.
+- name: Check if wsl.conf exists
+  ansible.builtin.stat:
+    path: /etc/wsl.conf
+  register: wsl_conf_stat
+
+- name: Back up wsl.conf once before managing interop settings
+  ansible.builtin.copy:
+    src: /etc/wsl.conf
+    dest: /etc/wsl.conf.dev-setup-backup
+    remote_src: true
+    mode: "0644"
+    force: false
+  become: true
+  when:
+    - wsl_disable_interop | bool
+    - wsl_conf_stat.stat.exists
+
+- name: Disable Windows interop in wsl.conf
+  community.general.ini_file:
+    path: /etc/wsl.conf
+    section: interop
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    mode: "0644"
+  become: true
+  loop:
+    - option: enabled
+      value: "false"
+    - option: appendWindowsPath
+      value: "false"
+  when: wsl_disable_interop | bool
+  register: wsl_interop_settings
+
+- name: Note that a WSL restart applies the interop change
+  ansible.builtin.debug:
+    msg: >-
+      wsl.conf interop settings updated. Run 'wsl --shutdown' from Windows and
+      reopen the distribution to apply them, then run 'gh auth login' once if
+      GitHub authentication is not already configured.
+  when:
+    - wsl_disable_interop | bool
+    - wsl_interop_settings is changed

@@ -4,3 +4,63 @@
   ansible.builtin.shell: curl -fsSL https://bun.sh/install | bash
   args:
     creates: "{{ ansible_env.HOME }}/.bun/bin/bun"
+
+- name: Check installed Bun version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.bun/bin/bun --version"
+  register: bun_runtime_check
+  changed_when: false
+  failed_when: false
+
+# OpenCode 2 runs on Bun, and releases older than the tested minimum abort at
+# startup when the nono sandbox denies reads of ancestor directories. Upgrade
+# older installations; newer releases are kept.
+- name: Upgrade older Bun for the OpenCode nono sandbox
+  when:
+    - bun_runtime_check.rc == 0
+    - bun_runtime_check.stdout | trim is version(bun_minimum_version, '<')
+  block:
+    - name: Validate architecture for the reviewed Bun archive
+      ansible.builtin.assert:
+        that:
+          - ansible_architecture == 'x86_64'
+        fail_msg: "The reviewed Bun compatibility upgrade supports Linux x86_64."
+
+    - name: Ensure private Bun upgrade cache exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.cache/dev-setup/bun-{{ bun_minimum_version }}"
+        state: directory
+        mode: "0700"
+
+    - name: Download reviewed Bun compatibility release
+      ansible.builtin.get_url:
+        url: "https://github.com/oven-sh/bun/releases/download/bun-v{{ bun_minimum_version }}/{{ bun_minimum_archive_name }}"
+        dest: "{{ ansible_env.HOME }}/.cache/dev-setup/bun-{{ bun_minimum_version }}/{{ bun_minimum_archive_name }}"
+        checksum: "sha256:{{ bun_minimum_archive_sha256 }}"
+        mode: "0600"
+
+    - name: Extract reviewed Bun compatibility release
+      ansible.builtin.unarchive:
+        src: "{{ ansible_env.HOME }}/.cache/dev-setup/bun-{{ bun_minimum_version }}/{{ bun_minimum_archive_name }}"
+        dest: "{{ ansible_env.HOME }}/.cache/dev-setup/bun-{{ bun_minimum_version }}"
+        remote_src: true
+        creates: "{{ ansible_env.HOME }}/.cache/dev-setup/bun-{{ bun_minimum_version }}/{{ bun_minimum_archive_name | splitext | first }}/bun"
+
+    - name: Install reviewed Bun compatibility binary
+      ansible.builtin.copy:
+        src: "{{ ansible_env.HOME }}/.cache/dev-setup/bun-{{ bun_minimum_version }}/{{ bun_minimum_archive_name | splitext | first }}/bun"
+        dest: "{{ ansible_env.HOME }}/.bun/bin/bun"
+        remote_src: true
+        mode: "0755"
+
+- name: Check Bun after compatibility upgrade
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.bun/bin/bun --version"
+  register: bun_compatible_check
+  changed_when: false
+  failed_when: false
+
+- name: Verify Bun supports the OpenCode nono sandbox
+  ansible.builtin.assert:
+    that:
+      - bun_compatible_check.rc == 0
+      - bun_compatible_check.stdout | trim is version(bun_minimum_version, '>=')
+    fail_msg: "Bun {{ bun_minimum_version }} or newer is required for sandboxed OpenCode; run the node sub-playbook to install or upgrade it."

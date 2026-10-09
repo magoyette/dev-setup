@@ -1,0 +1,52 @@
+---
+# GitHub CLI: general GitHub automation and the Linux-side Git credential
+# helper used when Windows interop is disabled (see docs/wsl-interop.md).
+# Authentication is a one-time interactive `gh auth login` and is not
+# managed by the playbook.
+- name: Ensure user local bin directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Check installed gh version
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.local/bin/gh --version"
+  register: gh_version_check
+  changed_when: false
+  failed_when: false
+
+- name: Install or upgrade gh
+  when: gh_version_check.rc != 0 or not (("version " ~ (gh_version | regex_replace('^v', ''))) in gh_version_check.stdout)
+  block:
+    - name: Validate architecture for the managed gh release
+      ansible.builtin.assert:
+        that:
+          - ansible_architecture == 'x86_64'
+        fail_msg: "The managed gh release supports Linux x86_64."
+
+    - name: Ensure gh download cache exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.cache/dev-setup/gh-{{ gh_version }}"
+        state: directory
+        mode: "0700"
+
+    - name: Download gh release archive
+      ansible.builtin.get_url:
+        url: "https://github.com/cli/cli/releases/download/{{ gh_version }}/{{ gh_linux_amd64_archive_name }}"
+        dest: "{{ ansible_env.HOME }}/.cache/dev-setup/gh-{{ gh_version }}/{{ gh_linux_amd64_archive_name }}"
+        checksum: "sha256:{{ gh_linux_amd64_sha256 }}"
+        mode: "0600"
+
+    - name: Extract gh release archive
+      ansible.builtin.unarchive:
+        src: "{{ ansible_env.HOME }}/.cache/dev-setup/gh-{{ gh_version }}/{{ gh_linux_amd64_archive_name }}"
+        dest: "{{ ansible_env.HOME }}/.cache/dev-setup/gh-{{ gh_version }}"
+        remote_src: true
+        creates: "{{ ansible_env.HOME }}/.cache/dev-setup/gh-{{ gh_version }}/gh_{{ gh_version | regex_replace('^v', '') }}_linux_amd64/bin/gh"
+
+    - name: Install gh binary
+      ansible.builtin.copy:
+        src: "{{ ansible_env.HOME }}/.cache/dev-setup/gh-{{ gh_version }}/gh_{{ gh_version | regex_replace('^v', '') }}_linux_amd64/bin/gh"
+        dest: "{{ ansible_env.HOME }}/.local/bin/gh"
+        remote_src: true
+        mode: "0755"

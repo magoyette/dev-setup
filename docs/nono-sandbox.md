@@ -20,28 +20,62 @@ file:
 The profile extends nono's built-in `default` profile, excludes the inherited
 `system_write_linux` group while retaining its device write permissions, grant
 the repository workspace read/write, grant read/write to the assistant state
-directories, grant read-only access to the shared skill directories, the
-generated dev-setup context, and the user's Git configuration (`~/.gitconfig`,
-`~/.config/git`, and `/etc/gitconfig` when it exists), and deny the expected
-Herdr and Docker socket paths. Git exits with a fatal error when an existing
+directories and to `~/.ansible/tmp` for Ansible's controller temporary files,
+grant read-only access to the shared skill directories, the generated dev-setup
+context, the user's Git configuration (`~/.gitconfig`, `~/.config/git`, and
+`/etc/gitconfig` when it exists), and Ansible collections
+(`~/.ansible/collections`, so sandboxed sessions can run
+`ansible-playbook --syntax-check`), and deny the expected Herdr and Docker
+socket paths. Git exits with a fatal error when an existing
 config file is unreadable, so those read grants are required for Git repo
 detection to work inside the sandbox.
 
 The `dev-setup-ai-assistant-sandbox` launcher sources
 `~/.config/dev-setup/ai-assistant-sandbox.env`, creates a private
-`/tmp/dev-setup-ai.*` directory and exports it as `TMPDIR`, and then execs
-`nono.sh run --profile <profile> --allow-cwd -- <command>`. `--allow-cwd`
+`/tmp/dev-setup-ai.*` directory and exports it as `TMPDIR`, removes
+`WSL_INTEROP` and `WSLENV` from the environment, and then runs
+`nono.sh run --profile <profile> --allow-cwd -- <command>` as a foreground
+child instead of exec-ing into it. nono marks its supervisor
+non-dumpable (`PR_SET_DUMPABLE(0)`), which hides the pane's foreground
+environment from Herdr's process detection, so an exec'd nono also hides
+the `HERDR_AGENT` attribution hint; keeping the launcher process as the
+foreground process-group leader preserves it (see
+[agent integrations](agent-integrations.md)). `--allow-cwd`
 grants the working directory at the profile's `workdir` level (`readwrite`)
 without asking for confirmation on every launch. Set
 `DEV_SETUP_NONO_ALLOW_CWD=false` (generated from
 `ai_assistants_nono_allow_cwd`) to restore the interactive sharing prompt.
+Before the real run, the launcher pre-flights the resolved policy with
+`nono run --dry-run`. Linux Landlock cannot enforce a `deny` rule inside an
+allowed directory, so a launch conflicts when the granted working directory
+or `NONO_ALLOW` contains denied paths — for example starting from `$HOME`,
+which contains the credential paths denied by nono's built-in profiles, or
+from `/tmp`, which contains the denied Herdr socket paths. The pre-flight
+prints the grants in effect and the remediation (launch from a narrower
+directory, or narrow or unset `NONO_ALLOW`) ahead of nono's own conflict
+report instead of failing with the raw policy error. Other pre-flight
+failures fall through to nono's report unchanged, and a sharing prompt
+accepted at runtime (with `--allow-cwd` disabled) is not pre-flighted.
 Everything after `--` is passed to the assistant, so the launcher cannot
 forward additional `nono` flags. Claude Code and Codex keep their native
 OS-level sandboxes and do not get a second `nono.sh` wrapper.
 
+Removing `WSL_INTEROP` and `WSLENV` only hides the easy Windows interop path:
+pathname Unix socket connections are not mediated on stock WSL2 kernels, so
+the interop sockets under `/run/WSL` stay reachable from inside the sandbox.
+Disabling interop in `wsl.conf` is the real boundary; see
+[WSL interop](wsl-interop.md).
+
+OpenCode 2 runs on Bun. Releases older than the tested minimum abort at
+startup when the sandbox denies reads of ancestor directories, so the node
+playbook upgrades older installations to `bun_minimum_version`; newer releases
+are kept.
+
 Access outside the profile grants is denied by the kernel (Landlock). A file
 with normal Unix permissions still returns `Permission denied` inside the
-sandbox; that is the expected symptom, not a filesystem problem.
+sandbox; that is the expected symptom, not a filesystem problem. Windows
+mounts such as `/mnt/c` and credential paths such as `~/.ssh` are denied by
+the same default.
 
 ## Checking Access
 
@@ -164,6 +198,23 @@ checks the changed file, and follow the completion checklist in
 - Update [agent integrations](agent-integrations.md) when profile behavior
   changes and add a changelog entry.
 
+## Git Authentication Inside The Sandbox
+
+The profile's read grants for `~/.gitconfig`, `~/.config/git`, and
+`/etc/gitconfig` exist so Git repo detection works inside the sandbox; they
+do not provide credentials. Credential helpers are unavailable by design:
+
+- the Windows Git Credential Manager is a Windows executable under a denied
+  `/mnt` path, so it cannot run from inside the sandbox;
+- when interop is disabled, the gh credential helper's token lives in
+  `~/.config/gh`, which the profile does not grant.
+
+Local commits, branches, diffs, and operations contained in the working tree
+work normally. Fetching private repositories and pushing fail with an
+authentication error inside the sandbox. Commit inside the sandbox and run
+authenticated Git operations from an ordinary shell. Do not widen the
+profile to expose the gh token or `~/.ssh` to the sandbox.
+
 ## WSL2 Limitations
 
 The managed profiles intentionally avoid nono proxy network profiles,
@@ -178,7 +229,11 @@ Microsoft WSL2 kernels. Consequences for one-off grants:
   a reachable local socket such as Herdr's `~/.config/herdr/herdr.sock` stays
   reachable from inside the sandbox. The profile's Herdr and Docker `deny`
   entries serve the private `TMPDIR` Landlock strategy; they do not block
-  socket connections.
+  socket connections. The WSL interop sockets under `/run/WSL` are reachable
+  the same way: a confined process can speak the interop protocol and launch
+  Windows processes, even though the launcher removes `WSL_INTEROP` and
+  `WSLENV`. Disabling interop in `wsl.conf` closes this route; see
+  [WSL interop](wsl-interop.md).
 - Do not grant all of `/tmp` to work around the private `TMPDIR`; Landlock
   cannot deny the Herdr paths inside an allowed `/tmp`. Grant a private
   directory.

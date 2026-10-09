@@ -1,5 +1,11 @@
 ---
 fnm_node_version: lts-latest
+# Older Bun releases abort when the nono sandbox denies reads of ancestor
+# directories, breaking sandboxed OpenCode. The node playbook upgrades older
+# installations to this tested minimum and keeps newer releases.
+bun_minimum_version: "1.4.2"
+bun_minimum_archive_name: "bun-linux-x64.zip"
+bun_minimum_archive_sha256: "36368faef7527875d5ffa52e53cd48021741f2a83eb6208a8dd64068d422a913"
 python_version: "3.13.12"
 pyenv_version: "v2.5.3"
 uv_version: "0.9.21"
@@ -22,6 +28,9 @@ difftastic_version: "0.67.0"
 hadolint_version: "v2.14.0"
 tokei_version: "v12.1.2"
 starship_version: "v1.24.2"
+gh_version: "v2.102.0"
+gh_linux_amd64_archive_name: "gh_2.102.0_linux_amd64.tar.gz"
+gh_linux_amd64_sha256: "bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386"
 bat_theme: "OneHalfDark"
 herdr_theme: "one-dark"
 delta_syntax_theme: "OneHalfDark"
@@ -46,6 +55,12 @@ ai_assistants_nono_profiles:
 # Grant each launcher's working directory through nono --allow-cwd without the
 # interactive sharing prompt. false restores the per-launch confirmation.
 ai_assistants_nono_allow_cwd: true
+# Opt-in Windows interop disable for this distribution. Set true in
+# ansible/vars.yml: the core playbook writes [interop] enabled=false and
+# appendWindowsPath=false to /etc/wsl.conf and switches Git credentials from
+# the Windows Git Credential Manager to gh. The change applies after
+# wsl --shutdown. See docs/wsl-interop.md for the impact analysis.
+wsl_disable_interop: false
 ai_assistants_mcp_catalog:
   context7:
     url: https://mcp.context7.com/mcp

@@ -66,6 +66,7 @@ strategy, or given a daily/runtime updater.
 | Hadolint | Pinned: `hadolint_version` | `ansible/defaults.yml`, `ansible/tasks/hadolint.yml` |
 | Tokei | Pinned: `tokei_version` | `ansible/defaults.yml`, `ansible/tasks/tokei.yml` |
 | Starship | Pinned: `starship_version` | `ansible/defaults.yml`, `ansible/tasks/starship.yml` |
+| gh | Pinned: `gh_version` plus archive checksum | `ansible/defaults.yml`, `ansible/tasks/gh.yml` |
 | Crit bootstrap binary | Pinned: `crit_version` plus binary checksum | `ansible/defaults.yml`, `ansible/tasks/crit.yml` |
 | Crit runtime binary | Daily updater through the Stow-managed `crit` wrapper | `crit/.local/bin/crit`, `crit/.local/bin/crit-auto-upgrade.sh` |
 | ccusage | Latest on playbook run: compares installed version to `npm view ccusage version` and installs `ccusage@latest` | `ansible/tasks/ccusage.yml` |
@@ -74,7 +75,7 @@ strategy, or given a daily/runtime updater.
 | humanizer skill | Upstream checkout: submodule updates with `git submodule update --remote --merge` | `.gitmodules`, `ansible/tasks/agent-skills.yml` |
 | agent-browser browsers and Linux dependencies | Repeated asset install through `agent-browser install --with-deps` | `ansible/tasks/agent-browser.yml` |
 | Playwright browsers and Linux dependencies | Repeated asset install through `playwright install-deps` and `playwright install` | `ansible/tasks/playwright.yml` |
-| bun | Install-only | `ansible/tasks/bun.yml` |
+| bun | Install-only; installations older than the tested minimum `bun_minimum_version` are upgraded because older releases abort when the nono sandbox denies ancestor-directory reads | `ansible/defaults.yml`, `ansible/tasks/bun.yml` |
 | zoxide | Install-only | `ansible/tasks/zoxide.yml` |
 | ansible-lint | Install-only through pipx | `ansible/tasks/ansible-lint.yml` |
 | tldr | Install-only through pipx | `ansible/tasks/tldr.yml` |

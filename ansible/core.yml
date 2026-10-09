@@ -25,6 +25,8 @@
 
     - ansible.builtin.import_tasks: tasks/apt-packages.yml
     - ansible.builtin.import_tasks: tasks/shell-config.yml
+    - ansible.builtin.import_tasks: tasks/wsl-interop.yml
+    - ansible.builtin.import_tasks: tasks/gh.yml
     - ansible.builtin.import_tasks: tasks/git.yml
     - ansible.builtin.import_tasks: tasks/difftastic.yml
     - name: Run Hunk tasks

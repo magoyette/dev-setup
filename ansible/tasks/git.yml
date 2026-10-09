@@ -150,12 +150,32 @@
     name: credential.helper
     scope: global
     value: "{{ ansible_env.HOME }}/.local/bin/git-credential-manager"
-  when: gcm_stat.stat.exists
+  when: gcm_stat.stat.exists and not (wsl_disable_interop | bool)
+
+# With interop disabled the Windows credential manager can no longer run, so
+# gh takes over GitHub authentication. The key is playbook-managed (the
+# enabled path replaces all its values), so absent removes it entirely. The
+# gh token under ~/.config/gh stays outside the nono sandbox grants:
+# authenticated GitHub operations fail inside the sandbox by design (see
+# docs/nono-sandbox.md).
+- name: Remove the Windows credential helper when interop is disabled
+  community.general.git_config:
+    name: credential.helper
+    scope: global
+    state: absent
+  when: wsl_disable_interop | bool
+
+- name: Configure gh as the GitHub credential helper when interop is disabled
+  community.general.git_config:
+    name: credential.https://github.com.helper
+    scope: global
+    value: "!{{ ansible_env.HOME }}/.local/bin/gh auth git-credential"
+  when: wsl_disable_interop | bool
 
 - name: Warn if Git for Windows credential manager not found
   ansible.builtin.debug:
     msg: "Git for Windows credential manager not found at /mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe - skipping credential helper setup"
-  when: not gcm_stat.stat.exists
+  when: not gcm_stat.stat.exists and not (wsl_disable_interop | bool)
 
 - name: Configure git aliases
   ansible.builtin.command: "{{ playbook_dir }}/../scripts/sync-git-aliases.sh"

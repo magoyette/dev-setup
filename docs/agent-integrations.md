@@ -9,9 +9,22 @@ configuration files remain the source of truth.
 `global-agent-context.md` contains concise user-level guidance shared by Claude
 Code, Codex, and OpenCode. The AI assistants playbook creates the gitignored
 `global-agent-context.local.md` file when absent and appends its contents to
-the shared guidance. The combined context is generated at
-`~/.config/dev-setup/global-agent-context.md`, and each assistant's global
-context path links to it. Rerun the playbook after editing the local file.
+the shared guidance. The combined context is then extended with a sandbox
+section for the target assistant and generated once per assistant at
+`~/.config/dev-setup/global-agent-context.<assistant>.md`; each assistant's
+global context path links to its own generated file:
+
+- Claude Code (`~/.claude/CLAUDE.md`) gets the enabled state and the write and
+  network limits of the managed Claude Code sandbox, rendered from
+  `claude_sandbox_enabled`, `ai_assistants_sandbox_writable_roots`, and
+  `ai_assistants_sandbox_allowed_hosts`.
+- Codex (`~/.codex/AGENTS.md`) gets the limits of its always-on native
+  sandbox, including the managed writable roots.
+- OpenCode (`~/.config/opencode/AGENTS.md`) gets a summary of the managed
+  `nono.sh` sandbox; see [nono.sh sandbox](nono-sandbox.md).
+
+The sandbox sections reflect the Ansible variables at generation time. Rerun
+the playbook after editing the local file or changing the sandbox variables.
 
 `AGENTS.md` is the repository-level instruction file. Codex and OpenCode read
 it natively, and Claude Code v2.1.277 and later reads it as a fallback when no
@@ -36,8 +49,12 @@ playbook refreshes it after deploying the repository-owned Claude dotfiles.
 
 `scripts/merge-claude-settings.sh` manages selected home-directory settings
 while preserving unrelated user keys. It disables Claude Code commit, pull
-request, and session-link attribution. Claude Code marketplaces and plugins are
-declared in `ansible/defaults.yml`.
+request, and session-link attribution, and manages the sandbox settings:
+`sandbox.enabled` from `claude_sandbox_enabled`,
+`sandbox.filesystem.allowWrite` from `ai_assistants_sandbox_writable_roots`,
+and `sandbox.network.allowedDomains` from
+`ai_assistants_sandbox_allowed_hosts`. Claude Code marketplaces and plugins
+are declared in `ansible/defaults.yml`.
 
 `scripts/merge-claude-mcps.sh` manages the shared user-scoped HTTP MCP servers
 in `~/.claude.json`. The playbook removes the legacy Context7 Claude plugin so
@@ -107,8 +124,10 @@ terminal preferences need to be moved into the global client configuration.
 See the [upstream migration guide](https://opencode.ai/v2/docs/migrate-v1/).
 
 OpenCode's global context is deployed to
-`~/.config/opencode/AGENTS.md`. Skills are discovered through the shared skill
-deployment paths.
+`~/.config/opencode/AGENTS.md`; it appends a concise summary of the managed
+`nono.sh` sandbox so sandboxed sessions in other repositories do not have to
+rediscover it. Skills are discovered through the shared skill deployment
+paths.
 
 The managed OpenCode config asks permission for native `websearch`. V2 selects
 a search provider on first use; connect one through `/connect` or supply its
@@ -133,18 +152,26 @@ The launcher selects `--standalone` for the TUI and server-backed commands so
 the private server inherits nono restrictions. Connecting to a shared or remote
 server would put tool execution under that server's policy instead. The V2
 profile also grants OpenCode's state directory and read access to shared skill
-directories and the global instruction source. Herdr's current dual-version
+directories, the global instruction source, and Ansible collections
+(`~/.ansible/collections`), plus `~/.ansible/tmp` for Ansible's controller
+temporary files, so sandboxed sessions can run
+`ansible-playbook --syntax-check`. Herdr's current dual-version
 integration supports V2. Its default-session socket lives under
 `~/.config/herdr/`, outside the profile's Herdr deny entries, and pathname
 Unix socket connections are not mediated on this WSL2 kernel, so that socket
 stays reachable from the sandboxed assistant.
 
-The nono wrapper is the pane's foreground process from Herdr's point of view,
-so process detection cannot attribute a pane to OpenCode on its own. The
-launcher exports `HERDR_AGENT=opencode` so Herdr applies its OpenCode screen
-manifest to the wrapped process; agent status then comes from screen
-detection, and the Herdr lifecycle plugin takes over the pane's status
-authority if it starts actively reporting.
+The launcher stays the pane's foreground process-group leader and runs the
+nono wrapper as a foreground child. nono's supervisor is the process Herdr
+would otherwise see in the pane, and current nono releases (observed with
+0.79.0) mark it non-dumpable (`PR_SET_DUMPABLE(0)`), which hides its
+environment from every other process, including Herdr's process detection.
+The launcher exports `HERDR_AGENT=opencode`, so Herdr reads that hint from
+the launcher process and applies its OpenCode screen manifest to the pane;
+agent status then comes from screen detection, and the Herdr lifecycle
+plugin takes over the pane's status authority if it starts actively
+reporting. Exec-ing into nono would make the pane unattributable: Herdr
+would show no agent status for sandboxed OpenCode panes.
 
 The playbook writes `ai_assistants_nono_*` values to
 `~/.config/dev-setup/ai-assistant-sandbox.env`, which is sourced by the managed
@@ -208,12 +235,13 @@ automation permissions.
 Herdr built-in integrations use the assistant command names it supports
 directly. The managed launchers keep the default `opencode` path sandboxed via
 PATH and Stow wiring. Claude and Codex retain their native sandboxing. The
-sandboxed OpenCode launcher exports `HERDR_AGENT=opencode` so Herdr's screen
-detection classifies panes whose real foreground process is hidden behind the
-nono wrapper. The current repository-managed Claude and Codex sandbox
-settings do not add Herdr's socket path to writable roots or network
-allowances, but there is no repository-managed native deny-list for that socket
-path.
+sandboxed OpenCode launcher exports `HERDR_AGENT=opencode` and stays the
+pane's foreground process-group leader while nono runs as a child, so
+Herdr can read the hint even though nono's non-dumpable supervisor hides
+the sandboxed process from process detection. The current repository-managed
+Claude and Codex sandbox settings do not add Herdr's socket path to
+writable roots or network allowances, but there is no repository-managed
+native deny-list for that socket path.
 
 Herdr's prefix key is set to `F12` (instead of the default `Ctrl-B`) to avoid
 colliding with Emacs's `C-b` binding. Herdr runs a persistent headless server
