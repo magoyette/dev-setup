@@ -23,7 +23,8 @@ the repository workspace read/write, grant read/write to the assistant state
 directories and to `~/.ansible/tmp` for Ansible's controller temporary files,
 grant read-only access to the shared skill directories, the generated dev-setup
 context, the user's Git configuration (`~/.gitconfig`, `~/.config/git`, and
-`/etc/gitconfig` when it exists), and Ansible collections
+`/etc/gitconfig` when it exists), the gh CLI's non-secret settings file
+(`~/.config/gh/config.yml`), and Ansible collections
 (`~/.ansible/collections`, so sandboxed sessions can run
 `ansible-playbook --syntax-check`), and deny the expected Herdr and Docker
 socket paths. Git exits with a fatal error when an existing
@@ -207,7 +208,11 @@ do not provide credentials. Credential helpers are unavailable by design:
 - the Windows Git Credential Manager is a Windows executable under a denied
   `/mnt` path, so it cannot run from inside the sandbox;
 - when interop is disabled, the gh credential helper's token lives in
-  `~/.config/gh`, which the profile does not grant.
+  `~/.config/gh/hosts.yml`, which the profile does not grant. The sibling
+  settings file `~/.config/gh/config.yml` is granted read-only — it holds
+  no credentials, and the gh CLI still aborts at startup inside the sandbox
+  with `failed to create root command` because the token file is
+  unreadable; the startup error names the token file instead.
 
 Local commits, branches, diffs, and operations contained in the working tree
 work normally. Fetching private repositories and pushing fail with an

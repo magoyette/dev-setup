@@ -143,8 +143,10 @@ nono's built-in `default` profile, grants the repository workspace and OpenCode
 state needed by the assistant, grants read-only access to the user's Git
 configuration (without it, Git aborts on the unreadable `~/.gitconfig` and
 OpenCode registers non-git duplicate projects, hiding the sessions already
-recorded for those directories), and explicitly denies expected Herdr and Docker
-socket paths. It intentionally avoids nono proxy network profiles, credential
+recorded for those directories) and to the gh CLI's non-secret settings file
+(`~/.config/gh/config.yml`; gh still aborts at startup inside the sandbox
+because its token file stays ungranted), and explicitly denies expected
+Herdr and Docker socket paths. It intentionally avoids nono proxy network profiles, credential
 proxying, capability elevation, and Landlock V6 process-scope settings because
 those are unavailable or rejected by default on stock Microsoft WSL2 kernels.
 

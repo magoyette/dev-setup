@@ -155,7 +155,8 @@
 # With interop disabled the Windows credential manager can no longer run, so
 # gh takes over GitHub authentication. The key is playbook-managed (the
 # enabled path replaces all its values), so absent removes it entirely. The
-# gh token under ~/.config/gh stays outside the nono sandbox grants:
+# gh token under ~/.config/gh/hosts.yml stays outside the nono sandbox
+# grants; only the non-secret ~/.config/gh/config.yml is granted read-only:
 # authenticated GitHub operations fail inside the sandbox by design (see
 # docs/nono-sandbox.md).
 - name: Remove the Windows credential helper when interop is disabled

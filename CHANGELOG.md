@@ -14,6 +14,17 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [11.2.1] - 2026-10-15
+
+### Added
+
+- Grant the OpenCode nono profile read access to the gh CLI's non-secret
+  settings file `~/.config/gh/config.yml`. The token file
+  `~/.config/gh/hosts.yml` stays outside the grants, so the gh CLI still
+  aborts at startup inside the sandbox, but its startup error now names the
+  token file instead of the settings file. The change applies to new sandbox
+  launches.
+
 ## [11.2.0] - 2026-10-08
 
 ### Added

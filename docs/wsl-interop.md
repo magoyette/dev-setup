@@ -60,7 +60,9 @@ backups through `~/repos/wsl-scripts`):
 
 The gh token lives under `~/.config/gh` and stays outside the nono sandbox
 grants: authenticated GitHub operations fail inside the sandbox by design.
-See
+The profile grants read-only access to the non-secret gh settings file
+(`~/.config/gh/config.yml`), not the token file, so the gh CLI itself still
+aborts at startup inside the sandbox. See
 [Git authentication inside the sandbox](nono-sandbox.md#git-authentication-inside-the-sandbox).
 
 ## Residual Risks

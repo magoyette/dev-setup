@@ -78,7 +78,8 @@ inside the current repository is unaffected.
   `~/.local/share/opencode`, `~/.local/state/opencode`), `~/.config/hunk`,
   `$XDG_RUNTIME_DIR/hunk-mcp`, and `$TMPDIR`.
 - Read-only: the shared skill directories, `~/.gitconfig`, `~/.config/git`,
-  `/etc/gitconfig`, and `~/.config/dev-setup`.
+  `/etc/gitconfig`, `~/.config/dev-setup`, and `~/.config/gh/config.yml`
+  (gh settings only; its token file stays ungranted).
 - `$TMPDIR` is a private `/tmp/dev-setup-ai.*` directory; the rest of `/tmp` is
   denied. Write temporary files under `$TMPDIR`, never hardcoded `/tmp` paths,
   and never grant all of `/tmp` to work around it.
@@ -92,8 +93,12 @@ inside the current repository is unaffected.
   `/mnt/c`, and other paths outside the grants, including other repositories
   under `~/repos`.
 - Git credentials are unavailable by design: fetching and pushing private
-  repositories fail with authentication errors. Commit and branch locally;
-  ask the user to run authenticated Git operations from an ordinary shell.
+  repositories fail with authentication errors. The gh CLI aborts at
+  startup inside the sandbox: its settings file
+  (`~/.config/gh/config.yml`) is granted read-only, but its token file
+  (`~/.config/gh/hosts.yml`) is not. Commit and branch locally; ask the
+  user to run authenticated Git operations, including gh, from an ordinary
+  shell.
 - When a needed path is denied, report the exact path instead of debugging the
   filesystem. The user can check it with `nono why`, grant one directory for a
   session with `NONO_ALLOW="$HOME/dir" opencode`, or change the managed
