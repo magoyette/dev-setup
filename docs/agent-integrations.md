@@ -138,30 +138,21 @@ Authentication is a one-time interactive operation and is not managed by
 Ansible.
 
 The managed `opencode` launcher runs through the strict managed `nono.sh`
-OpenCode profile when `nono.sh` or `nono` is installed. That profile extends
-nono's built-in `default` profile, grants the repository workspace and OpenCode
-state needed by the assistant, grants read-only access to the user's Git
-configuration (without it, Git aborts on the unreadable `~/.gitconfig` and
-OpenCode registers non-git duplicate projects, hiding the sessions already
-recorded for those directories) and to the gh CLI's non-secret settings file
-(`~/.config/gh/config.yml`; gh still aborts at startup inside the sandbox
-because its token file stays ungranted), and explicitly denies expected
-Herdr and Docker socket paths. It intentionally avoids nono proxy network profiles, credential
-proxying, capability elevation, and Landlock V6 process-scope settings because
-those are unavailable or rejected by default on stock Microsoft WSL2 kernels.
+OpenCode profile when `nono.sh` or `nono` is installed. The profile grants the
+repository workspace, OpenCode's state directories, and the read-only paths
+the assistant needs — including the user's Git configuration, without which
+OpenCode registers non-git duplicate projects and hides the sessions already
+recorded for those directories. See [nono.sh sandbox](nono-sandbox.md) for
+the grant inventory, each grant's rationale, the launcher's private `TMPDIR`
+strategy, and the WSL2 limitations the profile works around.
 
 The launcher selects `--standalone` for the TUI and server-backed commands so
-the private server inherits nono restrictions. Connecting to a shared or remote
-server would put tool execution under that server's policy instead. The V2
-profile also grants OpenCode's state directory and read access to shared skill
-directories, the global instruction source, and Ansible collections
-(`~/.ansible/collections`), plus `~/.ansible/tmp` for Ansible's controller
-temporary files, so sandboxed sessions can run
-`ansible-playbook --syntax-check`. Herdr's current dual-version
-integration supports V2. Its default-session socket lives under
-`~/.config/herdr/`, outside the profile's Herdr deny entries, and pathname
-Unix socket connections are not mediated on this WSL2 kernel, so that socket
-stays reachable from the sandboxed assistant.
+the private server inherits nono restrictions. Connecting to a shared or
+remote server would put tool execution under that server's policy instead.
+Herdr's current dual-version integration supports V2. Its default-session
+socket lives under `~/.config/herdr/`, outside the profile's Herdr deny
+entries, and pathname Unix socket connections are not mediated on this WSL2
+kernel, so that socket stays reachable from the sandboxed assistant.
 
 The launcher stays the pane's foreground process-group leader and runs the
 nono wrapper as a foreground child. nono's supervisor is the process Herdr
@@ -182,20 +173,10 @@ launcher scripts. The user-facing `nono.sh`-managed command is `opencode`.
 generated defaults at runtime.
 
 Ansible installs or updates the official `nono` CLI package used by those
-launchers, deploys the managed profiles under `~/.config/nono/profiles/`, and
-validates them with `nono profile validate`. See
-[nono.sh sandbox](nono-sandbox.md) for checking access, one-off filesystem
-grants for a single execution, and permanent profile changes.
-
-Both managed profiles exclude the inherited `system_write_linux` group and
-explicitly retain its device write permissions. The launcher creates a private
-`/tmp/dev-setup-ai.*` directory with `mktemp -d` and exports it as `TMPDIR`
-before starting nono, overriding any inherited temporary directory setting.
-Only that temporary directory is granted access. This avoids Linux Landlock's
-unsupported combination of allowing all of `/tmp` while denying Herdr paths
-inside it. Tools must respect `TMPDIR`; hardcoded `/tmp` writes are blocked.
-Temporary directories remain after exit for normal system temporary-file
-cleanup. Direct profile invocations must also supply a private `TMPDIR`.
+launchers and deploys the managed profiles. See
+[nono.sh sandbox](nono-sandbox.md) for the profile inventory, checking
+access, one-off filesystem grants for a single execution, and permanent
+profile changes.
 
 ## Shared MCP Servers
 

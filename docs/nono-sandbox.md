@@ -33,10 +33,13 @@ detection to work inside the sandbox.
 
 The `dev-setup-ai-assistant-sandbox` launcher sources
 `~/.config/dev-setup/ai-assistant-sandbox.env`, creates a private
-`/tmp/dev-setup-ai.*` directory and exports it as `TMPDIR`, removes
-`WSL_INTEROP` and `WSLENV` from the environment, and then runs
-`nono.sh run --profile <profile> --allow-cwd -- <command>` as a foreground
-child instead of exec-ing into it. nono marks its supervisor
+`/tmp/dev-setup-ai.*` directory with `mktemp -d` and exports it as `TMPDIR`,
+overriding any inherited temporary directory setting. Only that directory is
+granted, so tools must respect `TMPDIR`; hardcoded `/tmp` writes are blocked.
+Leftover directories remain after exit for normal system temporary-file
+cleanup. The launcher removes `WSL_INTEROP` and `WSLENV` from the environment
+and then runs `nono.sh run --profile <profile> --allow-cwd -- <command>` as a
+foreground child instead of exec-ing into it. nono marks its supervisor
 non-dumpable (`PR_SET_DUMPABLE(0)`), which hides the pane's foreground
 environment from Herdr's process detection, so an exec'd nono also hides
 the `HERDR_AGENT` attribution hint; keeping the launcher process as the
@@ -196,8 +199,8 @@ checks the changed file, and follow the completion checklist in
   over directories, and `$HOME`/`$TMPDIR` variables over hardcoded paths.
 - Keep the Herdr and Docker `deny` rules; they are load-bearing for the
   launcher's private `TMPDIR` strategy.
-- Update [agent integrations](agent-integrations.md) when profile behavior
-  changes and add a changelog entry.
+- Update [agent integrations](agent-integrations.md) when the change affects
+  launcher or integration behavior, and add a changelog entry.
 
 ## Git Authentication Inside The Sandbox
 

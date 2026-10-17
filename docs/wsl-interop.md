@@ -59,10 +59,8 @@ backups through `~/repos/wsl-scripts`):
 | GUI apps (WSLg) | Unaffected; WSLg does not depend on interop. Smoke-test a headful Playwright launch after the restart. |
 
 The gh token lives under `~/.config/gh` and stays outside the nono sandbox
-grants: authenticated GitHub operations fail inside the sandbox by design.
-The profile grants read-only access to the non-secret gh settings file
-(`~/.config/gh/config.yml`), not the token file, so the gh CLI itself still
-aborts at startup inside the sandbox. See
+grants, so the gh CLI aborts at startup inside the sandbox and authenticated
+GitHub operations fail there by design. See
 [Git authentication inside the sandbox](nono-sandbox.md#git-authentication-inside-the-sandbox).
 
 ## Residual Risks

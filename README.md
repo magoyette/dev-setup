@@ -77,9 +77,9 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   default. Each sandbox launch gets a private `TMPDIR` under `/tmp`; tools must
   respect `TMPDIR` because the profile does not grant general `/tmp` access.
   The profile grants read-only access to the user's Git configuration so Git
-  repo detection works inside the sandbox, and to the non-secret gh settings
-  file `~/.config/gh/config.yml`; the gh token stays ungranted, so gh itself
-  still aborts at startup inside the sandbox. The launcher passes `--allow-cwd`
+  repo detection works inside the sandbox; the gh token and other Git
+  credentials stay outside the grants, so authenticated GitHub operations
+  fail inside the sandbox by design. The launcher passes `--allow-cwd`
   so the working directory is granted at the profile workdir level
   (`readwrite`) without an interactive sharing prompt; set
   `ai_assistants_nono_allow_cwd` to `false` to restore that prompt. The
