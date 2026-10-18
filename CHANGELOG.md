@@ -14,6 +14,16 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [12.0.1] - 2026-10-18
+
+### Added
+
+- OpenCode now pre-approves the read-only Git subcommands (`diff`, `log`,
+  `ls-tree`, `show`, `status`) when they target a repository through
+  `git -C <path>`, for example `git -C /home/user/repos/demo show <commit>
+  --stat`. The `git -C` forms of `git commit` and `git push` are denied, matching
+  the existing guardrails for the plain commands.
+
 ## [12.0.0] - 2026-10-18
 
 ### Removed
