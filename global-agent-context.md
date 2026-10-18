@@ -18,7 +18,6 @@ Check `--help` for exact flags when needed.
 - `pyenv`: use to manage the default Python runtime and per-project Python versions.
 - `gh`: use for GitHub operations (issues, releases, pull requests, API queries) instead of ad-hoc `curl` calls.
 - `socket`: use for local npm dependency and supply-chain scans when explicitly requested. Authentication with `socket login` may be required.
-- `tldr`: use for quick command examples when `--help` is too verbose.
 - `tokei`: use to count files, lines, code, comments, and blanks by language.
 - `uv`: use for Python package execution, virtual environments, and script workflows.
 

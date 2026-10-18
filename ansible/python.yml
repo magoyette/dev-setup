@@ -12,4 +12,4 @@
 
     - ansible.builtin.import_tasks: tasks/python.yml
     - ansible.builtin.import_tasks: tasks/ansible-lint.yml
-    - ansible.builtin.import_tasks: tasks/tldr.yml
+    - ansible.builtin.import_tasks: tasks/retired-python-tools.yml

@@ -11,7 +11,7 @@ source of truth.
 | Sub-playbook | Primary responsibilities |
 | --- | --- |
 | `core.yml` | Apt packages, shell configuration, WSL interop settings, gh, Git, Difftastic, Hunk, Hadolint, Tokei, and Zoxide |
-| `python.yml` | pyenv, managed CPython, pipx, uv, ansible-lint, and tldr |
+| `python.yml` | pyenv, managed CPython, pipx, uv, and ansible-lint |
 | `starship.yml` | Starship installation and shell initialization |
 | `node.yml` | Node, Bun, Markdown/YAML tools, and Socket |
 | `ai-assistants.yml` | Coding assistants, integrations, hooks, agent skills, and browser automation (agent-browser, Playwright) |

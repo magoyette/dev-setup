@@ -14,6 +14,14 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [12.0.0] - 2026-10-18
+
+### Removed
+
+- Remove the `tldr` command-line client from the Python sub-playbook. The next
+  `python` sub-playbook execution uninstalls the pipx package and removes its
+  client data and cache directories.
+
 ## [11.3.1] - 2026-10-17
 
 ### Added

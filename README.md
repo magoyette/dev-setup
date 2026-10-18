@@ -267,7 +267,6 @@ Ansible is installed to run the playbooks. Stow is used by Ansible to manage the
 - [uv](https://github.com/astral-sh/uv) : Python project, package, tool, and script runner
 - [pipx](https://pipx.pypa.io/) : Python CLI app installer backed by the pyenv-managed Python
 - [ansible-lint](https://docs.ansible.com/projects/lint/) : linter for Ansible playbooks and task files, installed via `pipx`
-- [tldr](https://tldr.sh/) : simplified examples for common command-line tools, installed via `pipx` with the official Python client
 
 ### starship sub-playbook
 

@@ -78,7 +78,6 @@ strategy, or given a daily/runtime updater.
 | bun | Install-only; installations older than the tested minimum `bun_minimum_version` are upgraded because older releases abort when the nono sandbox denies ancestor-directory reads | `ansible/defaults.yml`, `ansible/tasks/bun.yml` |
 | zoxide | Install-only | `ansible/tasks/zoxide.yml` |
 | ansible-lint | Install-only through pipx | `ansible/tasks/ansible-lint.yml` |
-| tldr | Install-only through pipx | `ansible/tasks/tldr.yml` |
 | Claude Code initial install | Install-only; Claude Code upgrades itself afterward | `ansible/tasks/claude-code.yml` |
 | Claude sandbox runtime | Install-only npm global | `ansible/tasks/claude-code.yml` |
 | Claude Code plugins | Install-only if the user-scoped plugin is missing | `ansible/tasks/claude-code.yml` |
