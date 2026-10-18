@@ -55,9 +55,14 @@ Before running `./release.sh`:
 
 1. Ensure the appropriate versioned changelog section exists with today's
    date.
-2. Do not add per-version comparison links. Use the compare URL template near
+2. Set `playbook_version` in `ansible/defaults.yml` to the release version and
+   review `min_previously_applied_version` when cleanup tasks change; see
+   [Playbook Version Tracking](provisioning-reference.md#playbook-version-tracking).
+   `release.sh` refuses to tag when `playbook_version` does not match the
+   prompted version.
+3. Do not add per-version comparison links. Use the compare URL template near
    the top of `CHANGELOG.md` when a version diff is needed.
-3. Commit the changelog and release changes.
+4. Commit the changelog and release changes.
 
 Then run `./release.sh`. It displays the beginning of the changelog, prompts for
 the version, creates an annotated tag, pushes commits, and pushes the tag.

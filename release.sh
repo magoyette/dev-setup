@@ -22,6 +22,17 @@ if git tag | grep -qx "$tag"; then
   exit 1
 fi
 
+# Check playbook_version matches the release version
+playbook_version=$(sed -n 's/^playbook_version:[[:space:]]*"\([^"]*\)".*/\1/p' ansible/defaults.yml)
+if [ -z "$playbook_version" ]; then
+  echo "Error: playbook_version not found in ansible/defaults.yml" >&2
+  exit 1
+fi
+if [ "$playbook_version" != "$version" ]; then
+  echo "Error: release version $version does not match playbook_version $playbook_version in ansible/defaults.yml" >&2
+  exit 1
+fi
+
 echo "Creating annotated tag $tag"
 git tag -a "$tag" -m "$tag"
 

@@ -14,6 +14,17 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [12.1.0] - 2026-10-18
+
+### Added
+
+- The main playbook records the last applied version in
+  `~/.local/state/dev-setup/applied-version` after each successful run and
+  enforces a minimum previously applied version before making any change.
+  Version 12.1.0 requires a previously applied 12.x version; a machine below
+  the required version stops with instructions to apply a qualifying version
+  first. Only full main playbook runs check the gate and update the record.
+
 ## [12.0.1] - 2026-10-18
 
 ### Added

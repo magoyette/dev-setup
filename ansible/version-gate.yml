@@ -1,0 +1,55 @@
+---
+- name: Applied playbook version gate
+  hosts: localhost
+  connection: local
+  vars_files:
+    - defaults.yml
+    - vars.yml
+  tasks:
+    - name: Check the applied-version record
+      ansible.builtin.stat:
+        path: "{{ applied_version_record_path }}"
+      register: applied_version_record_file
+
+    - name: Read the applied-version record
+      ansible.builtin.slurp:
+        src: "{{ applied_version_record_path }}"
+      when: applied_version_record_file.stat.exists
+      register: applied_version_record_content
+
+    - name: Set the applied version from the record
+      ansible.builtin.set_fact:
+        applied_version: "{{ applied_version_record_content.content | b64decode | trim }}"
+        applied_version_source: "recorded in {{ applied_version_record_path }}"
+      when: applied_version_record_file.stat.exists
+
+    - name: Assume the pre-tracking applied version without a record
+      ansible.builtin.set_fact:
+        applied_version: "{{ pre_tracking_assumed_applied_version }}"
+        applied_version_source: "assumed; no record found at {{ applied_version_record_path }}"
+      when: not applied_version_record_file.stat.exists
+
+    - name: Reject a malformed applied-version record
+      ansible.builtin.fail:
+        msg: >-
+          The applied-version record at {{ applied_version_record_path }} is
+          '{{ applied_version }}', which is not a valid X.Y.Z version. Fix or
+          remove the file, then re-run the playbook.
+      when:
+        - applied_version_record_file.stat.exists
+        - applied_version is not match('^[0-9]+\.[0-9]+\.[0-9]+$')
+
+    - name: Enforce the minimum applied playbook version
+      ansible.builtin.fail:
+        msg: >-
+          This machine's last applied playbook version is
+          {{ applied_version }} ({{ applied_version_source }}), but playbook
+          {{ playbook_version }} requires a previously applied version of at
+          least {{ min_previously_applied_version }}. Apply a qualifying
+          version first, for example: git fetch --tags && git checkout
+          v{{ min_previously_applied_version }} && ./run-ansible.sh
+      when: applied_version is version(min_previously_applied_version, '<')
+
+    - name: Mark the version gate as passed for the record play
+      ansible.builtin.set_fact:
+        version_gate_run: true

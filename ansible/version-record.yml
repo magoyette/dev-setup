@@ -1,0 +1,27 @@
+---
+- name: Record the applied playbook version
+  hosts: localhost
+  connection: local
+  vars_files:
+    - defaults.yml
+    - vars.yml
+  tasks:
+    - name: Refuse to record outside a full main playbook run
+      ansible.builtin.fail:
+        msg: >-
+          The applied-version record is written only by a full main playbook
+          run (./run-ansible.sh or ./install.sh), after every other play
+          succeeded. Run the main playbook instead of version-record.yml.
+      when: version_gate_run is not defined
+
+    - name: Create the dev-setup state directory
+      ansible.builtin.file:
+        path: "{{ applied_version_record_path | dirname }}"
+        state: directory
+        mode: "0755"
+
+    - name: Record the applied playbook version
+      ansible.builtin.copy:
+        content: "{{ playbook_version }}\n"
+        dest: "{{ applied_version_record_path }}"
+        mode: "0644"

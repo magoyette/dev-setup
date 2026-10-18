@@ -1,4 +1,18 @@
 ---
+# Version of this playbook. Bumped with each release; release.sh refuses to tag
+# when this value does not match the prompted release version.
+playbook_version: "12.1.0"
+# Minimum previously applied playbook version required by this version.
+# ansible/version-gate.yml fails before any change when the machine's
+# recorded applied version is lower.
+min_previously_applied_version: "12.0.0"
+# Assumed applied version for machines without an applied-version record:
+# provisioned before version tracking (12.1.0) or a fresh clone. Must stay
+# below the minimum of any release that relies on tracked history.
+pre_tracking_assumed_applied_version: "12.0.0"
+# Machine-local record of the last fully applied playbook version, read by
+# ansible/version-gate.yml and written by ansible/version-record.yml.
+applied_version_record_path: "{{ ansible_env.HOME }}/.local/state/dev-setup/applied-version"
 fnm_node_version: lts-latest
 # Older Bun releases abort when the nono sandbox denies reads of ancestor
 # directories, breaking sandboxed OpenCode. The node playbook upgrades older

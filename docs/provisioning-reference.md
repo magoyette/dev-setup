@@ -21,10 +21,58 @@ Each sub-playbook exits with `meta: end_play` when it is excluded from
 `playbooks_in_main_playbook`. This also applies when a sub-playbook is run
 directly with `./run-ansible.sh <name>`.
 
+`playbook.yml` also imports two always-run plays that have no
+`playbooks_in_main_playbook` guard: `version-gate.yml` before the sub-playbooks
+and `version-record.yml` after them. See
+[Playbook Version Tracking](#playbook-version-tracking).
+
 Task files normally live under `ansible/tasks/`, one per tool or concern.
 Pinned versions, checksums, managed npm packages, and plugin lists live in
 `ansible/defaults.yml`. User-configurable values are demonstrated in
 `ansible/vars.yml.example`; the actual `ansible/vars.yml` is gitignored.
+
+## Playbook Version Tracking
+
+The main playbook tracks the last fully applied version per machine so cleanup
+tasks can later be removed while remaining guaranteed to have run at least
+once.
+
+`ansible/playbook.yml` imports two always-run plays around the selectable
+sub-playbooks:
+
+| Play | Responsibility |
+| --- | --- |
+| `version-gate.yml` | Fails before any change when the machine's recorded applied version is below `min_previously_applied_version`; sets the `version_gate_run` fact |
+| `version-record.yml` | Writes `playbook_version` to the record once every other play succeeded; requires the `version_gate_run` fact so it cannot run standalone |
+
+The record is `applied_version_record_path`
+(`~/.local/state/dev-setup/applied-version`), a bare `X.Y.Z` string. Ansible
+aborts the run on any task failure, so the record is written only after a fully
+successful run; check-mode runs never write it. Direct sub-playbook runs
+(`./run-ansible.sh <name>`) neither check the gate nor update the record, and
+the record play refuses to run outside a main playbook run because the gate
+play must have set `version_gate_run` in the same invocation first.
+
+The variables live in `ansible/defaults.yml`:
+
+- `playbook_version`: this playbook's version, bumped with each release.
+  `release.sh` refuses to tag when it does not match the prompted version.
+- `min_previously_applied_version`: minimum previously applied version this
+  playbook requires. When a release removes a cleanup task, raise it to the
+  last version that still contained the task so machines that skipped it are
+  forced through a version that performs the cleanup.
+- `pre_tracking_assumed_applied_version`: version assumed for machines without
+  a record (provisioned before 12.1.0 tracking, or a fresh clone). Keep it
+  below the minimum of any release that relies on tracked history.
+- `applied_version_record_path`: machine-local record file path.
+
+Version comparisons use Ansible's `version` test rather than string ordering,
+so `12.10.0` compares greater than `12.9.0`.
+
+The 12.1.0 transition gate is `min_previously_applied_version: "12.0.0"`
+("version 12 at least"). Every machine passes it: machines without a record
+are assumed to be at 12.0.0, and 12.1.0 still contains every cleanup task, so
+its own full run performs them before recording itself.
 
 ## Common Commands
 
