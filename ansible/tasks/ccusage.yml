@@ -31,3 +31,10 @@
     dest: "{{ ansible_env.HOME }}/.local/bin/ccusage"
     state: link
     force: true
+
+- name: Add ocusage alias
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: "^alias ocusage="
+    line: 'alias ocusage="ccusage opencode"'
+    state: present

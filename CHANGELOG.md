@@ -14,6 +14,13 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [11.3.1] - 2026-10-17
+
+### Added
+
+- Add the `ocusage` shell alias for `ccusage opencode`, a concise way to
+  track OpenCode costs with third-party subscriptions.
+
 ## [11.3.0] - 2026-10-17
 
 ### Added
