@@ -1,0 +1,4 @@
+interface:
+  display_name: "nono-sandbox-review"
+  short_description: "Document the nono.sh sandbox's impact on a session"
+  default_prompt: "Use $nono-sandbox-review to review this session and document the commands the nono.sh sandbox blocked, why I attempted them, and the impact of the denials."

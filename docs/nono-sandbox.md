@@ -21,7 +21,12 @@ The profile extends nono's built-in `default` profile, excludes the inherited
 `system_write_linux` group while retaining its device write permissions, grant
 the repository workspace read/write, grant read/write to the assistant state
 directories and to `~/.ansible/tmp` for Ansible's controller temporary files,
-grant read-only access to the shared skill directories, the generated dev-setup
+grant read-only access to the shared skill directories, the dev-setup skill
+source directories and Hunk's bundled skill directory (the symlink targets
+under `~/repos/dev-setup` and `~/.local/opt/hunk/skills`, so deployed skills
+resolve when OpenCode is launched outside the dev-setup repository; Landlock
+checks the resolved path, so granting the link directories alone is not
+enough), the generated dev-setup
 context, the user's Git configuration (`~/.gitconfig`, `~/.config/git`, and
 `/etc/gitconfig` when it exists), the gh CLI's non-secret settings file
 (`~/.config/gh/config.yml`), and Ansible collections

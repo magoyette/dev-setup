@@ -172,3 +172,28 @@
     path: "{{ ansible_env.HOME }}/.claude/skills/{{ item.path | basename }}"
     state: absent
   loop: "{{ codex_own_skill_dirs.files }}"
+
+- name: Find agent skill symlinks
+  ansible.builtin.find:
+    paths:
+      - "{{ ansible_env.HOME }}/.agents/skills"
+      - "{{ ansible_env.HOME }}/.claude/skills"
+    file_type: link
+    recurse: false
+  register: agent_skill_links
+
+- name: Resolve agent skill symlinks
+  ansible.builtin.stat:
+    path: "{{ item.path }}"
+  loop: "{{ agent_skill_links.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  register: agent_skill_link_targets
+
+- name: Remove broken agent skill symlinks
+  ansible.builtin.file:
+    path: "{{ item.item.path }}"
+    state: absent
+  loop: "{{ agent_skill_link_targets.results | selectattr('stat.exists', 'equalto', false) }}"
+  loop_control:
+    label: "{{ item.item.path }}"

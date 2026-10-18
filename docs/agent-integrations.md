@@ -253,11 +253,26 @@ shared path:
 | `external-skills-codex/` | Codex |
 
 External skills may be downloaded bundles or Git submodules. The
-`ansible/tasks/agent-skills.yml` task handles discovery and links.
+`ansible/tasks/agent-skills.yml` task handles discovery and links, and removes
+broken symlinks from the deployment directories so deleted skills do not leave
+dead links behind.
+
+Skills are deployed as symlinks into `~/.claude/skills/` and
+`~/.agents/skills/`. OpenCode runs under the managed nono.sh sandbox and
+Landlock checks the resolved path, so the sandboxed OpenCode profile grants
+read-only access to the skill source directories and Hunk's bundled skill
+directory; without those grants, symlinked skills are invisible to OpenCode
+sessions launched outside the dev-setup repository. See
+[nono.sh sandbox](nono-sandbox.md).
 
 Use agent-browser for generic browser automation. Use Playwright when explicitly
 requested or when Playwright-specific features such as cross-browser testing,
 request routing, tracing, or storage state are required.
+
+Use `nono-sandbox-review` to document the nono.sh sandbox's impact on a
+session: the operations it denied, why each was attempted, and the
+consequences for the task. The skill reports findings only; sandbox policy
+changes follow [nono.sh sandbox](nono-sandbox.md).
 
 ## Review Agents
 

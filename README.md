@@ -206,6 +206,11 @@ This repository supports shared agent skills and agent-specific skills.
 - Claude-only skills: `skills-claude/` and `external-skills-claude/`
 - Codex-targeted skills: `skills-codex/` and `external-skills-codex/`
 
+Skills are symlinked into `~/.claude/skills/` and `~/.agents/skills/`, and
+provisioning removes broken symlinks left by deleted skills. The managed
+OpenCode sandbox profile grants read-only access to the symlink targets, so
+deployed skills resolve for OpenCode regardless of the launch directory.
+
 See [Front-end agent hooks](docs/front-end-agent-hooks.md) for the project-local
 Impeccable installation and design-hook workflow.
 
@@ -322,6 +327,10 @@ to one of the AI assistants.
 - `manage-npm-upgrades` : shared skill for inspecting and upgrading dependencies
   in npm repositories while preserving cooldowns, version styles, workspaces,
   peer compatibility, and security policy.
+- `nono-sandbox-review` : shared skill that reviews a session and documents what
+  the nono.sh sandbox denied: blocked commands and file accesses, why each
+  was attempted, and the impact on the task. Assistant permission prompts are
+  excluded.
 
 ### External skills
 

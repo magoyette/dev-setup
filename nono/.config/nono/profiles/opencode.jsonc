@@ -51,6 +51,13 @@
       "$HOME/.config/gh/config.yml",
       "$HOME/.gitconfig",
       "$HOME/.config/git",
+      "$HOME/.local/opt/hunk/skills",
+      "$HOME/repos/dev-setup/external-skills",
+      "$HOME/repos/dev-setup/external-skills-claude",
+      "$HOME/repos/dev-setup/external-skills-codex",
+      "$HOME/repos/dev-setup/skills",
+      "$HOME/repos/dev-setup/skills-claude",
+      "$HOME/repos/dev-setup/skills-codex",
       "/etc/gitconfig"
     ],
     "write": [

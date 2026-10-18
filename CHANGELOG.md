@@ -14,6 +14,27 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [11.3.0] - 2026-10-17
+
+### Added
+
+- Add the shared `nono-sandbox-review` skill, deployed to Claude Code, Codex,
+  and OpenCode. It reviews a session and documents the operations the nono.sh
+  sandbox denied, why each was attempted, and the impact on the task.
+  Assistant-level permission prompts are excluded because they are a separate
+  layer from the OS sandbox.
+
+### Fixed
+
+- Grant the sandboxed OpenCode profile read access to the dev-setup skill
+  source directories and Hunk's bundled skill directory, so symlinked skills
+  resolve when OpenCode is launched outside the dev-setup repository.
+  Previously `hunk-review` and every repo-symlinked skill were invisible to
+  OpenCode sessions started outside the repository.
+- Remove broken skill symlinks from `~/.agents/skills/` and
+  `~/.claude/skills/` during provisioning, so deleted skills no longer leave
+  dead links behind.
+
 ## [11.2.1] - 2026-10-15
 
 ### Added
