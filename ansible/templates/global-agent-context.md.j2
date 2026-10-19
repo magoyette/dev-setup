@@ -78,7 +78,8 @@ inside the current repository is unaffected.
   `~/.local/share/opencode`, `~/.local/state/opencode`), `~/.config/hunk`,
   `$XDG_RUNTIME_DIR/hunk-mcp`, and `$TMPDIR`.
 - Read-only: the shared skill directories, `~/.gitconfig`, `~/.config/git`,
-  `/etc/gitconfig`, `~/.config/dev-setup`, and `~/.config/gh/config.yml`.
+  `/etc/gitconfig`, `~/.config/dev-setup`,
+  `~/.local/state/dev-setup/applied-version`, and `~/.config/gh/config.yml`.
 - `$TMPDIR` is a private `/tmp/dev-setup-ai.*` directory; the rest of `/tmp` is
   denied. Write temporary files under `$TMPDIR`, never hardcoded `/tmp` paths,
   and never grant all of `/tmp` to work around it.

@@ -69,10 +69,14 @@ The variables live in `ansible/defaults.yml`:
 Version comparisons use Ansible's `version` test rather than string ordering,
 so `12.10.0` compares greater than `12.9.0`.
 
-The 12.1.0 transition gate is `min_previously_applied_version: "12.0.0"`
-("version 12 at least"). Every machine passes it: machines without a record
-are assumed to be at 12.0.0, and 12.1.0 still contains every cleanup task, so
-its own full run performs them before recording itself.
+The 13.0.0 transition gate is `min_previously_applied_version: "12.1.0"`
+("version 12.1.0 at least"). Version 13.0.0 removes the one-time cleanup
+tasks for retired tools and legacy settings, and 12.1.0 is the last version
+that still contained them, so the gate guarantees they have run at least
+once on every machine that passes it. Machines without a record — provisioned
+before 12.1.0 tracking, or a fresh clone — are assumed to be at 12.0.0 and
+are blocked. They must apply a qualifying version such as 12.1.0 once first;
+its full run performs every cleanup task and writes the record.
 
 ## Common Commands
 

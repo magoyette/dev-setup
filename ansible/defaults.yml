@@ -1,14 +1,18 @@
 ---
 # Version of this playbook. Bumped with each release; release.sh refuses to tag
 # when this value does not match the prompted release version.
-playbook_version: "12.1.0"
+playbook_version: "13.0.0"
 # Minimum previously applied playbook version required by this version.
 # ansible/version-gate.yml fails before any change when the machine's
-# recorded applied version is lower.
-min_previously_applied_version: "12.0.0"
+# recorded applied version is lower. Version 13.0.0 removes the one-time
+# cleanup tasks for retired tools and legacy settings; 12.1.0 is the last
+# version that still contained them, so machines without a qualifying
+# record must apply it (or a later version that keeps them) first.
+min_previously_applied_version: "12.1.0"
 # Assumed applied version for machines without an applied-version record:
 # provisioned before version tracking (12.1.0) or a fresh clone. Must stay
-# below the minimum of any release that relies on tracked history.
+# below the minimum of any release that relies on tracked history, so
+# 13.0.0 blocks record-less machines until they apply a qualifying version.
 pre_tracking_assumed_applied_version: "12.0.0"
 # Machine-local record of the last fully applied playbook version, read by
 # ansible/version-gate.yml and written by ansible/version-record.yml.

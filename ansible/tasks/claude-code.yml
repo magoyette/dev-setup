@@ -81,11 +81,6 @@
   changed_when: false
   failed_when: false
 
-- name: Remove legacy Context7 Claude Code plugin
-  ansible.builtin.command: claude plugin uninstall context7@claude-plugins-official --scope user
-  changed_when: true
-  when: "'context7@claude-plugins-official' in claude_plugin_list.stdout_lines"
-
 - name: Install Claude Code plugins
   ansible.builtin.command: claude plugin install {{ item }} --scope user
   loop: "{{ claude_code_plugins }}"
@@ -102,14 +97,3 @@
     path: "{{ ansible_env.HOME }}/.bashrc"
     line: 'export ENABLE_CLAUDEAI_MCP_SERVERS=false'
     state: present
-
-- name: Remove legacy claude wrapper function for daily auto-upgrade
-  ansible.builtin.lineinfile:
-    path: "{{ ansible_env.HOME }}/.bashrc"
-    regexp: '^claude\(\) \{ local stamp="\$HOME/\.local/share/claude-upgrade-check";'
-    state: absent
-
-- name: Remove legacy claude upgrade check stamp file
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.local/share/claude-upgrade-check"
-    state: absent

@@ -35,48 +35,6 @@
     scope: global
     value: "default"
 
-- name: Check for legacy Delta community themes include
-  ansible.builtin.command:
-    argv:
-      - git
-      - config
-      - --global
-      - --get-all
-      - include.path
-  register: delta_include_paths
-  changed_when: false
-  failed_when: false
-
-- name: Remove legacy Delta community themes include
-  community.general.git_config:
-    name: include.path
-    scope: global
-    state: absent
-  when:
-    - delta_include_paths.stdout_lines | length > 0
-    - >-
-      delta_include_paths.stdout_lines |
-      difference([ansible_env.HOME ~ '/.config/delta/themes.gitconfig']) |
-      length == 0
-
-- name: Remove legacy Delta named theme feature
-  community.general.git_config:
-    name: delta.features
-    scope: global
-    state: absent
-
-- name: Remove legacy Delta dark mode
-  community.general.git_config:
-    name: delta.dark
-    scope: global
-    state: absent
-
-- name: Remove legacy Delta light mode
-  community.general.git_config:
-    name: delta.light
-    scope: global
-    state: absent
-
 - name: Set delta syntax theme
   community.general.git_config:
     name: delta.syntax-theme

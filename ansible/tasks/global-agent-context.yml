@@ -37,12 +37,6 @@
   vars:
     context_assistant: opencode
 
-# Replaced by the per-assistant generated files above.
-- name: Remove retired shared global agent context
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.config/dev-setup/global-agent-context.md"
-    state: absent
-
 - name: Deploy global agent context for Claude Code
   ansible.builtin.file:
     src: "{{ ansible_env.HOME }}/.config/dev-setup/global-agent-context.claude-code.md"

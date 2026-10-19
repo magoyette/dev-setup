@@ -1,17 +1,6 @@
 ---
-- name: Remove retired jinx spellchecking dependencies
-  become: true
-  ansible.builtin.apt:
-    name:
-      - hunspell
-      - hunspell-en-ca
-      - hunspell-en-us
-      - hunspell-fr-comprehensive
-      - libenchant-2-dev
-    state: absent
-
 # pkg-config is used by the libtree-sitter build in tasks/libtree-sitter.yml
-# and by general Emacs build tooling; it is retained after the jinx removal.
+# and by general Emacs build tooling.
 - name: Install pkgconf
   become: true
   ansible.builtin.apt:

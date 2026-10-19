@@ -23,12 +23,6 @@
     line: 'alias bat="batcat"'
     state: present
 
-- name: Remove legacy fd alias
-  ansible.builtin.lineinfile:
-    path: "{{ ansible_env.HOME }}/.bashrc"
-    line: 'alias fd="fdfind"'
-    state: absent
-
 - name: Link fd into ~/.local/bin
   ansible.builtin.file:
     src: /usr/bin/fdfind

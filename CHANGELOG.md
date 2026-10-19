@@ -14,6 +14,33 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.0.0] - 2026-10-18
+
+### Added
+
+- Grant the sandboxed OpenCode profile read access to the dev-setup
+  applied-version record (`~/.local/state/dev-setup/applied-version`), so
+  sessions can check the machine's last applied playbook version.
+
+### Changed
+
+- Require a previously applied playbook version of at least 12.1.0. The main
+  playbook now stops before making changes on machines whose last applied
+  version is lower or that have no applied-version record; they must apply a
+  qualifying version first, for example 12.1.0. It is the last release that
+  still performs the cleanup tasks removed in this version, so the
+  requirement guarantees they have run at least once on every machine.
+
+### Removed
+
+- Remove the one-time cleanup tasks for retired tools and legacy settings:
+  the Superpowers and Pi integrations (including the Herdr Pi integration
+  and the Codex config-section cleanup script), the `tldr` client, jinx
+  spellchecking dependencies, the shared global agent context file, legacy
+  Delta git theme settings, the legacy `fd`/`fdfind` alias, the legacy
+  Context7 Claude Code plugin, the legacy Claude auto-upgrade wrapper, and
+  legacy downloaded skills.
+
 ## [12.1.0] - 2026-10-18
 
 ### Added
