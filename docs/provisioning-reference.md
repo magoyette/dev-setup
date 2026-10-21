@@ -84,7 +84,9 @@ its full run performs every cleanup task and writes the record.
 - Re-run all selected playbooks: `./run-ansible.sh`
 - Run one selected sub-playbook: `./run-ansible.sh <name>`
 - Syntax check: `ansible-playbook ansible/playbook.yml --syntax-check`
-- Advisory lint: `ansible-lint ansible/`
+- Advisory lint: `ansible-lint ansible/` (inside the OpenCode sandbox, use the
+  redirected invocation from
+  [nono.sh sandbox](nono-sandbox.md#managed-profiles))
 
 The playbook is intended to be idempotent. Re-running it should normally report
 no changes unless managed state or a pinned value differs.

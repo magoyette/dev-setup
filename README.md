@@ -79,7 +79,10 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   The profile grants read-only access to the user's Git configuration so Git
   repo detection works inside the sandbox; the gh token and other Git
   credentials stay outside the grants, so authenticated GitHub operations
-  fail inside the sandbox by design. The launcher passes `--allow-cwd`
+  fail inside the sandbox by design. The profile also grants the pyenv tree,
+  the pipx venv behind the `ansible-lint` shim, and `/dev/shm`, so `python3`
+  and the advisory `ansible-lint` run inside sandboxed sessions. The launcher
+  passes `--allow-cwd`
   so the working directory is granted at the profile workdir level
   (`readwrite`) without an interactive sharing prompt; set
   `ai_assistants_nono_allow_cwd` to `false` to restore that prompt. The

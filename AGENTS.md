@@ -63,7 +63,9 @@ Run checks based on the files changed:
 
 `ansible-lint ansible/` is advisory because the repository has pre-existing
 violations. Review its output manually and do not run broad automatic fixes
-without checking the resulting diff.
+without checking the resulting diff. Inside the OpenCode sandbox, use the
+redirected invocation documented in
+[docs/nono-sandbox.md](docs/nono-sandbox.md).
 
 ## Change Documentation
 

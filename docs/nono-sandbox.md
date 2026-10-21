@@ -39,6 +39,29 @@ socket paths. Git exits with a fatal error when an existing
 config file is unreadable, so those read grants are required for Git repo
 detection to work inside the sandbox.
 
+The profile also grants read/write access to `/dev/shm`: Python's
+`multiprocessing` allocates named semaphores there, and Ansible's controller
+creates one `multiprocessing.Lock()` per referenced module, so without the
+grant every sandboxed `ansible-playbook` invocation prints an `errors were
+encountered during the plugin load` warning per module (the run itself still
+succeeds). Read-only grants cover the pyenv tree (`$HOME/.pyenv`) and the
+pipx venv behind the `ansible-lint` shim
+(`$HOME/.local/share/pipx/venvs/ansible-lint`): both tools sit behind
+indirection that a single-path grant cannot cover — pyenv shims re-exec
+through `~/.pyenv/libexec/pyenv` and `~/.pyenv/versions`, and the
+`~/.local/bin/ansible-lint` symlink resolves into its venv; Landlock checks
+the resolved path. A read-file grant covers `/sys/fs/cgroup/cpu.max`, which
+ansible-lint reads to size its syntax-check worker pool. Run the installed
+linter inside the sandbox with the ansible-compat cache redirected to the
+private `TMPDIR` and offline requirements resolution, because the galaxy
+cache and the collections directory stay outside the write grants:
+
+```bash
+ANSIBLE_HOME="$TMPDIR/ansible-home" \
+  ANSIBLE_COLLECTIONS_PATH="$HOME/.ansible/collections" \
+  ansible-lint --offline ansible/
+```
+
 The `dev-setup-ai-assistant-sandbox` launcher sources
 `~/.config/dev-setup/ai-assistant-sandbox.env`, creates a private
 `/tmp/dev-setup-ai.*` directory with `mktemp -d` and exports it as `TMPDIR`,

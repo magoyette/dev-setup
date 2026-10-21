@@ -14,6 +14,20 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.0.1] - 2026-10-18
+
+### Fixed
+
+- Unblock `python3` and the advisory `ansible-lint` inside the sandboxed
+  OpenCode profile. Grant read-only access to the pyenv tree and the pipx
+  venv behind the `ansible-lint` symlink (the previous single-file grant on
+  the python3 shim could not work, because pyenv shims re-exec through
+  ungranted paths), grant `/dev/shm` read/write so Python multiprocessing
+  and Ansible's per-module locks can allocate named semaphores (removes the
+  per-module plugin-load warnings from sandboxed syntax checks), and grant
+  read access to `/sys/fs/cgroup/cpu.max` for ansible-lint's worker pool
+  sizing.
+
 ## [13.0.0] - 2026-10-18
 
 ### Added

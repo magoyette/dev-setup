@@ -41,7 +41,8 @@
       "$HOME/.local/state/opencode",
       "$HOME/.local/share/opentui",
       "$XDG_RUNTIME_DIR/hunk-mcp",
-      "$TMPDIR"
+      "$TMPDIR",
+      "/dev/shm"
     ],
     "read": [
       "$HOME/.agents/skills",
@@ -58,7 +59,9 @@
       "$HOME/repos/dev-setup/skills",
       "$HOME/repos/dev-setup/skills-claude",
       "$HOME/repos/dev-setup/skills-codex",
-      "/etc/gitconfig"
+      "/etc/gitconfig",
+      "$HOME/.local/share/pipx/venvs/ansible-lint",
+      "$HOME/.pyenv"
     ],
     "write": [
       "/dev/null",
@@ -71,11 +74,10 @@
       "/dev/pts",
       "/proc/self/fd"
     ],
-    "allow_file": [
-      "~/.pyenv/shims/python3"
-    ],
+    "allow_file": [],
     "read_file": [
-      "$HOME/.local/state/dev-setup/applied-version"
+      "$HOME/.local/state/dev-setup/applied-version",
+      "/sys/fs/cgroup/cpu.max"
     ],
     "write_file": [],
     "unix_socket": [],
