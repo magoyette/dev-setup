@@ -197,7 +197,10 @@ The AI assistants playbook upgrades a managed V1 installation to V2 and saves
 its binary and configuration in `~/.opencode/v1-backup/`. The launcher uses a
 private server for interactive sessions and server-backed commands, keeping
 tool execution inside nono. Web search requires a search provider connected
-through `/connect` or its API-key environment variable. See
+through `/connect` or its API-key environment variable. The launcher presets
+`OPENCODE_DISABLE_FREE_MODELS=1`, so the zero-cost OpenCode and OpenCode Go
+models disappear from catalogs, defaults, and fallbacks; preset the variable
+to `false` before a launch to keep them. See
 [OpenCode integration details](docs/agent-integrations.md#opencode).
 
 ## Agent skills

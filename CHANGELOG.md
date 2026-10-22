@@ -14,6 +14,15 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.1] - 2026-10-21
+
+### Changed
+
+- The managed OpenCode launcher presets `OPENCODE_DISABLE_FREE_MODELS=1`
+  (OpenCode 2.1.2+), so the zero-cost OpenCode and OpenCode Go models
+  disappear from model catalogs, defaults, and fallbacks. Preset the variable
+  to `false` before a launch to keep free models available.
+
 ## [13.1.0] - 2026-10-21
 
 ### Added

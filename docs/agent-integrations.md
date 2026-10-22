@@ -144,6 +144,16 @@ a search provider on first use; connect one through `/connect` or supply its
 API-key environment variable. The V1-only `OPENCODE_ENABLE_EXA` launcher setting
 is no longer used.
 
+The launcher presets `OPENCODE_DISABLE_FREE_MODELS=1` (OpenCode 2.1.2+),
+removing the zero-cost `opencode` and `opencode-go` models from catalogs,
+defaults, and fallbacks, so the model picker and automatic fallback offer only
+paid models; explicitly selecting a hidden model fails with
+`Model unavailable`. Preset the variable to override one launch, for example
+`OPENCODE_DISABLE_FREE_MODELS=false opencode`. Private `--standalone` servers
+and `opencode serve` inherit the launcher environment, so the upstream
+`opencode service set env` form is needed only for a shared background service
+started outside the launcher.
+
 Authentication is a one-time interactive operation and is not managed by
 Ansible.
 

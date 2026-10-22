@@ -80,14 +80,16 @@ test("V2 merge preserves unrelated config and plugin order, reconciles MCPs, and
   }
 });
 
-test("launcher selects private servers and keeps offline subcommands valid", () => {
+test("launcher selects private servers, hides free models by default, and keeps offline subcommands valid", () => {
   const dir = mkdtempSync(`${tmpdir()}/opencode-launcher-test-`);
   try {
     const helper = `${dir}/dev-setup-ai-assistant-sandbox`;
-    writeFileSync(helper, '#!/bin/sh\nprintf "%s\\n" "$@"\n');
+    writeFileSync(helper, '#!/bin/sh\nprintf "%s\\n" "$@"\nprintf "OPENCODE_DISABLE_FREE_MODELS=%s\\n" "${OPENCODE_DISABLE_FREE_MODELS-unset}"\n');
     chmodSync(helper, 0o755);
-    const run = (args) => spawnSync("bash", [`${root}/ai-assistant-launchers/.local/bin/opencode`, ...args], {
-      env: { ...process.env, PATH: `${dir}:${process.env.PATH}`, DEV_SETUP_REAL_OPENCODE: "/bin/true" }, encoding: "utf8",
+    const baseEnv = { ...process.env, PATH: `${dir}:${process.env.PATH}`, DEV_SETUP_REAL_OPENCODE: "/bin/true" };
+    delete baseEnv.OPENCODE_DISABLE_FREE_MODELS;
+    const run = (args, extraEnv = {}) => spawnSync("bash", [`${root}/ai-assistant-launchers/.local/bin/opencode`, ...args], {
+      env: { ...baseEnv, ...extraEnv }, encoding: "utf8",
     });
     for (const args of [[], ["run", "a prompt"], ["models"], ["session", "list"], ["auth", "list"], ["--log-level", "debug", "run", "prompt"], ["--prompt", "debug"]]) {
       const result = run(args);
@@ -104,6 +106,8 @@ test("launcher selects private servers and keeps offline subcommands valid", () 
     assert.equal(run(["run", "--", "--server"]).status, 0);
     const nested = run(["--log-level", "error", "auth", "list"]).stdout;
     assert.ok(nested.includes("auth\nlist\n--standalone\n"));
+    assert.ok(run([]).stdout.includes("OPENCODE_DISABLE_FREE_MODELS=1\n"));
+    assert.ok(run([], { OPENCODE_DISABLE_FREE_MODELS: "false" }).stdout.includes("OPENCODE_DISABLE_FREE_MODELS=false\n"));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

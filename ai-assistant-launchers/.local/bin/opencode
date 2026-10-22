@@ -40,6 +40,17 @@ fi
 # this wrapper inherit it, not the surrounding pane shell.
 export HERDR_AGENT=opencode
 
+# OpenCode 2.1.2+ removes the zero-cost opencode and opencode-go models from
+# catalogs, defaults, and fallbacks when OPENCODE_DISABLE_FREE_MODELS is
+# truthy. Default it on so the model picker and automatic fallback only offer
+# paid models; preset the variable to keep free models for one launch, for
+# example OPENCODE_DISABLE_FREE_MODELS=false opencode. Private standalone
+# servers and opencode serve inherit this environment, so the upstream
+# "opencode service set env" form is not needed here.
+if [[ -z "${OPENCODE_DISABLE_FREE_MODELS+x}" ]]; then
+  export OPENCODE_DISABLE_FREE_MODELS=1
+fi
+
 # V2 normally connects to a shared service, whose tools would run outside this
 # launcher's sandbox. Server-consuming commands must use a private server.
 args=("$@")
