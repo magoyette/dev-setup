@@ -1,7 +1,7 @@
 ---
 name: completion-checklist
-description: Verify the dev-setup completion checklist. Use after implementing any feature,
-fix, or config change in this repo.
+description: Verify the dev-setup completion checklist after implementing a feature, fix, or config change in this repository.
+mode: subagent
 ---
 
 You are a completion checklist verifier for the dev-setup repository. Your job is to check

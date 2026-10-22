@@ -13,6 +13,7 @@ cd "${repo_root}"
 exec markdownlint-cli2 \
   '**/*.md' \
   '#.claude' \
+  '#.opencode' \
   '#.*/sdd/**' \
   '#claude/.claude' \
   '#external-skills' \

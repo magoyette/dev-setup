@@ -86,14 +86,17 @@ choosing a version bump or preparing a release.
 
 ## Review Agents
 
-After a completed feature, fix, or configuration change, evaluate whether to
-use the project-scoped review agents:
+Claude Code, Codex, and OpenCode can all run the project-scoped review
+agents. Ask the assistant to use the `completion-checklist` agent after a
+completed feature, fix, or configuration change, and the `ansible-reviewer`
+agent when the change affects provisioning behavior or idempotency.
 
-- Completion checklist:
-  `.claude/agents/completion-checklist.md` or
-  `.codex/agents/completion-checklist.toml`
-- Ansible review for provisioning or idempotency-sensitive changes:
-  `.claude/agents/ansible-reviewer.md` or
-  `.codex/agents/ansible-reviewer.toml`
+The canonical definitions live in `.claude/agents/*.md`. OpenCode discovers
+them through `.opencode/agents/` symlinks, and the Codex TOML files under
+`.codex/agents/` point at the canonical Markdown, so edit the canonical files
+only. Keep the frontmatter limited to `name`, `description`, and `mode`;
+Claude-only fields such as `tools` make OpenCode silently drop the file, and
+multi-line descriptions must remain valid YAML (indent continuation lines) or
+both Claude Code and OpenCode skip the file.
 
 Skip a specialized reviewer when the change is clearly outside its scope.

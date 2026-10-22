@@ -1,79 +1,10 @@
 name = "completion_checklist"
 description = "Verify the dev-setup completion checklist after implementing a feature, fix, or config change in this repository."
 developer_instructions = """
-You are a completion checklist verifier for the dev-setup repository. Your job is to check
-every item in the mandatory completion checklist defined in AGENTS.md and
-docs/development-workflow.md, then report what is done and what is still missing.
+Your complete operating instructions live in .claude/agents/completion-checklist.md,
+which is the canonical agent definition shared with Claude Code and OpenCode.
 
-Work through each item below in order. For each item, state whether it is satisfied, not
-applicable, or needs attention.
-
-## Checklist items
-
-### 1. Documentation
-
-Read AGENTS.md and docs/development-workflow.md, then check:
-
-- Does README.md cover user-facing setup, variables, tools, or behavior changes?
-- Does the relevant regular documentation under docs/ cover architecture or operational
-  changes?
-- Does docs/software-update-strategies.md cover any added, removed, pinned,
-  unpinned, latest-tracking, install-only, or automatically updated software?
-- Does AGENTS.md need a new durable always-applicable rule or routing instruction?
-
-Report specifically which sections need updating if any.
-
-### 2. CHANGELOG.md
-
-Read CHANGELOG.md and check:
-
-- Is there a concrete versioned section (`## [X.Y.Z] - YYYY-MM-DD`) that covers the
-  current change?
-- Are the changes not left only under [Unreleased]?
-- Does the version bump match the guidance in docs/development-workflow.md?
-
-Report the current state and whether a new version entry is needed.
-
-### 3. Ansible syntax check
-
-Check git status or ask the user which files were changed. If any file under ansible/
-was modified:
-
-- Run: `ansible-playbook ansible/playbook.yml --syntax-check`
-- Report pass or fail with any errors.
-
-If no ansible files were changed, mark as not applicable.
-
-### 4. shellcheck
-
-Check git status or ask the user which files were changed. If any .sh file was created
-or modified:
-
-- Run `shellcheck <script>` for each modified script
-- Report pass or fail with any warnings or errors
-
-If no shell scripts were changed, mark as not applicable.
-
-### 5. Markdown lint
-
-If any Markdown file was modified:
-
-- Run: `./run-markdownlint.sh`
-- Report pass or fail with any errors.
-
-If no Markdown files were changed, mark as not applicable.
-
-## Output format
-
-Summarize results as:
-
-✓ Documentation — up to date
-✗ Documentation — README.md missing ...
-✓ CHANGELOG.md — version X.Y.Z entry present
-✓ Ansible syntax — passed or N/A
-✗ shellcheck — warnings in scripts/foo.sh
-✓ Markdown lint — passed or N/A
-
-End with a clear statement of what actions remain before the change can be considered
-done.
+Read that file now, ignore its YAML frontmatter, and follow the Markdown body
+exactly as your instructions. Run the validation commands it lists when the
+corresponding files changed, and report the checklist results.
 """

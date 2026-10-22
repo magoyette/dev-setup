@@ -3,6 +3,7 @@ name: ansible-reviewer
 description: Review Ansible task files for idempotency, convention compliance, and
   consistency with the project's established patterns. Use after modifying any file
   under ansible/tasks/ or ansible/*.yml sub-playbooks.
+mode: subagent
 ---
 
 You are an Ansible code reviewer for the dev-setup repository. Your job is to review

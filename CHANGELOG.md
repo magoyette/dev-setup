@@ -14,6 +14,30 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.0] - 2026-10-21
+
+### Added
+
+- Make the project-scoped review agents (`ansible-reviewer` and
+  `completion-checklist`) available in OpenCode V2. The canonical definitions
+  stay in `.claude/agents/`, OpenCode discovers them through new
+  `.opencode/agents/` symlinks, and a `mode: subagent` frontmatter field
+  (ignored by Claude Code) keeps them out of OpenCode's primary-agent list.
+
+### Changed
+
+- The Codex agent TOML files under `.codex/agents/` now point
+  `developer_instructions` at the canonical Markdown definitions instead of
+  duplicating the prompts, and no longer set `sandbox_mode` (current Codex
+  releases ignore it in custom agent files; agents inherit the parent
+  session's sandbox).
+
+### Fixed
+
+- Repair the `completion-checklist` agent's frontmatter: its multi-line
+  `description` was not valid YAML, so Claude Code had been silently skipping
+  the agent.
+
 ## [13.0.1] - 2026-10-18
 
 ### Fixed
