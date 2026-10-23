@@ -81,7 +81,10 @@ Copy `ansible/vars.yml.example` into `vars.yml` and set your personal values:
   credentials stay outside the grants, so authenticated GitHub operations
   fail inside the sandbox by design. The profile also grants the pyenv tree,
   the pipx venv behind the `ansible-lint` shim, and `/dev/shm`, so `python3`
-  and the advisory `ansible-lint` run inside sandboxed sessions. The launcher
+  and the advisory `ansible-lint` run inside sandboxed sessions, and it
+  grants Crit's data root and global config and the dev-setup nono profile
+  directory, so the Crit review skill and `nono why` policy checks work
+  inside sandboxed sessions. The launcher
   passes `--allow-cwd`
   so the working directory is granted at the profile workdir level
   (`readwrite`) without an interactive sharing prompt; set

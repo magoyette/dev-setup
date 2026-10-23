@@ -14,6 +14,21 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.2] - 2026-10-23
+
+### Added
+
+- Unblock the Crit review skill inside the sandboxed OpenCode profile: grant
+  read/write access to Crit's data root `~/.crit` (the review daemon writes
+  its session locks and review data there) and read-only access to
+  `~/.crit.config.json`, so reviews run natively without a `HOME` override
+  and the global Crit settings apply again. Also grant read-only access to
+  the dev-setup nono profile directory, so `nono why --profile opencode`
+  verifies denials from inside sandboxed sessions launched from any
+  repository. Sandboxed sessions should still invoke `crit-bin` with
+  `CRIT_NO_UPDATE_CHECK=1` and `--no-open` instead of the `crit` wrapper,
+  whose daily upgrade check writes outside the sandbox.
+
 ## [13.1.1] - 2026-10-21
 
 ### Changed
@@ -106,7 +121,7 @@ https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 - OpenCode now pre-approves the read-only Git subcommands (`diff`, `log`,
   `ls-tree`, `show`, `status`) when they target a repository through
   `git -C <path>`, for example `git -C /home/user/repos/demo show <commit>
-  --stat`. The `git -C` forms of `git commit` and `git push` are denied, matching
+--stat`. The `git -C` forms of `git commit` and `git push` are denied, matching
   the existing guardrails for the plain commands.
 
 ## [12.0.0] - 2026-10-18

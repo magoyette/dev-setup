@@ -76,13 +76,18 @@ inside the current repository is unaffected.
 
 - Read/write: OpenCode state (`~/.opencode`, `~/.config/opencode`,
   `~/.local/share/opencode`, `~/.local/state/opencode`), `~/.config/hunk`,
-  `$XDG_RUNTIME_DIR/hunk-mcp`, and `$TMPDIR`.
+  `~/.crit` (Crit review data and session locks), `$XDG_RUNTIME_DIR/hunk-mcp`,
+  and `$TMPDIR`.
 - Read-only: the shared skill directories, `~/.gitconfig`, `~/.config/git`,
   `/etc/gitconfig`, `~/.config/dev-setup`,
-  `~/.local/state/dev-setup/applied-version`, and `~/.config/gh/config.yml`.
+  `~/.local/state/dev-setup/applied-version`, `~/.config/gh/config.yml`, and
+  `~/.crit.config.json` (global Crit settings).
 - `$TMPDIR` is a private `/tmp/dev-setup-ai.*` directory; the rest of `/tmp` is
   denied. Write temporary files under `$TMPDIR`, never hardcoded `/tmp` paths,
   and never grant all of `/tmp` to work around it.
+- Launch Crit reviews with `crit-bin`, `CRIT_NO_UPDATE_CHECK=1`, and
+  `--no-open`, and relay the printed review URL: the `crit` wrapper performs a
+  daily upgrade check that writes outside the sandbox, so it stays ungranted.
 - Network access is not restricted by the sandbox.
 
 ### Limitations
@@ -100,10 +105,12 @@ inside the current repository is unaffected.
   user to run authenticated Git operations, including gh, from an ordinary
   shell.
 - When a needed path is denied, report the exact path instead of debugging the
-  filesystem. The user can check it with `nono why`, grant one directory for a
-  session with `NONO_ALLOW="$HOME/dir" opencode`, or change the managed
-  profile in the dev-setup repository. Run diagnostics and grants from an
-  ordinary shell: `~/.config/nono` is outside the sandbox grants and
-  prompt-based elevation is unavailable on this kernel. Full details:
-  `docs/nono-sandbox.md` in the dev-setup repository.
+  filesystem. Verify it with `nono why --profile opencode`; the profile's own
+  source directory is granted read-only, so the command works inside the
+  sandbox. The user can then grant one directory for a session with
+  `NONO_ALLOW="$HOME/dir" opencode` or change the managed profile in the
+  dev-setup repository. Profile edits need an ordinary shell unless the
+  session was launched from that repository, and prompt-based elevation is
+  unavailable on this kernel. Full details: `docs/nono-sandbox.md` in the
+  dev-setup repository.
 {% endif %}

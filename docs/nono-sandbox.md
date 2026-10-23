@@ -26,7 +26,11 @@ source directories and Hunk's bundled skill directory (the symlink targets
 under `~/repos/dev-setup` and `~/.local/opt/hunk/skills`, so deployed skills
 resolve when OpenCode is launched outside the dev-setup repository; Landlock
 checks the resolved path, so granting the link directories alone is not
-enough), the generated dev-setup
+enough), the dev-setup nono profile directory
+(`~/repos/dev-setup/nono/.config/nono`, the resolved target of the
+`~/.config/nono` Stow symlink, so `nono why --profile opencode` and
+`nono profile validate` work inside sandboxed sessions launched from any
+repository), the generated dev-setup
 context, the dev-setup applied-version record
 (`~/.local/state/dev-setup/applied-version`, so sandboxed sessions can check
 the machine's last applied playbook version), the user's Git configuration
@@ -120,6 +124,10 @@ starting anything:
 ```bash
 nono why --profile opencode --path "$HOME/.emacs.d/README.md" --op read
 ```
+
+Because the profile grants its own source directory read-only, this also works
+inside sandboxed OpenCode sessions: agents can confirm a denial with its policy
+reason instead of inferring the cause from error signatures.
 
 `nono run --dry-run` prints the fully resolved capability set and accepts the
 same flags as a real run, which makes it the quickest way to preview a grant:

@@ -231,6 +231,15 @@ only when sharing is enabled, and its CLI plugin notifies on blocking Crit
 review commands. The incompatible generated V1 `plugins/crit.ts` is removed
 after installing Crit's integration; its shared helper and skills are retained.
 
+Crit's review daemon writes its session locks and review data under its data
+root `~/.crit` and merges the global settings file `~/.crit.config.json`. The
+managed OpenCode nono profile grants the data root read/write and the settings
+file read-only, so the Crit review skill runs natively inside sandboxed
+sessions. The `crit` wrapper's repository target stays ungranted because its
+daily upgrade check writes outside the sandbox; sandboxed sessions invoke
+`crit-bin` directly with `CRIT_NO_UPDATE_CHECK=1` and `--no-open`, relaying the
+printed review URL instead of opening the user's browser.
+
 Herdr provides terminal and session orchestration. Its integrations do not
 alter assistant sandbox policy, writable roots, network permissions, or browser
 automation permissions.

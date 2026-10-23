@@ -37,6 +37,7 @@
       "$HOME/.ansible/tmp",
       "$HOME/.config/opencode",
       "$HOME/.config/hunk",
+      "$HOME/.crit",
       "$HOME/.local/share/opencode",
       "$HOME/.local/state/opencode",
       "$HOME/.local/share/opentui",
@@ -56,6 +57,7 @@
       "$HOME/repos/dev-setup/external-skills",
       "$HOME/repos/dev-setup/external-skills-claude",
       "$HOME/repos/dev-setup/external-skills-codex",
+      "$HOME/repos/dev-setup/nono/.config/nono",
       "$HOME/repos/dev-setup/skills",
       "$HOME/repos/dev-setup/skills-claude",
       "$HOME/repos/dev-setup/skills-codex",
@@ -76,6 +78,7 @@
     ],
     "allow_file": [],
     "read_file": [
+      "$HOME/.crit.config.json",
       "$HOME/.local/state/dev-setup/applied-version",
       "/sys/fs/cgroup/cpu.max"
     ],
