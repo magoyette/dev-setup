@@ -14,6 +14,20 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.3] - 2026-10-24
+
+### Added
+
+- Unblock the hunk-review skill inside the sandboxed OpenCode profile: grant
+  read-only access to Hunk's managed install directory `~/.local/opt/hunk`
+  (the `hunk` binary, its metadata, and the bundled skills behind the deployed
+  `hunk-review` symlinks, replacing the skills-only grant) and read/write
+  access to Hunk's app state directory `~/.local/state/hunk`, so the
+  `hunk session` commands run natively inside sandboxed sessions. Also grant
+  read-only access to the Bun runtime tree `~/.bun`, mirroring the built-in
+  read-only Node runtime grants: agents can execute `bun`, while `bun install`
+  writes stay denied like npm's.
+
 ## [13.1.2] - 2026-10-23
 
 ### Added

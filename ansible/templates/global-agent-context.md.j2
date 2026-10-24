@@ -75,13 +75,19 @@ inside the current repository is unaffected.
 ### Configuration
 
 - Read/write: OpenCode state (`~/.opencode`, `~/.config/opencode`,
-  `~/.local/share/opencode`, `~/.local/state/opencode`), `~/.config/hunk`,
-  `~/.crit` (Crit review data and session locks), `$XDG_RUNTIME_DIR/hunk-mcp`,
-  and `$TMPDIR`.
-- Read-only: the shared skill directories, `~/.gitconfig`, `~/.config/git`,
-  `/etc/gitconfig`, `~/.config/dev-setup`,
+  `~/.local/share/opencode`, `~/.local/state/opencode`), Hunk state
+  (`~/.config/hunk`, `~/.local/state/hunk`), `~/.crit` (Crit review data and
+  session locks), `$XDG_RUNTIME_DIR/hunk-mcp`, and `$TMPDIR`.
+- Read-only: the shared skill directories, the managed Hunk install
+  (`~/.local/opt/hunk`), the Bun runtime (`~/.bun`), `~/.gitconfig`,
+  `~/.config/git`, `/etc/gitconfig`, `~/.config/dev-setup`,
   `~/.local/state/dev-setup/applied-version`, `~/.config/gh/config.yml`, and
   `~/.crit.config.json` (global Crit settings).
+- The bundled `hunk-review` skill runs natively: use its `hunk session ...`
+  CLI commands and never launch the interactive TUI (`hunk diff` or
+  `hunk show`).
+- `bun` and `npm` run read-only: package installs that write under
+  `~/.bun/install` or `~/.npm` are denied.
 - `$TMPDIR` is a private `/tmp/dev-setup-ai.*` directory; the rest of `/tmp` is
   denied. Write temporary files under `$TMPDIR`, never hardcoded `/tmp` paths,
   and never grant all of `/tmp` to work around it.

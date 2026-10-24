@@ -20,13 +20,18 @@ file:
 The profile extends nono's built-in `default` profile, excludes the inherited
 `system_write_linux` group while retaining its device write permissions, grant
 the repository workspace read/write, grant read/write to the assistant state
-directories and to `~/.ansible/tmp` for Ansible's controller temporary files,
+directories (including `~/.local/state/hunk`, where the Hunk CLI persists its
+app state) and to `~/.ansible/tmp` for Ansible's controller temporary files,
 grant read-only access to the shared skill directories, the dev-setup skill
-source directories and Hunk's bundled skill directory (the symlink targets
-under `~/repos/dev-setup` and `~/.local/opt/hunk/skills`, so deployed skills
-resolve when OpenCode is launched outside the dev-setup repository; Landlock
-checks the resolved path, so granting the link directories alone is not
-enough), the dev-setup nono profile directory
+source directories, the Bun runtime tree (`$HOME/.bun`, mirroring the built-in
+read-only Node runtime grants, so agents can execute `bun` while `bun install`
+writes stay denied), and Hunk's managed install directory (the symlink targets
+under `~/repos/dev-setup` and `$HOME/.local/opt/hunk`, which holds the `hunk`
+binary, its metadata, and the bundled skills, so deployed skills resolve when
+OpenCode is launched outside the dev-setup repository and the bundled
+`hunk-review` CLI commands run inside sandboxed sessions; Landlock checks the
+resolved path, so granting the link directories alone is not enough), the
+dev-setup nono profile directory
 (`~/repos/dev-setup/nono/.config/nono`, the resolved target of the
 `~/.config/nono` Stow symlink, so `nono why --profile opencode` and
 `nono profile validate` work inside sandboxed sessions launched from any

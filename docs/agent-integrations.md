@@ -216,8 +216,11 @@ an already-running Hunk session; agents do not launch the interactive TUI.
 
 Hunk stores its local session credentials and daemon coordination files under
 `$XDG_RUNTIME_DIR/hunk-mcp` and communicates with the daemon over loopback. The
-managed OpenCode nono profile allows that runtime directory and
-`~/.config/hunk` without adding a broader network policy. If another assistant
+managed OpenCode nono profile allows that runtime directory, `~/.config/hunk`,
+and Hunk's app state directory `~/.local/state/hunk`, and grants read-only
+access to the managed install directory `~/.local/opt/hunk`, so the bundled
+`hunk-review` skill and its `hunk session` CLI commands run natively inside
+sandboxed sessions without adding a broader network policy. If another assistant
 sandbox blocks loopback access, the Hunk skill directs the agent to request the
 normal sandbox escalation instead of exposing the daemon remotely.
 
@@ -289,7 +292,7 @@ dead links behind.
 Skills are deployed as symlinks into `~/.claude/skills/` and
 `~/.agents/skills/`. OpenCode runs under the managed nono.sh sandbox and
 Landlock checks the resolved path, so the sandboxed OpenCode profile grants
-read-only access to the skill source directories and Hunk's bundled skill
+read-only access to the skill source directories and Hunk's managed install
 directory; without those grants, symlinked skills are invisible to OpenCode
 sessions launched outside the dev-setup repository. See
 [nono.sh sandbox](nono-sandbox.md).

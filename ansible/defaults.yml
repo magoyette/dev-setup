@@ -1,7 +1,7 @@
 ---
 # Version of this playbook. Bumped with each release; release.sh refuses to tag
 # when this value does not match the prompted release version.
-playbook_version: "13.1.2"
+playbook_version: "13.1.3"
 # Minimum previously applied playbook version required by this version.
 # ansible/version-gate.yml fails before any change when the machine's
 # recorded applied version is lower. Version 13.0.0 removes the one-time
