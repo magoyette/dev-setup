@@ -34,6 +34,9 @@ Read CHANGELOG.md and check:
   current change?
 - Are the changes NOT left only under `[Unreleased]`?
 - Does the version bump match the guidance in docs/development-workflow.md?
+- Does `playbook_version` in `ansible/defaults.yml` match the newest
+  `CHANGELOG.md` version? Per AGENTS.md, the two are set together in the same
+  change and must never drift apart.
 
 Report the current state and whether a new version entry is needed.
 

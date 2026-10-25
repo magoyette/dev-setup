@@ -78,6 +78,9 @@ For behavior, feature, fix, or configuration changes:
 - Update `docs/software-update-strategies.md` when managed software is added,
   removed, pinned, unpinned, moved to latest, or given an automatic updater.
 - Add a concise entry to a concrete versioned section in `CHANGELOG.md`.
+- Set `playbook_version` in `ansible/defaults.yml` to match that section's
+  version in the same change; the playbook version and the newest changelog
+  version must never drift apart.
 - Do not add changelog entries for documentation-only changes to `README.md`,
   `AGENTS.md`, or `docs/`.
 

@@ -55,7 +55,8 @@ play must have set `version_gate_run` in the same invocation first.
 
 The variables live in `ansible/defaults.yml`:
 
-- `playbook_version`: this playbook's version, bumped with each release.
+- `playbook_version`: this playbook's version, kept matched to the newest
+  `CHANGELOG.md` version in the change that adds that section.
   `release.sh` refuses to tag when it does not match the prompted version.
 - `min_previously_applied_version`: minimum previously applied version this
   playbook requires. When a release removes a cleanup task, raise it to the

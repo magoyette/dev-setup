@@ -14,6 +14,18 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.4] - 2026-10-25
+
+### Added
+
+- OpenCode now pre-approves `ast-grep` and `uniq` commands.
+
+### Changed
+
+- Keep `playbook_version` in `ansible/defaults.yml` matched to the newest
+  `CHANGELOG.md` version in the same change that adds the changelog section,
+  instead of setting it during the release process.
+
 ## [13.1.3] - 2026-10-24
 
 ### Added

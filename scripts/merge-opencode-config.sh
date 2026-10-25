@@ -65,6 +65,7 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
       },
       "bash": {
         "*": "ask",
+        "ast-grep *": "allow",
         "awk *": "allow",
         "cat *": "allow",
         "cd *": "allow",
@@ -114,6 +115,7 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
         "sort *": "allow",
         "tail *": "allow",
         "tokei *": "allow",
+        "uniq *": "allow",
         "wc *": "allow"
       },
       "webfetch": "ask",

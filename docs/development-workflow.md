@@ -38,6 +38,11 @@ The project uses Semantic Versioning and Keep a Changelog.
 | New tool or significant new behavior | Minor |
 | Bug fix or small configuration adjustment | Patch |
 
+Keep `playbook_version` in `ansible/defaults.yml` matched to the newest
+`CHANGELOG.md` version at all times: the change that adds a versioned changelog
+section sets `playbook_version` to that version, so the release step only
+verifies the match.
+
 Every user-facing changelog entry belongs under a concrete section formatted:
 
 ```text
@@ -55,7 +60,8 @@ Before running `./release.sh`:
 
 1. Ensure the appropriate versioned changelog section exists with today's
    date.
-2. Set `playbook_version` in `ansible/defaults.yml` to the release version and
+2. Verify `playbook_version` in `ansible/defaults.yml` already matches the
+   release version (it is kept in sync with the newest changelog section) and
    review `min_previously_applied_version` when cleanup tasks change; see
    [Playbook Version Tracking](provisioning-reference.md#playbook-version-tracking).
    `release.sh` refuses to tag when `playbook_version` does not match the

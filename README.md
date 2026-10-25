@@ -235,7 +235,8 @@ bundled skills and external skill directories.
 
 ## Releasing a new version
 
-Update `CHANGELOG.md` with the version to release, then commit.
+Add the new version section to `CHANGELOG.md` and set `playbook_version` in
+`ansible/defaults.yml` to that version in the same change, then commit.
 
 After the commit, run the release script from the repo root:
 
