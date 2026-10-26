@@ -14,6 +14,19 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.5] - 2026-10-25
+
+### Added
+
+- Document browser automation inside the sandboxed OpenCode profile: the
+  generated OpenCode global context now carries the verified launch recipes
+  for `agent-browser` (socket directory, Playwright Chromium executable,
+  `--no-sandbox`) and `playwright-cli` (bundled Chromium), the `~/.cache`
+  grant that enables them, the `--profile` context `nono why` needs to see
+  that grant, and the security posture of running Chromium without its
+  internal sandbox under Landlock. `docs/nono-sandbox.md` holds the full
+  canonical documentation.
+
 ## [13.1.4] - 2026-10-25
 
 ### Added

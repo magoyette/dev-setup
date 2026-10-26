@@ -299,7 +299,11 @@ sessions launched outside the dev-setup repository. See
 
 Use agent-browser for generic browser automation. Use Playwright when explicitly
 requested or when Playwright-specific features such as cross-browser testing,
-request routing, tracing, or storage state are required.
+request routing, tracing, or storage state are required. Both run inside the
+sandboxed OpenCode profile with the launch recipes that the generated OpenCode
+context summarizes and that
+[nono.sh sandbox](nono-sandbox.md#browser-automation-inside-the-sandbox)
+documents in full.
 
 Use `nono-sandbox-review` to document the nono.sh sandbox's impact on a
 session: the operations it denied, why each was attempted, and the

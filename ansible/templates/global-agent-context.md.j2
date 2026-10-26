@@ -77,7 +77,9 @@ inside the current repository is unaffected.
 - Read/write: OpenCode state (`~/.opencode`, `~/.config/opencode`,
   `~/.local/share/opencode`, `~/.local/state/opencode`), Hunk state
   (`~/.config/hunk`, `~/.local/state/hunk`), `~/.crit` (Crit review data and
-  session locks), `$XDG_RUNTIME_DIR/hunk-mcp`, and `$TMPDIR`.
+  session locks), `~/.cache` (user caches, including the Playwright browser
+  builds and daemon state under `ms-playwright`), `$XDG_RUNTIME_DIR/hunk-mcp`,
+  and `$TMPDIR`.
 - Read-only: the shared skill directories, the managed Hunk install
   (`~/.local/opt/hunk`), the Bun runtime (`~/.bun`), `~/.gitconfig`,
   `~/.config/git`, `/etc/gitconfig`, `~/.config/dev-setup`,
@@ -95,6 +97,31 @@ inside the current repository is unaffected.
   `--no-open`, and relay the printed review URL: the `crit` wrapper performs a
   daily upgrade check that writes outside the sandbox, so it stays ungranted.
 - Network access is not restricted by the sandbox.
+
+### Browser automation
+
+- System Chrome under `/opt/google/chrome` is denied; run the
+  Playwright-managed Chromium builds under `~/.cache/ms-playwright` instead.
+- `agent-browser` needs `AGENT_BROWSER_SOCKET_DIR="$TMPDIR/agent-browser"`
+  on every invocation — its default socket directory under
+  `$XDG_RUNTIME_DIR` is denied — plus `--executable-path` on a
+  `~/.cache/ms-playwright/chromium-*/chrome-linux64/chrome` build and
+  `--args "--no-sandbox"` when the daemon starts.
+- `playwright-cli` needs only `open --browser=chromium`: its daemon and
+  browser builds live under `~/.cache`, browser profiles under `$TMPDIR`,
+  and it disables Chromium's sandbox by default. Install missing browser
+  builds through the `playwright-core` registry CLI embedded in the
+  `@playwright/cli` package (`node .../node_modules/playwright-core/cli.js
+  install chromium`); the `install-browser` subcommand is broken in the
+  installed 1.59 alpha. It writes `.playwright-cli/` snapshot and console
+  artifacts into the working directory, so clean or gitignore them in Git
+  repositories.
+- Both tools run Chromium without its internal sandbox, so the nono profile
+  is the containment boundary: prefer known URLs, keep sessions short-lived,
+  and never save browser auth state to disk.
+- `nono why` needs the `--profile opencode` context to see these grants:
+  without a capability context it reports every user path, including the
+  `user_caches_linux`-granted `~/.cache`, as not granted.
 
 ### Limitations
 

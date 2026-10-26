@@ -71,6 +71,14 @@ ANSIBLE_HOME="$TMPDIR/ansible-home" \
   ansible-lint --offline ansible/
 ```
 
+The profile includes nono's built-in `user_caches_linux` group, which grants
+read/write access to the user cache directory (`~/.cache`): the
+Playwright-managed Chromium builds under `~/.cache/ms-playwright` are the
+only locally executable Chrome binaries — the system Chrome under
+`/opt/google/chrome` is denied — and the Playwright CLI daemon keeps its
+session state under `~/.cache/ms-playwright/daemon`. See
+[Browser Automation Inside The Sandbox](#browser-automation-inside-the-sandbox).
+
 The `dev-setup-ai-assistant-sandbox` launcher sources
 `~/.config/dev-setup/ai-assistant-sandbox.env`, creates a private
 `/tmp/dev-setup-ai.*` directory with `mktemp -d` and exports it as `TMPDIR`,
@@ -133,6 +141,15 @@ nono why --profile opencode --path "$HOME/.emacs.d/README.md" --op read
 Because the profile grants its own source directory read-only, this also works
 inside sandboxed OpenCode sessions: agents can confirm a denial with its policy
 reason instead of inferring the cause from error signatures.
+
+One caveat on that verification: `nono why` evaluates a path only against a
+selected capability context, so the `--profile opencode` flag in the example
+above is required. Without it, every user path — including the
+`user_caches_linux`-granted `~/.cache` — reports as `path_not_granted`, which
+looks like a sandbox denial but is only a missing context. `nono run
+--dry-run -v` (group paths appear with a `[group:...]` annotation) and the
+applied capability list in `$NONO_CAP_FILE` inside a running session remain
+the ground truth for what a launch actually grants.
 
 `nono run --dry-run` prints the fully resolved capability set and accepts the
 same flags as a real run, which makes it the quickest way to preview a grant:
@@ -266,6 +283,81 @@ work normally. Fetching private repositories and pushing fail with an
 authentication error inside the sandbox. Commit inside the sandbox and run
 authenticated Git operations from an ordinary shell. Do not widen the
 profile to expose the gh token or `~/.ssh` to the sandbox.
+
+## Browser Automation Inside The Sandbox
+
+`agent-browser` and `playwright-cli` run inside sandboxed OpenCode sessions,
+with two environment constraints to work around:
+
+- the system Chrome binary under `/opt/google/chrome` is denied, so both
+  tools launch a Playwright-managed Chromium build from
+  `~/.cache/ms-playwright` instead;
+- Chrome's own Linux sandbox cannot start under the nono profile — the
+  zygote aborts with `No usable sandbox!` — so the browser process tree runs
+  without Chromium's internal sandbox.
+
+Both tools therefore run with the nono profile as the only containment
+boundary. The residual exposure of a compromised renderer is the granted
+paths (including the working directory and OpenCode state) plus unrestricted
+network access, so prefer known URLs, keep sessions short-lived, and never
+save browser auth state to disk; `AGENT_BROWSER_ALLOWED_DOMAINS` restricts
+agent-browser navigation to trusted domains as an extra mitigation.
+
+### agent-browser
+
+`agent-browser` needs three workarounds:
+
+- set `AGENT_BROWSER_SOCKET_DIR="$TMPDIR/agent-browser"` on every invocation,
+  because the daemon's default socket directory under `$XDG_RUNTIME_DIR` is
+  not granted;
+- select a locally executable build with `--executable-path` (any
+  `chromium-*/chrome-linux64/chrome` under `~/.cache/ms-playwright` works;
+  the `chromium_headless_shell-*` builds do not);
+- pass `--args "--no-sandbox"` when the daemon starts.
+
+```bash
+AGENT_BROWSER_SOCKET_DIR="$TMPDIR/agent-browser" agent-browser \
+  --executable-path \
+  "$HOME/.cache/ms-playwright/chromium-<rev>/chrome-linux64/chrome" \
+  --args "--no-sandbox" \
+  open https://example.com
+```
+
+The socket-directory variable must be exported for every later command,
+including `close`; `--executable-path` and `--args` apply only when the
+daemon starts.
+
+### playwright-cli
+
+`playwright-cli` runs with a single flag and no other workarounds:
+
+```bash
+playwright-cli open --browser=chromium https://example.com
+```
+
+Playwright disables Chromium's sandbox by default (`--no-sandbox` and
+`--no-zygote-sandbox` are part of its default launch arguments), its daemon
+state lives under the granted `~/.cache/ms-playwright/daemon`, and browser
+profiles are created under `$TMPDIR`.
+
+Browser builds are revision-pinned per Playwright version, and the globally
+installed `playwright` package and `@playwright/cli` can expect different
+revisions. When `open --browser=chromium` reports a missing browser, install
+the CLI's expected build through the registry embedded in its package:
+
+```bash
+node "<npm global root>/@playwright/cli/node_modules/playwright-core/cli.js" \
+  install chromium
+```
+
+The `install-browser` subcommand is broken in the installed 1.59 alpha: it
+prints the `Browser "chromium" is not installed` error instead of installing.
+The download relies on the writable `~/.cache` grant and unrestricted network
+access, both provided by the profile.
+
+`playwright-cli` writes snapshot and console artifacts to a
+`.playwright-cli/` directory in the working directory; clean them up or add
+the directory to `.gitignore` in Git repositories.
 
 ## WSL2 Limitations
 
