@@ -25,7 +25,7 @@ Many Socket commands can run only after authentication. Log in manually:
 socket login
 ```
 
-Socket can also read an API token from `SOCKET_SECURITY_API_TOKEN` for commands
+Socket can also read an API token from `SOCKET_CLI_API_TOKEN` for commands
 where an environment-based token is preferable.
 
 ## Project scans

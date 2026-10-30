@@ -14,6 +14,29 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.7] - 2026-10-29
+
+### Added
+
+- OpenCode now pre-approves `exit 1`, `git ls-files` and
+  `git -C <dir> ls-files`, `nono profile show`, and `readlink` commands, so
+  sandbox inspection and repository checks run without a permission prompt.
+
+### Changed
+
+- Document the tool-specific limits of the sandboxed OpenCode profile: `fnm`
+  and `bun` deny install operations, `pipx` and `python -m venv` cannot create
+  environments, `uv tool install` needs its directories redirected into
+  `$TMPDIR`, and `socket` authenticates through `SOCKET_CLI_API_TOKEN`. The
+  generated OpenCode global context carries the short form;
+  `docs/nono-sandbox.md` holds the full detail.
+
+### Fixed
+
+- Correct the Socket API token environment variable in `docs/socket.md` to
+  `SOCKET_CLI_API_TOKEN`, the current name the installed CLI reads; the
+  previous name remains a legacy fallback.
+
 ## [13.1.6] - 2026-10-29
 
 ### Added

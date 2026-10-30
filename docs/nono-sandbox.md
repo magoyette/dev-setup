@@ -158,6 +158,78 @@ same flags as a real run, which makes it the quickest way to preview a grant:
 nono run --profile opencode --read-file "$HOME/.emacs.d/README.md" --dry-run -- true
 ```
 
+## Tool-Specific Limits
+
+The grants cover executing the managed toolchain, not every operation each
+tool can perform. The limits below were verified inside a sandboxed OpenCode
+session; `nono why --profile opencode --path <path>` confirms each denial.
+
+### Node toolchain
+
+`fnm` is read-only. The built-in `node_runtime` group grants
+`$HOME/.local/share/fnm` and the Node installations read-only, so `fnm list`,
+`fnm current`, and `fnm exec --using=<version> -- <command>` work, while
+`fnm install` and `fnm alias` fail: `install` panics when it cannot create a
+download directory under `~/.local/share/fnm/node-versions/.downloads`, and
+`alias` reports `Permission denied (os error 13)`. Install Node versions from
+an ordinary shell.
+
+`bun` follows the same pattern: executing scripts works, but `bun install` and
+`bun add` fail with `unable to write files to tempdir: EACCES` because the
+package cache under `~/.bun` is read-only. Redirect the cache into the private
+temporary directory:
+
+```bash
+BUN_INSTALL_CACHE_DIR="$TMPDIR/bun-cache" bun install
+```
+
+`yaml`, `socket`, and the other globally installed npm packages live in the
+fnm-managed Node installation, so they are only on PATH in fnm-integrated
+shells.
+
+### Python tooling
+
+`pipx` does not work with its default directories: startup fails with
+`PermissionError` on `~/.local/share/pipx/venvs`, which is not granted.
+Redirecting `PIPX_HOME` and `PIPX_BIN_DIR` into `$TMPDIR` moves the failure to
+`pipx install`, which creates its shared environment with `python -m venv`;
+ensurepip runs pip, and pip reads `/etc/debian_version`, a path the sandbox
+denies. `python -m venv` fails for the same reason in any sandboxed session.
+
+`uv` replaces both paths:
+
+```bash
+uv venv .venv                  # project environment
+uv venv --seed .venv           # same, with pip installed
+uv pip install <package>       # into the active environment
+```
+
+`uv tool install` works for persistent CLI tools, but its default directories
+are read-only. Point them at the private temporary directory:
+
+```bash
+UV_TOOL_DIR="$TMPDIR/uv-tools" UV_TOOL_BIN_DIR="$TMPDIR/uv-bin" \
+  uv tool install <package>
+```
+
+Tools installed that way disappear with the session's `$TMPDIR`; install
+persistent tools from an ordinary shell.
+
+### Socket
+
+The `socket` CLI runs, but it needs an API token. `SOCKET_CLI_API_TOKEN`
+supplies it without writing configuration:
+
+```bash
+SOCKET_CLI_API_TOKEN=... socket package score npm <package>
+```
+
+### Interactive tools
+
+`fzf` works non-interactively (`--filter`) but its interactive picker needs a
+terminal. That is a TTY constraint, not a sandbox denial: run it from an
+ordinary shell or a terminal-backed session.
+
 ## One-Off Grants For A Single Execution
 
 All three methods leave managed state untouched and apply only to that

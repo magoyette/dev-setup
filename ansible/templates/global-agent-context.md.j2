@@ -98,6 +98,22 @@ inside the current repository is unaffected.
   daily upgrade check that writes outside the sandbox, so it stays ungranted.
 - Network access is not restricted by the sandbox.
 
+### Tool-specific limits
+
+- `fnm` is read-only: `fnm install` and `fnm alias` fail. Use the installed
+  versions through `fnm list` and `fnm exec --using=<version> -- <command>`.
+- `bun install` and `bun add` fail because `~/.bun` is read-only; redirect the
+  cache with `BUN_INSTALL_CACHE_DIR="$TMPDIR/bun-cache"`.
+- `pipx` does not work in the sandbox, and neither does `python -m venv`. Use
+  `uv venv` for project environments and `uv tool install` for CLI tools.
+- `uv tool install` needs `UV_TOOL_DIR="$TMPDIR/uv-tools"` and
+  `UV_TOOL_BIN_DIR="$TMPDIR/uv-bin"`, because `~/.local/share/uv` and
+  `~/.local/bin` are read-only.
+- Authenticate the `socket` CLI with the `SOCKET_CLI_API_TOKEN` environment
+  variable.
+- `yaml` and `socket` come from the fnm-managed Node runtime, so they are only
+  on PATH in fnm-integrated shells.
+
 ### Browser automation
 
 - System Chrome under `/opt/google/chrome` is denied; run the
