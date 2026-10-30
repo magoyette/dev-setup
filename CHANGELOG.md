@@ -14,6 +14,14 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.6] - 2026-10-29
+
+### Added
+
+- OpenCode now pre-approves the repository's Ansible syntax-check commands,
+  `ansible-playbook ansible/playbook.yml --syntax-check` with and without a
+  `2>&1` redirect, so validation runs without a permission prompt.
+
 ## [13.1.5] - 2026-10-25
 
 ### Added

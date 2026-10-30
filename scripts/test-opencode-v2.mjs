@@ -66,6 +66,8 @@ test("V2 merge preserves unrelated config and plugin order, reconciles MCPs, and
     assert.equal(config.mcp.servers.native.command[0], "native-server");
     assert.equal(config.mcp.timeout.execution, 1234);
     assert.ok(config.permissions.some((p) => p.action === "shell" && p.resource === "git push *" && p.effect === "deny"));
+    assert.ok(config.permissions.some((p) => p.action === "shell" && p.resource === "ansible-playbook ansible/playbook.yml --syntax-check" && p.effect === "allow"));
+    assert.ok(config.permissions.some((p) => p.action === "shell" && p.resource === "ansible-playbook ansible/playbook.yml --syntax-check 2>&1" && p.effect === "allow"));
     assert.deepEqual(config.permissions.filter((p) => p.action === "read").map((p) => p.effect), ["allow", "deny", "deny", "allow"]);
     assert.equal(merge().status, 0);
     env.AI_ASSISTANTS_MCPS = "[]";

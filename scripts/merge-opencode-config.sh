@@ -65,6 +65,8 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
       },
       "bash": {
         "*": "ask",
+        "ansible-playbook ansible/playbook.yml --syntax-check": "allow",
+        "ansible-playbook ansible/playbook.yml --syntax-check 2>&1": "allow",
         "ast-grep *": "allow",
         "awk *": "allow",
         "cat *": "allow",
