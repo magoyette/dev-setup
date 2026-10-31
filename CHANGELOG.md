@@ -14,6 +14,12 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.8] - 2026-10-31
+
+### Added
+
+- OpenCode now pre-approves `diff` and `stat` commands.
+
 ## [13.1.7] - 2026-10-29
 
 ### Added
