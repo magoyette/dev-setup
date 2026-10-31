@@ -278,7 +278,9 @@ The tradeoff: `NONO_ALLOW` grants read and write access to the whole directory
 (recursive), and there is no environment variable for the read-only flags.
 Use it for quick throwaway sessions where read/write on one directory is
 acceptable; use direct invocation with `--read` or `--read-file` when the
-grant must stay read-only.
+grant must stay read-only. The grant lives in the environment of that launch
+and its child processes, so it disappears when the session exits and never
+touches the managed profile.
 
 ### Overlay Profile
 

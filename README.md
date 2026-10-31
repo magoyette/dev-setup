@@ -138,6 +138,23 @@ Run the bootstrap script:
 
 This installs Ansible via apt, then runs the Ansible playbook. The playbook is idempotent (safe to re-run after changes). Re-running it should normally report no changes unless a managed setting or pinned version/checksum actually differs.
 
+## Sandboxed OpenCode sessions
+
+OpenCode runs inside the managed `nono.sh` profile, which grants only the paths
+listed in `nono/.config/nono/profiles/opencode.jsonc`. To give a single session
+access to another directory, set `NONO_ALLOW` when launching it:
+
+```sh
+NONO_ALLOW="$HOME/.emacs.d" opencode
+```
+
+`nono` reads `NONO_ALLOW` itself, so the grant passes through the managed
+launcher and applies to that session only. It grants read and write access
+recursively, and there is no environment variable for a read-only grant: invoke
+`nono run` directly with `--read` or `--read-file` when the grant must stay
+read-only. See [nono sandbox](docs/nono-sandbox.md) for the direct invocation
+and overlay profile alternatives.
+
 ## Useful commands
 
 ```sh
@@ -166,6 +183,7 @@ Reference documents:
 
 - [Provisioning reference](docs/provisioning-reference.md)
 - [Agent integrations](docs/agent-integrations.md)
+- [nono sandbox](docs/nono-sandbox.md)
 - [Development workflow](docs/development-workflow.md)
 - [Software update strategies](docs/software-update-strategies.md)
 - [Socket CLI usage](docs/socket.md)
