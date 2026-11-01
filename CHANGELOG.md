@@ -14,6 +14,19 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.9] - 2026-11-01
+
+### Added
+
+- OpenCode now pre-approves `cut` commands.
+
+### Changed
+
+- Document the sandboxed OpenCode limitations for npm/npx cache writes, the
+  global `~/.agents` skill lock, and shell history. The generated OpenCode
+  global context carries the short form; `docs/nono-sandbox.md` holds the full
+  detail.
+
 ## [13.1.8] - 2026-10-31
 
 ### Added

@@ -72,6 +72,7 @@ jq --argjson catalog "$mcp_catalog" --argjson enabled "$enabled_mcps" '
         "cat *": "allow",
         "cd *": "allow",
         "command *": "allow",
+        "cut *": "allow",
         "diff *": "allow",
         "du *": "allow",
         "echo *": "allow",

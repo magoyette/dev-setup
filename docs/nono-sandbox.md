@@ -183,6 +183,19 @@ temporary directory:
 BUN_INSTALL_CACHE_DIR="$TMPDIR/bun-cache" bun install
 ```
 
+`npm` and `npx` follow the same pattern: the `node_runtime` group grants
+`~/.npm` read-only, so a command that writes the cache fails with `EACCES`
+under `~/.npm/_cacache/tmp`. npm's "root-owned files" message is misleading;
+the sandbox is the cause. Redirect the cache:
+
+```bash
+npm_config_cache="$TMPDIR/npm-cache" npx --yes skills@latest list
+```
+
+The redirect covers `_cacache`, `_logs`, and `_npx`. `_npx` matters for `npx`:
+it installs the package tree there and later reuses it without re-verifying
+file contents, which is why `~/.npm` stays read-only.
+
 `yaml`, `socket`, and the other globally installed npm packages live in the
 fnm-managed Node installation, so they are only on PATH in fnm-integrated
 shells.
@@ -229,6 +242,24 @@ SOCKET_CLI_API_TOKEN=... socket package score npm <package>
 `fzf` works non-interactively (`--filter`) but its interactive picker needs a
 terminal. That is a TTY constraint, not a sandbox denial: run it from an
 ordinary shell or a terminal-backed session.
+
+### Agent state and shell history
+
+The profile grants `~/.agents/skills` read-only but not its parent directory.
+`ls ~/.agents` and reads of `~/.agents/.skill-lock.json` are denied, so a
+sandboxed session cannot inspect the global skill lock directly. The project
+`skills-lock.json` and the `.agents/skills` / `.claude/skills` symlink layout
+are the sandbox-visible evidence of project-scope installs. The `skills` CLI
+also swallows the lock-file read error and falls back to an empty lock, so a
+sandboxed `skills list -g` can mislabel global skills as local; run the check
+outside the sandbox when global scope matters.
+
+Shell history files (`~/.bash_history`, `~/.zsh_history`) are denied by the
+required `deny_shell_history` group inherited from the built-in `default`
+profile. The group cannot be excluded (`nono profile validate` rejects it);
+only `--bypass-protection <PATH>` paired with an explicit grant overrides it,
+which is not recommended because history routinely contains credentials. Use
+repository artifacts or an ordinary shell instead.
 
 ## One-Off Grants For A Single Execution
 

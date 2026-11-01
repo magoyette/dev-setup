@@ -89,7 +89,8 @@ inside the current repository is unaffected.
   CLI commands and never launch the interactive TUI (`hunk diff` or
   `hunk show`).
 - `bun` and `npm` run read-only: package installs that write under
-  `~/.bun/install` or `~/.npm` are denied.
+  `~/.bun/install` or `~/.npm` are denied. See Tool-specific limits for the
+  cache redirects.
 - `$TMPDIR` is a private `/tmp/dev-setup-ai.*` directory; the rest of `/tmp` is
   denied. Write temporary files under `$TMPDIR`, never hardcoded `/tmp` paths,
   and never grant all of `/tmp` to work around it.
@@ -104,6 +105,9 @@ inside the current repository is unaffected.
   versions through `fnm list` and `fnm exec --using=<version> -- <command>`.
 - `bun install` and `bun add` fail because `~/.bun` is read-only; redirect the
   cache with `BUN_INSTALL_CACHE_DIR="$TMPDIR/bun-cache"`.
+- `npm` and `npx` fail when they write to `~/.npm`; redirect the cache with
+  `npm_config_cache="$TMPDIR/npm-cache"`. The redirect covers the package
+  cache, logs, and the `npx` install tree.
 - `pipx` does not work in the sandbox, and neither does `python -m venv`. Use
   `uv venv` for project environments and `uv tool install` for CLI tools.
 - `uv tool install` needs `UV_TOOL_DIR="$TMPDIR/uv-tools"` and
@@ -113,6 +117,16 @@ inside the current repository is unaffected.
   variable.
 - `yaml` and `socket` come from the fnm-managed Node runtime, so they are only
   on PATH in fnm-integrated shells.
+
+### Sandbox state limits
+
+- `~/.agents` is not listable and `~/.agents/.skill-lock.json` is not
+  readable; only `~/.agents/skills` is granted. Use the project
+  `skills-lock.json` and symlink layout to determine install scope, or run the
+  check outside the sandbox.
+- Shell history files (`~/.bash_history`, `~/.zsh_history`) are denied by the
+  required shell-history group. Do not try to read them; use repository
+  artifacts or an ordinary shell.
 
 ### Browser automation
 
