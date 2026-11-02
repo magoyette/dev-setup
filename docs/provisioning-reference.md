@@ -169,6 +169,9 @@ Shell entries are managed by the task file for the owning tool, usually with
 Important ordering and environment constraints:
 
 - `~/.local/bin` must be available in non-interactive shells.
+- Astro telemetry is disabled with `ASTRO_TELEMETRY_DISABLED=1` in both
+  `~/.bashrc` and `~/.profile`, so Astro commands skip the telemetry config
+  write to `~/.config/astro` that the sandbox denies.
 - pyenv initialization is managed in both `~/.bashrc` and `~/.profile` so the
   Python runtime works in interactive and login shells.
 - Startup rehashing is disabled for pyenv.

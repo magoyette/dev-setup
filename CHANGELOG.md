@@ -14,6 +14,14 @@ URL template:
 https://github.com/magoyette/dev-setup/compare/vOLD_VERSION...vNEW_VERSION
 ```
 
+## [13.1.10] - 2026-11-01
+
+### Fixed
+
+- Disable Astro telemetry with `ASTRO_TELEMETRY_DISABLED=1` in `~/.bashrc` and
+  `~/.profile`, so Astro commands no longer fail when the sandbox denies the
+  telemetry config write to `~/.config/astro`.
+
 ## [13.1.9] - 2026-11-01
 
 ### Added

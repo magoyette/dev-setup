@@ -67,6 +67,22 @@
     state: present
   when: (shell_editor | default('') | trim | length) > 0
 
+- name: Disable Astro telemetry in bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    regexp: "^export ASTRO_TELEMETRY_DISABLED="
+    line: "export ASTRO_TELEMETRY_DISABLED=1"
+    state: present
+
+- name: Disable Astro telemetry in profile
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.profile"
+    create: true
+    regexp: "^export ASTRO_TELEMETRY_DISABLED="
+    line: "export ASTRO_TELEMETRY_DISABLED=1"
+    insertafter: EOF
+    state: present
+
 - name: Add zoxide init to bashrc
   ansible.builtin.lineinfile:
     path: "{{ ansible_env.HOME }}/.bashrc"
